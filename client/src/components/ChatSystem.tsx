@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Send } from 'lucide-react';
 
 interface ChatMessage {
   id: string;
@@ -9,6 +8,7 @@ interface ChatMessage {
 }
 
 export default function ChatSystem() {
+  const [activeChannel, setActiveChannel] = useState('main');
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
@@ -19,7 +19,14 @@ export default function ChatSystem() {
   ]);
   const [inputText, setInputText] = useState('');
 
-  const handleSendMessage = () => {
+  const channels = [
+    { id: 'main', label: 'Main' },
+    { id: 'sales', label: 'Sales' },
+    { id: 'clan', label: 'Clan' }
+  ];
+
+  const handleSendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
     if (inputText.trim()) {
       const newMessage: ChatMessage = {
         id: Date.now().toString(),
@@ -44,23 +51,37 @@ export default function ChatSystem() {
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
-
   return (
-    <div className="glass-panel rounded-lg p-3 flex-shrink-0">
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="font-orbitron text-sm text-orange-400">Game Chat</h3>
-        <div className="text-xs text-gray-400">
-          {messages.length} messages
-        </div>
+    <div id="footer-chat-container" className="glass-panel w-full p-2 rounded-lg flex flex-col">
+      <div className="flex-shrink-0 flex flex-wrap gap-1 mb-2">
+        {channels.map((channel) => (
+          <button 
+            key={channel.id}
+            data-channel={channel.id}
+            className={`footer-tab-button glass-button text-xs px-3 py-1 rounded-md flex-grow ${
+              activeChannel === channel.id ? 'active' : ''
+            }`}
+            onClick={() => setActiveChannel(channel.id)}
+          >
+            {channel.label}
+          </button>
+        ))}
+        <button 
+          id="open-chat-modal-btn" 
+          className="glass-button text-xs px-2 py-1 rounded-md" 
+          title="Open Full Chat"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 0h-4m4 0l-5-5"></path>
+          </svg>
+        </button>
       </div>
       
-      <div className="h-20 overflow-y-auto custom-scrollbar mb-2 space-y-1">
+      <div 
+        id="footer-chat-content-wrapper" 
+        className="text-xs space-y-1 overflow-y-auto custom-scrollbar flex-grow" 
+        style={{ height: '70px' }}
+      >
         {messages.map((message) => (
           <div key={message.id} className={`text-xs p-2 rounded ${
             message.sender === 'user' 
@@ -75,22 +96,24 @@ export default function ChatSystem() {
         ))}
       </div>
       
-      <div className="flex gap-2">
-        <input
-          type="text"
+      <form id="footer-message-form" className="flex-shrink-0 flex gap-2 mt-2" onSubmit={handleSendMessage}>
+        <input 
+          type="text" 
+          id="footer-message-input" 
+          className="footer-chat-input flex-grow w-full px-2 py-1 text-xs rounded-md" 
+          placeholder="Type a message..." 
+          autoComplete="off"
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
-          onKeyPress={handleKeyPress}
-          placeholder="Type a message..."
-          className="flex-1 px-2 py-1 text-sm bg-black/50 border border-orange-500/30 rounded text-white placeholder-gray-500 focus:outline-none focus:border-orange-500"
         />
-        <button
-          onClick={handleSendMessage}
-          className="glass-button px-2 py-1 rounded text-orange-400 hover:text-orange-300"
+        <button 
+          type="submit" 
+          id="footer-send-button" 
+          className="glass-button text-xs px-3 py-1 rounded-md"
         >
-          <Send className="w-4 h-4" />
+          Send
         </button>
-      </div>
+      </form>
     </div>
   );
 }
