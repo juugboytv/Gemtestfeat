@@ -129,6 +129,64 @@ export const zoneProgress = pgTable('zone_progress', {
   lastVisit: timestamp('last_visit'),
 });
 
+// Gems table - comprehensive gem system with grades T1-T9
+export const gems = pgTable('gems', {
+  id: serial('id').primaryKey(),
+  characterId: integer('character_id').notNull().references(() => characters.id, { onDelete: 'cascade' }),
+  
+  // Gem identification
+  gemType: text('gem_type').notNull(), // warstone, warheart, etc.
+  grade: integer('grade').notNull(), // 1-9 (T1-T9)
+  category: text('category').notNull(), // Fighter, Caster, Utility, Farming
+  
+  // Stats based on gem type and grade
+  statBonus: integer('stat_bonus').notNull(), // Primary stat bonus
+  secondaryBonus: integer('secondary_bonus').default(0), // Secondary effect if any
+  
+  // Special properties
+  enchantments: jsonb('enchantments'), // Special gem effects
+  isSocketed: boolean('is_socketed').default(false),
+  socketedItemId: integer('socketed_item_id'), // Reference to item it's socketed in
+  
+  // Economy
+  value: integer('value').notNull(),
+  inBank: boolean('in_bank').default(false),
+  
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
+// Shadow items table - procedural gear with tiers T1-T20
+export const shadowItems = pgTable('shadow_items', {
+  id: serial('id').primaryKey(),
+  characterId: integer('character_id').notNull().references(() => characters.id, { onDelete: 'cascade' }),
+  
+  // Shadow item identification
+  baseItemName: text('base_item_name').notNull(), // Base item type
+  shadowTier: integer('shadow_tier').notNull(), // 1-20 (T1-T20)
+  quality: text('quality').notNull(), // normal, enhanced, superior, legendary
+  
+  // Procedural stats
+  weaponClass: integer('weapon_class').default(0),
+  spellClass: integer('spell_class').default(0),
+  armorClass: integer('armor_class').default(0),
+  
+  // Special properties
+  enchantments: jsonb('enchantments'), // Procedural enchantments
+  sockets: integer('sockets').default(0), // Number of gem sockets
+  socketedGems: jsonb('socketed_gems'), // Array of socketed gem IDs
+  
+  // Equipment properties
+  equipRequirements: jsonb('equip_requirements'), // Level and stat requirements
+  isEquipped: boolean('is_equipped').default(false),
+  equipSlot: text('equip_slot'), // weapon, armor, shield, etc.
+  
+  // Economy
+  value: integer('value').notNull(),
+  inBank: boolean('in_bank').default(false),
+  
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
 // Game configuration and balancing data
 export const gameConfig = pgTable('game_config', {
   id: serial('id').primaryKey(),
@@ -174,6 +232,20 @@ export const zoneProgressRelations = relations(zoneProgress, ({ one }) => ({
   }),
 }));
 
+export const gemsRelations = relations(gems, ({ one }) => ({
+  character: one(characters, {
+    fields: [gems.characterId],
+    references: [characters.id],
+  }),
+}));
+
+export const shadowItemsRelations = relations(shadowItems, ({ one }) => ({
+  character: one(characters, {
+    fields: [shadowItems.characterId],
+    references: [characters.id],
+  }),
+}));
+
 // Zod schemas for validation
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -207,6 +279,16 @@ export const insertGameConfigSchema = createInsertSchema(gameConfig).omit({
   updatedAt: true,
 });
 
+export const insertGemSchema = createInsertSchema(gems).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertShadowItemSchema = createInsertSchema(shadowItems).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Type exports
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -220,3 +302,7 @@ export type ZoneProgress = typeof zoneProgress.$inferSelect;
 export type InsertZoneProgress = z.infer<typeof insertZoneProgressSchema>;
 export type GameConfig = typeof gameConfig.$inferSelect;
 export type InsertGameConfig = z.infer<typeof insertGameConfigSchema>;
+export type Gem = typeof gems.$inferSelect;
+export type InsertGem = z.infer<typeof insertGemSchema>;
+export type ShadowItem = typeof shadowItems.$inferSelect;
+export type InsertShadowItem = z.infer<typeof insertShadowItemSchema>;
