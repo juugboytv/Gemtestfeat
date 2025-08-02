@@ -129,8 +129,34 @@ export default function GeminusGame() {
       "Ring": null,
       "Spell 2": null
     },
-    inventory: [],
-    gemPouch: [],
+    inventory: [
+      {
+        instanceId: "armor_001",
+        name: "Steel Chestplate", 
+        type: "Armor",
+        imageUrl: "https://placehold.co/48x48/1f2937/f97316?text=A",
+        baseItemId: "steel_armor",
+        socketedGems: [],
+        sockets: 2
+      },
+      {
+        instanceId: "boots_001",
+        name: "Iron Boots",
+        type: "Boots", 
+        imageUrl: "https://placehold.co/48x48/1f2937/f97316?text=B",
+        baseItemId: "iron_boots",
+        socketedGems: [
+          { id: "ruby", grade: 1, abbreviation: "R" }
+        ],
+        sockets: 1
+      }
+    ],
+    gemPouch: [
+      { id: "ruby", grade: 1, abbreviation: "R" },
+      { id: "sapphire", grade: 2, abbreviation: "S" },
+      { id: "emerald", grade: 1, abbreviation: "E" },
+      { id: "diamond", grade: 3, abbreviation: "D" }
+    ],
     zones: {
       "1": { name: "Crystal Caves (Dwarf)", levelReq: 1, biome: "mountain", gearTier: 1 },
       "2": { name: "Glimmerwood (Elf)", levelReq: 1, biome: "forest", gearTier: 1 },
@@ -154,6 +180,8 @@ export default function GeminusGame() {
   const [statInfoModal, setStatInfoModal] = useState({ open: false, stat: "", info: "" });
   const [itemActionModal, setItemActionModal] = useState({ open: false, item: null });
   const [equipmentView, setEquipmentView] = useState("equipment"); // "equipment" or "socket"
+  const [selectedGemId, setSelectedGemId] = useState<string | null>(null);
+  const [socketingModal, setSocketingModal] = useState<{ open: boolean; item: GameItem | null }>({ open: false, item: null });
   
   // Equipment slot configuration from original
   const equipmentSlotConfig = [
@@ -169,6 +197,14 @@ export default function GeminusGame() {
     { name: 'Ring', type: 'Ring' },
     { name: 'Spell 2', type: 'Spellbook' }
   ];
+
+  // Inventory bags configuration from original
+  const inventoryBags = {
+    'Weapon Chest': ['Weapon'],
+    'Bag of Gear': ['Helmet', 'Armor', 'Leggings', 'Boots', 'Gauntlets'],
+    'Jewelry Box': ['Amulet', 'Ring'],
+    'Spell Satchel': ['Spellbook'],
+  };
 
   // Tab switching function
   const switchTab = (tabName: string) => {
@@ -452,66 +488,150 @@ export default function GeminusGame() {
                   {/* Infusion Tab */}
                   {gameState.currentTab === 'infusion' && (
                     <div className="h-full">
-                      <h2 className="font-orbitron text-xl mb-4 text-orange-400">Infusion Chamber</h2>
+                      <p className="text-xs text-center text-gray-400 mb-2">Select a gem, then tap an item to open the socketing panel.</p>
                       
-                      <div className="infusion-grid">
-                        <div className="infusion-panel">
-                          <div className="infusion-panel-title">Inventory</div>
-                          <div className="infusion-content-area">
-                            {gameState.inventory.length === 0 ? (
-                              <div className="text-center text-gray-400 py-8">No items available</div>
-                            ) : (
-                              gameState.inventory.map((item, index) => (
-                                <div key={index} className="infusion-item-entry">
-                                  <img src={item.imageUrl} alt={item.name} />
-                                  <div className="infusion-item-info">
-                                    <div className="item-name">{item.name}</div>
-                                    <div className="item-details">{item.type}</div>
-                                  </div>
-                                </div>
-                              ))
-                            )}
+                      {/* Sort & Filter Items */}
+                      <div className="stat-accordion-item open mb-2">
+                        <button className="stat-accordion-header">
+                          <h3 className="flex items-center">
+                            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4h13M3 8h9M3 12h9m-9 4h6"></path>
+                            </svg>
+                            Sort & Filter Items
+                          </h3>
+                          <svg className="accordion-arrow w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                          </svg>
+                        </button>
+                        <div className="stat-accordion-content !p-2">
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                            <div>
+                              <label className="text-xs text-gray-400">Category</label>
+                              <select className="editor-input !w-full !text-xs">
+                                <option value="All">All</option>
+                                <option value="Weapon Chest">Weapon Chest</option>
+                                <option value="Bag of Gear">Bag of Gear</option>
+                                <option value="Jewelry Box">Jewelry Box</option>
+                                <option value="Spell Satchel">Spell Satchel</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="text-xs text-gray-400">Sub-Type</label>
+                              <select className="editor-input !w-full !text-xs">
+                                <option value="All">All</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="text-xs text-gray-400">Tier</label>
+                              <select className="editor-input !w-full !text-xs">
+                                <option value="All">All Tiers</option>
+                                <option value="1">Tier 1</option>
+                                <option value="2">Tier 2</option>
+                                <option value="3">Tier 3</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="text-xs text-gray-400">Quality</label>
+                              <select className="editor-input !w-full !text-xs">
+                                <option value="All">All</option>
+                                <option value="Dropper">Dropper</option>
+                                <option value="Shadow">Shadow</option>
+                                <option value="Echo">Echo</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="text-xs text-gray-400">Socketed</label>
+                              <select className="editor-input !w-full !text-xs">
+                                <option value="All">All</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                              </select>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 mt-2 border-t border-gray-700 pt-2">
+                            <div>
+                              <label className="text-xs text-gray-400">Sort By</label>
+                              <select className="editor-input !w-full !text-xs">
+                                <option value="tier">Tier</option>
+                                <option value="name">Name</option>
+                                <option value="type">Type</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="text-xs text-gray-400">Order</label>
+                              <select className="editor-input !w-full !text-xs">
+                                <option value="desc">Descending</option>
+                                <option value="asc">Ascending</option>
+                              </select>
+                            </div>
                           </div>
                         </div>
+                      </div>
 
-                        <div className="infusion-panel">
-                          <div className="infusion-panel-title">Focused Item</div>
-                          <div className="infusion-content-area">
-                            {gameState.infusionState.selectedItem ? (
-                              <div className="focused-item-container">
-                                <img src={gameState.infusionState.selectedItem.imageUrl} alt={gameState.infusionState.selectedItem.name} />
-                                <div className="focused-item-details">
-                                  <div className="item-name">{gameState.infusionState.selectedItem.name}</div>
-                                  <div className="item-tier">{gameState.infusionState.selectedItem.type}</div>
-                                </div>
-                                <div className="sockets-container">
-                                  {Array.from({length: gameState.infusionState.selectedItem.sockets || 0}).map((_, i) => (
-                                    <div key={i} className="infusion-socket-slot">
-                                      <span className="text-gray-500 text-xs">○</span>
+                      {/* Item Bags */}
+                      {Object.entries(inventoryBags).map(([bagName, itemTypes]) => {
+                        const bagItems = gameState.inventory.filter(item => itemTypes.includes(item.type));
+                        return (
+                          <div key={bagName} className="stat-accordion-item mb-2" data-bag-container={bagName}>
+                            <button className="stat-accordion-header">
+                              <h3>{bagName} <span className="text-xs text-gray-500 font-sans">({bagItems.length})</span></h3>
+                              <svg className="accordion-arrow w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                              </svg>
+                            </button>
+                            <div className="stat-accordion-content !p-2">
+                              <div className="inventory-grid">
+                                {bagItems.map((item) => (
+                                  <div 
+                                    key={item.instanceId} 
+                                    className="inventory-slot" 
+                                    data-instance-id={item.instanceId}
+                                    onClick={() => setSocketingModal({ open: true, item })}
+                                  >
+                                    <div className="inventory-slot-content">
+                                      <img src={item.imageUrl} alt={item.name} className="w-12 h-12" />
+                                      <span className="item-label text-xs">T1</span>
+                                      {item.socketedGems && item.socketedGems.filter(g => g).length > 0 && (
+                                        <div className="gem-dot-container">
+                                          {item.socketedGems.filter(g => g).map((_, index) => (
+                                            <div key={index} className="gem-dot"></div>
+                                          ))}
+                                        </div>
+                                      )}
                                     </div>
-                                  ))}
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="text-center text-gray-400 py-8">Select an item to infuse</div>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="infusion-panel">
-                          <div className="infusion-panel-title">Gem Pouch</div>
-                          <div className="infusion-content-area">
-                            {gameState.gemPouch.length === 0 ? (
-                              <div className="text-center text-gray-400 py-8">No gems available</div>
-                            ) : (
-                              <div className="gem-pouch-grid">
-                                {gameState.gemPouch.map((gem, index) => (
-                                  <div key={index} className="gem-item">
-                                    <img src={gem.imageUrl} alt={gem.name} className="w-full h-full object-contain" />
                                   </div>
                                 ))}
                               </div>
-                            )}
+                            </div>
+                          </div>
+                        );
+                      })}
+
+                      {/* Gem Pouch */}
+                      <div className="stat-accordion-item open">
+                        <button className="stat-accordion-header">
+                          <h3>Gem Pouch <span className="text-xs text-gray-500 font-sans">({gameState.gemPouch.length})</span></h3>
+                          <svg className="accordion-arrow w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                          </svg>
+                        </button>
+                        <div className="stat-accordion-content !p-2">
+                          <div className="gem-pouch-grid">
+                            {gameState.gemPouch.map((gemInfo, index) => (
+                              <div 
+                                key={`${gemInfo.id}-${index}`}
+                                className={`gem-item ${selectedGemId === `${gemInfo.id}-${index}` ? 'selected' : ''}`}
+                                data-gem-id={`${gemInfo.id}-${index}`}
+                                onClick={() => setSelectedGemId(selectedGemId === `${gemInfo.id}-${index}` ? null : `${gemInfo.id}-${index}`)}
+                              >
+                                <img 
+                                  src={`https://placehold.co/40x40/1f2937/f97316?text=${gemInfo.abbreviation}`} 
+                                  className="w-10 h-10" 
+                                  alt={`${gemInfo.abbreviation} Grade ${gemInfo.grade}`}
+                                />
+                                <span className="item-label">{gemInfo.abbreviation}{gemInfo.grade}</span>
+                              </div>
+                            ))}
                           </div>
                         </div>
                       </div>
@@ -582,6 +702,92 @@ export default function GeminusGame() {
                   )}
 
                 </div>
+
+                {/* Socketing Modal */}
+                {socketingModal.open && socketingModal.item && (
+                  <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50" onClick={() => setSocketingModal({ open: false, item: null })}>
+                    <div className="glass-panel p-4 rounded-lg w-11/12 max-w-md" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex justify-between items-center mb-4">
+                        <h2 className="font-orbitron text-xl text-white">{socketingModal.item.name}</h2>
+                        <button 
+                          onClick={() => setSocketingModal({ open: false, item: null })}
+                          className="text-2xl leading-none transition-colors hover:text-orange-400"
+                        >
+                          &times;
+                        </button>
+                      </div>
+                      
+                      <div className="text-center mb-4">
+                        <div className="flex justify-center items-center gap-4 mt-2">
+                          {Array(socketingModal.item.sockets || 0).fill(0).map((_, index) => {
+                            const gemInfo = socketingModal.item?.socketedGems?.[index];
+                            return (
+                              <div 
+                                key={index}
+                                className={`infusion-socket-slot ${gemInfo ? 'has-gem' : ''}`}
+                                data-socket-index={index}
+                                onClick={() => {
+                                  // Handle socket click logic here
+                                  const updatedInventory = gameState.inventory.map(item => {
+                                    if (item.instanceId === socketingModal.item?.instanceId) {
+                                      const newItem = { ...item };
+                                      if (!newItem.socketedGems) newItem.socketedGems = [];
+                                      
+                                      if (gemInfo) {
+                                        // Remove gem
+                                        newItem.socketedGems[index] = undefined;
+                                        setGameState(prev => ({
+                                          ...prev,
+                                          inventory: prev.inventory.map(i => i.instanceId === item.instanceId ? newItem : i),
+                                          gemPouch: [...prev.gemPouch, gemInfo]
+                                        }));
+                                      } else if (selectedGemId) {
+                                        // Add gem
+                                        const gemIndex = parseInt(selectedGemId.split('-')[1]);
+                                        const gemToSocket = gameState.gemPouch[gemIndex];
+                                        if (gemToSocket) {
+                                          newItem.socketedGems[index] = gemToSocket;
+                                          setGameState(prev => ({
+                                            ...prev,
+                                            inventory: prev.inventory.map(i => i.instanceId === item.instanceId ? newItem : i),
+                                            gemPouch: prev.gemPouch.filter((_, i) => i !== gemIndex)
+                                          }));
+                                          setSelectedGemId(null);
+                                        }
+                                      }
+                                    }
+                                    return item;
+                                  });
+                                  
+                                  // Update the modal item
+                                  setSocketingModal(prev => ({
+                                    ...prev,
+                                    item: updatedInventory.find(item => item.instanceId === socketingModal.item?.instanceId) || null
+                                  }));
+                                }}
+                              >
+                                {gemInfo ? (
+                                  <>
+                                    <img 
+                                      src={`https://placehold.co/44x44/1f2937/f97316?text=${gemInfo.abbreviation}`} 
+                                      className="w-11 h-11"
+                                      alt={`${gemInfo.abbreviation} Grade ${gemInfo.grade}`}
+                                    />
+                                    <span className="item-label">{gemInfo.abbreviation}{gemInfo.grade}</span>
+                                  </>
+                                ) : (
+                                  <div className="w-11 h-11 border-2 border-dashed border-gray-600 rounded flex items-center justify-center">
+                                    <span className="text-gray-500 text-xs">Empty</span>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Focus Mode Button */}
                 <button 
