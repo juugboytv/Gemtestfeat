@@ -1486,7 +1486,7 @@
                 ]];
             }).reduce((obj, [key, value]) => ({ ...obj, [key]: value }), {}),
             
-            // ADVANCED ZONES (25-101) - Unique monsters from formatted zone data
+            // ADVANCED ZONES (25-101) - All unique monsters from formatted zone data
             25: [
                 { id: 'z25_e01', name: 'Shrieker', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
                 { id: 'z25_e02', name: 'Rocklurker', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
@@ -1498,7 +1498,7 @@
                 { id: 'z25_e08', name: 'Stone Sentinel', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
                 { id: 'z25_e09', name: 'Whisper Wraith', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
                 { id: 'z25_e10', name: 'Abyss Stalker', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
-                { id: 'z25_boss', name: 'Abyss Stalker (Boss)', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
+                { id: 'z25_boss', name: 'Abyss Stalker - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
             ],
             26: [
                 { id: 'z26_e01', name: 'Sand Serpent', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
@@ -1511,7 +1511,7 @@
                 { id: 'z26_e08', name: 'Oasis Bandit', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
                 { id: 'z26_e09', name: 'Starfall Sprite', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
                 { id: 'z26_e10', name: 'Nomad Hunter', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
-                { id: 'z26_boss', name: 'Nomad Hunter (Boss)', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
+                { id: 'z26_boss', name: 'Nomad Hunter - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
             ],
             27: [
                 { id: 'z27_e01', name: 'Bog Lurker', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
@@ -1524,7 +1524,7 @@
                 { id: 'z27_e08', name: 'Water Hag', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
                 { id: 'z27_e09', name: 'Spore Cloud', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
                 { id: 'z27_e10', name: 'Reed Ambusher', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
-                { id: 'z27_boss', name: 'Reed Ambusher (Boss)', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
+                { id: 'z27_boss', name: 'Reed Ambusher - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
             ],
             28: [
                 { id: 'z28_e01', name: 'Ice Drake', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
@@ -1537,7 +1537,7 @@
                 { id: 'z28_e08', name: 'Spire Guard', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
                 { id: 'z28_e09', name: 'Avalanche Beast', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
                 { id: 'z28_e10', name: 'Ice Construct', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
-                { id: 'z28_boss', name: 'Ice Construct (Boss)', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
+                { id: 'z28_boss', name: 'Ice Construct - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
             ],
             29: [
                 { id: 'z29_e01', name: 'Stone Giant', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
@@ -1550,7 +1550,7 @@
                 { id: 'z29_e08', name: 'Peak Harpy', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
                 { id: 'z29_e09', name: 'Basalt Ogre', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
                 { id: 'z29_e10', name: 'Vine Strangler', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
-                { id: 'z29_boss', name: 'Vine Strangler (Boss)', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
+                { id: 'z29_boss', name: 'Vine Strangler - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
             ],
             30: [
                 { id: 'z30_e01', name: 'Time Aberration', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
@@ -1563,10 +1563,8 @@
                 { id: 'z30_e08', name: 'Quantum Serpent', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
                 { id: 'z30_e09', name: 'Future Scavenger', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
                 { id: 'z30_e10', name: 'Past Echo', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
-                { id: 'z30_boss', name: 'Past Echo (Boss)', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
+                { id: 'z30_boss', name: 'Past Echo - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
             ],
-            
-            // Continue with more zones from the formatted data...
             31: [
                 { id: 'z31_e01', name: 'Gale Elemental', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
                 { id: 'z31_e02', name: 'Cloud Serpent', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
@@ -1578,7 +1576,126 @@
                 { id: 'z31_e08', name: 'Howling Beast', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
                 { id: 'z31_e09', name: 'Summit Yeti', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
                 { id: 'z31_e10', name: 'Gust Weaver', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
-                { id: 'z31_boss', name: 'Gust Weaver (Boss)', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
+                { id: 'z31_boss', name: 'Gust Weaver - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
+            ],
+            32: [
+                { id: 'z32_e01', name: 'Blight Creeper', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
+                { id: 'z32_e02', name: 'Venom Spider', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
+                { id: 'z32_e03', name: 'Acid Slug', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
+                { id: 'z32_e04', name: 'Mire Serpent', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
+                { id: 'z32_e05', name: 'Thorn Ogre', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
+                { id: 'z32_e06', name: 'Shadow Panther', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
+                { id: 'z32_e07', name: 'Spore Beast', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
+                { id: 'z32_e08', name: 'Rotting Zombie', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
+                { id: 'z32_e09', name: 'Corrupt Elemental', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
+                { id: 'z32_e10', name: 'Jungle Brute', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
+                { id: 'z32_boss', name: 'Jungle Brute - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
+            ],
+            33: [
+                { id: 'z33_e01', name: 'Acid Slime', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
+                { id: 'z33_e02', name: 'Caustic Crab', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
+                { id: 'z33_e03', name: 'Fume Stalker', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
+                { id: 'z33_e04', name: 'Fen Lurker', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
+                { id: 'z33_e05', name: 'Toxic Toad', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
+                { id: 'z33_e06', name: 'Corroder Beetle', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
+                { id: 'z33_e07', name: 'Melted Horror', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
+                { id: 'z33_e08', name: 'Sulfuric Elemental', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
+                { id: 'z33_e09', name: 'Bile Serpent', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
+                { id: 'z33_e10', name: 'Corrupt Shambler', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
+                { id: 'z33_boss', name: 'Corrupt Shambler - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
+            ],
+            34: [
+                { id: 'z34_e01', name: 'Bone Construct', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
+                { id: 'z34_e02', name: 'Skeleton Warrior', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
+                { id: 'z34_e03', name: 'Ghoul Scavenger', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
+                { id: 'z34_e04', name: 'Dust Wraith', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
+                { id: 'z34_e05', name: 'Sand Shrieker', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
+                { id: 'z34_e06', name: 'Carrion Crawler', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
+                { id: 'z34_e07', name: 'Fossil Golem', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
+                { id: 'z34_e08', name: 'Necro Serpent', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
+                { id: 'z34_e09', name: 'Boneyard Ogre', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
+                { id: 'z34_e10', name: 'Skull Spider', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
+                { id: 'z34_boss', name: 'Skull Spider - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
+            ],
+            35: [
+                { id: 'z35_e01', name: 'Gullet Beast', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
+                { id: 'z35_e02', name: 'Maw Worm', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
+                { id: 'z35_e03', name: 'Teeth Construct', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
+                { id: 'z35_e04', name: 'Digestion Slime', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
+                { id: 'z35_e05', name: 'Voracious Horror', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
+                { id: 'z35_e06', name: 'Throat Lurker', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
+                { id: 'z35_e07', name: 'Bile Ogre', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
+                { id: 'z35_e08', name: 'Acid Dripper', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
+                { id: 'z35_e09', name: 'Stomach Dweller', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
+                { id: 'z35_e10', name: 'Inner Demon', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
+                { id: 'z35_boss', name: 'Inner Demon - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
+            ],
+            36: [
+                { id: 'z36_e01', name: 'Toxi-Fairy', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
+                { id: 'z36_e02', name: 'Venom Blossom', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
+                { id: 'z36_e03', name: 'Nectar Slime', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
+                { id: 'z36_e04', name: 'Pollen Sprite', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
+                { id: 'z36_e05', name: 'Poison Bee', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
+                { id: 'z36_e06', name: 'Bloom Lurker', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
+                { id: 'z36_e07', name: 'Stinger Mantis', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
+                { id: 'z36_e08', name: 'Noxious Moth', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
+                { id: 'z36_e09', name: 'Thorn Creeper', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
+                { id: 'z36_e10', name: 'Soporific Cloud', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
+                { id: 'z36_boss', name: 'Soporific Cloud - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
+            ],
+            37: [
+                { id: 'z37_e01', name: 'Tempest Elemental', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
+                { id: 'z37_e02', name: 'Gale Serpent', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
+                { id: 'z37_e03', name: 'Wave Lurker', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
+                { id: 'z37_e04', name: 'Thunder Drake', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
+                { id: 'z37_e05', name: 'Lightning Spirit', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
+                { id: 'z37_e06', name: 'Shore Strider', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
+                { id: 'z37_e07', name: 'Sea Brute', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
+                { id: 'z37_e08', name: 'Mist Horror', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
+                { id: 'z37_e09', name: 'Coastal Predator', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
+                { id: 'z37_e10', name: 'Reef Guardian', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
+                { id: 'z37_boss', name: 'Reef Guardian - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
+            ],
+            38: [
+                { id: 'z38_e01', name: 'Rust Golem', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
+                { id: 'z38_e02', name: 'Corroded Automaton', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
+                { id: 'z38_e03', name: 'Scrap Scavenger', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
+                { id: 'z38_e04', name: 'Acidic Drone', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
+                { id: 'z38_e05', name: 'Metal Slime', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
+                { id: 'z38_e06', name: 'Gear Hound', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
+                { id: 'z38_e07', name: 'Oxide Lurker', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
+                { id: 'z38_e08', name: 'Rusted Knight', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
+                { id: 'z38_e09', name: 'Filament Horror', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
+                { id: 'z38_e10', name: 'Decay Spitter', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
+                { id: 'z38_boss', name: 'Decay Spitter - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
+            ],
+            39: [
+                { id: 'z39_e01', name: 'Giant Spider', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
+                { id: 'z39_e02', name: 'Silk Creeper', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
+                { id: 'z39_e03', name: 'Venom Sac', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
+                { id: 'z39_e04', name: 'Webspinner', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
+                { id: 'z39_e05', name: 'Cave Crawler', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
+                { id: 'z39_e06', name: 'Egg Cluster', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
+                { id: 'z39_e07', name: 'Shadow Weaver', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
+                { id: 'z39_e08', name: 'Brood Matron', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
+                { id: 'z39_e09', name: 'Cocoon Horror', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
+                { id: 'z39_e10', name: 'Chitin Brute', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
+                { id: 'z39_boss', name: 'Chitin Brute - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
+            ],
+            
+            // Continue implementing zones 40-101 with exact monster names from GDD
+            40: [
+                { id: 'z40_e01', name: 'Barb Thorn', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
+                { id: 'z40_e02', name: 'Crimson Creeper', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
+                { id: 'z40_e03', name: 'Blood Rose', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
+                { id: 'z40_e04', name: 'Thorn Beast', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
+                { id: 'z40_e05', name: 'Spiked Crawler', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
+                { id: 'z40_e06', name: 'Rose Guardian', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
+                { id: 'z40_e07', name: 'Razor Petal', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
+                { id: 'z40_e08', name: 'Bloody Vine', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
+                { id: 'z40_e09', name: 'Prickle Horror', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
+                { id: 'z40_e10', name: 'Bramble King', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
+                { id: 'z40_boss', name: 'Bramble King - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
             ],
             
             50: [
@@ -1592,7 +1709,7 @@
                 { id: 'z50_e08', name: 'Pressure Horror', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
                 { id: 'z50_e09', name: 'Deep Crab', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
                 { id: 'z50_e10', name: 'Manta Ray', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
-                { id: 'z50_boss', name: 'Manta Ray (Boss)', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
+                { id: 'z50_boss', name: 'Manta Ray - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
             ],
             
             75: [
@@ -1606,7 +1723,7 @@
                 { id: 'z75_e08', name: 'Dark Matter Beast', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
                 { id: 'z75_e09', name: 'Dimension Shifter', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
                 { id: 'z75_e10', name: 'Soul Eater', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
-                { id: 'z75_boss', name: 'Soul Eater (Boss)', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
+                { id: 'z75_boss', name: 'Soul Eater - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
             ],
             
             101: [
@@ -1620,7 +1737,7 @@
                 { id: 'z101_e08', name: 'Echo Guardian', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
                 { id: 'z101_e09', name: 'Dimensional Rift', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
                 { id: 'z101_e10', name: 'Terminus Beast', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
-                { id: 'z101_boss', name: 'Terminus Beast (Boss)', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
+                { id: 'z101_boss', name: 'Terminus Beast - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
             ]
         },
         
