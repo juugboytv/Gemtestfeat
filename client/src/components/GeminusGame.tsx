@@ -152,10 +152,12 @@ export default function GeminusGame() {
       }
     ],
     gemPouch: [
-      { id: "ruby", grade: 1, abbreviation: "R" },
-      { id: "sapphire", grade: 2, abbreviation: "S" },
-      { id: "emerald", grade: 1, abbreviation: "E" },
-      { id: "diamond", grade: 3, abbreviation: "D" }
+      { id: "lorestone", grade: 1, abbreviation: "LST" },
+      { id: "mindrite", grade: 2, abbreviation: "MDR" },
+      { id: "warstone", grade: 1, abbreviation: "WST" },
+      { id: "true_core", grade: 3, abbreviation: "TRC" },
+      { id: "vital_core", grade: 1, abbreviation: "VTC" },
+      { id: "flame_core", grade: 2, abbreviation: "FLC" }
     ],
     zones: {
       "1": { name: "Crystal Caves (Dwarf)", levelReq: 1, biome: "mountain", gearTier: 1 },
@@ -204,6 +206,39 @@ export default function GeminusGame() {
     'Bag of Gear': ['Helmet', 'Armor', 'Leggings', 'Boots', 'Gauntlets'],
     'Jewelry Box': ['Amulet', 'Ring'],
     'Spell Satchel': ['Spellbook'],
+  };
+
+  // Import your complete game data structure
+  const GameData = {
+    ItemFactory: {
+      baseItemTemplates: [
+        // Only showing a few key ones for now - the complete list will be imported from gameData.ts
+        { id: 'base_helm_1', name: 'Iron Helm', type: 'Helmet', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/juugboytv-equipment1/IMG_1396.png', proportion: 0.75, sockets: 2 },
+        { id: 'base_armor_1', name: 'Steel Plate Armor', type: 'Armor', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/juugboytv-equipment1/IMG_1401.png', proportion: 1.0, sockets: 2 },
+        { id: 'base_sword_1', name: 'Knightly Sword', type: 'Weapon', subType: 'Sword', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/Weapons/IMG_1412.png', proportion: 1.0, sockets: 2 }
+      ]
+    },
+    Gems: {
+      lorestone: { name: 'LoreStone', abbreviation: 'LST', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Gems/IMG_1500.png', effect: "Increase Base Spell Class", values: [1.5, 2.5, 3.5, 5, 7, 9, 11, 13, 15] },
+      mindrite: { name: 'Mindrite', abbreviation: 'MDR', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Gems/IMG_1504.png', effect: "Increase Wisdom", values: [5, 7.5, 10, 12.5, 15, 20, 30, 40, 50] },
+      warstone: { name: 'WarStone', abbreviation: 'WST', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Gems/IMG_1503.png', effect: "Increase Base Weapon Class", values: [1.5, 2.5, 3.5, 5, 7, 9, 11, 13, 15] },
+      true_core: { name: 'True-Core', abbreviation: 'TRC', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Gemsmisc/IMG_1538.png', effect: "Increase Hit Chance", values: [3, 6, 9, 12, 15, 18, 21, 25, 30] },
+      vital_core: { name: 'Vital-Core', abbreviation: 'VTC', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Gemsmisc/IMG_1533.png', effect: "Heals", values: [5, 7.5, 10, 12.5, 15, 20, 30, 40, 50] },
+      flame_core: { name: 'Flame-Core', abbreviation: 'FLC', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Gemsmisc/IMG_1530.png', effect: "Damages Enemy", values: [8, 10, 12, 14, 16, 19, 22, 26, 30] }
+    },
+    equipmentSlotConfig: [
+      { name: 'Helmet', type: 'Helmet' },
+      { name: 'Weapon 1', type: 'Weapon' },
+      { name: 'Armor', type: 'Armor' },
+      { name: 'Weapon 2', type: 'Weapon' },
+      { name: 'Gauntlets', type: 'Gauntlets' },
+      { name: 'Leggings', type: 'Leggings' },
+      { name: 'Boots', type: 'Boots' },
+      { name: 'Necklace', type: 'Amulet' },
+      { name: 'Spell 1', type: 'Spellbook' },
+      { name: 'Ring', type: 'Ring' },
+      { name: 'Spell 2', type: 'Spellbook' }
+    ]
   };
 
   // Tab switching function
@@ -735,7 +770,7 @@ export default function GeminusGame() {
                                       
                                       if (gemInfo) {
                                         // Remove gem
-                                        newItem.socketedGems[index] = undefined;
+                                        newItem.socketedGems[index] = null as any;
                                         setGameState(prev => ({
                                           ...prev,
                                           inventory: prev.inventory.map(i => i.instanceId === item.instanceId ? newItem : i),
