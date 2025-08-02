@@ -6,93 +6,135 @@ interface QuestTabProps {
 }
 
 export default function QuestTab({ gameState, updateGameState }: QuestTabProps) {
-  const handleClaimRewards = () => {
-    // Update player with quest rewards
-    updateGameState({
-      player: {
-        ...gameState.player,
-        questStreak: 0,
-        questPool: { xp: 0, gold: 0, items: [] }
-      }
-    });
-  };
+  const dailyQuests = [
+    {
+      id: 'kill_goblins',
+      title: 'Daily: Goblin Slayer',
+      objective: 'Defeat 10 Goblins',
+      progress: 5,
+      required: 10,
+      rewards: { xp: 100, gold: 50 },
+      completed: false
+    },
+    {
+      id: 'collect_ore',
+      title: 'Daily: Mineral Collector',
+      objective: 'Collect 5 Iron Ore',
+      progress: 2,
+      required: 5,
+      rewards: { xp: 75, gold: 30 },
+      completed: false
+    },
+    {
+      id: 'cast_spells',
+      title: 'Daily: Spellcaster',
+      objective: 'Cast 15 Spells',
+      progress: 15,
+      required: 15,
+      rewards: { xp: 125, gold: 75 },
+      completed: true
+    }
+  ];
+
+  const weeklyQuests = [
+    {
+      id: 'boss_weekly',
+      title: 'Weekly: Dragon Slayer',
+      objective: 'Defeat the Ancient Dragon',
+      progress: 0,
+      required: 1,
+      rewards: { xp: 1000, gold: 500, item: 'Dragon Scale Armor' },
+      completed: false
+    }
+  ];
+
+  const questStreak = 7;
 
   return (
     <div className="h-full">
       <h2 className="font-orbitron text-xl mb-4 text-orange-400">Quest Log</h2>
       
-      {/* Active Quests */}
+      {/* Daily Quests */}
       <div className="mb-6">
-        <h3 className="font-orbitron text-lg mb-3 text-orange-400">Active Quests</h3>
-        {gameState.player.activeQuests.length === 0 ? (
-          <div className="glass-panel p-4 rounded-lg text-center text-gray-500">
-            No active quests. Level up to find new adventures!
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {gameState.player.activeQuests.map((quest: any, index: number) => (
-              <div key={index} className="quest-item">
-                <h4 className="quest-title">{quest.name}</h4>
-                <p className="quest-objective">
-                  Objective: {quest.objective?.type} a {quest.objective?.monster} in {quest.objective?.zone}
-                </p>
-                <div className="quest-rewards">
-                  Rewards: 
-                  <span className="quest-reward-xp ml-2">{quest.rewards?.xp?.toLocaleString()} XP</span>, 
-                  <span className="quest-reward-gold ml-1">{quest.rewards?.gold?.toLocaleString()} Gold</span>
-                  {quest.rewards?.item && <span>, and a special item!</span>}
-                </div>
+        <h3 className="font-orbitron text-lg mb-3 text-orange-400">Daily Quests</h3>
+        <div className="space-y-3">
+          {dailyQuests.map((quest) => (
+            <div key={quest.id} className="quest-item">
+              <div className="quest-title">
+                {quest.title}
+                {quest.completed && <span className="ml-2 text-green-400">✓</span>}
               </div>
-            ))}
-          </div>
-        )}
+              <div className="quest-objective">{quest.objective}</div>
+              <div className="text-sm text-gray-400 mb-2">
+                Progress: {quest.progress}/{quest.required}
+              </div>
+              <div className="progress-bar-track h-2 mb-2">
+                <div 
+                  className="progress-bar-fill bg-orange-500" 
+                  style={{ width: `${(quest.progress / quest.required) * 100}%` }}
+                />
+              </div>
+              <div className="quest-rewards">
+                Rewards: 
+                <span className="quest-reward-xp ml-1">+{quest.rewards.xp} XP</span>
+                <span className="quest-reward-gold ml-2">+{quest.rewards.gold}g</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Weekly Quests */}
+      <div className="mb-6">
+        <h3 className="font-orbitron text-lg mb-3 text-orange-400">Weekly Quests</h3>
+        <div className="space-y-3">
+          {weeklyQuests.map((quest) => (
+            <div key={quest.id} className="quest-item">
+              <div className="quest-title">
+                {quest.title}
+                {quest.completed && <span className="ml-2 text-green-400">✓</span>}
+              </div>
+              <div className="quest-objective">{quest.objective}</div>
+              <div className="text-sm text-gray-400 mb-2">
+                Progress: {quest.progress}/{quest.required}
+              </div>
+              <div className="progress-bar-track h-2 mb-2">
+                <div 
+                  className="progress-bar-fill bg-red-500" 
+                  style={{ width: `${(quest.progress / quest.required) * 100}%` }}
+                />
+              </div>
+              <div className="quest-rewards">
+                Rewards: 
+                <span className="quest-reward-xp ml-1">+{quest.rewards.xp} XP</span>
+                <span className="quest-reward-gold ml-2">+{quest.rewards.gold}g</span>
+                {quest.rewards.item && (
+                  <span className="ml-2 text-purple-400">{quest.rewards.item}</span>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Quest Streak */}
       <div className="quest-streak-panel">
-        <h3 className="font-orbitron text-lg">Quest Streak</h3>
-        <div className="quest-streak-value text-center my-4">
-          {gameState.player.questStreak} (+{gameState.player.questStreak * 10}%)
+        <h3 className="font-orbitron text-lg mb-3 text-orange-400">Quest Streak</h3>
+        <div className="quest-streak-value">{questStreak}</div>
+        <div className="text-sm text-gray-400">Days Completed</div>
+        <div className="mt-3 text-xs text-gray-500">
+          Bonus: +{questStreak * 5}% XP from all sources
         </div>
-        
-        <div className="mt-4">
-          <h4 className="font-bold text-gray-300 mb-2">Reward Pool</h4>
-          <div className="space-y-1 text-sm">
-            <p className="quest-pool-item">
-              <span className="quest-reward-xp">
-                {Math.floor(gameState.player.questPool.xp * (1 + gameState.player.questStreak * 0.1)).toLocaleString()} XP
-              </span>
-            </p>
-            <p className="quest-pool-item">
-              <span className="quest-reward-gold">
-                {Math.floor(gameState.player.questPool.gold * (1 + gameState.player.questStreak * 0.1)).toLocaleString()} Gold
-              </span>
-            </p>
-            <p className="quest-pool-item text-gray-400">
-              {gameState.player.questPool.items.length} items
-            </p>
-          </div>
-        </div>
-        
-        <button 
-          onClick={handleClaimRewards}
-          className={`glass-button w-full py-2 mt-4 rounded-md font-orbitron ${
-            gameState.player.questStreak === 0 ? 'opacity-50 cursor-not-allowed' : ''
-          }`}
-          disabled={gameState.player.questStreak === 0}
-        >
-          Claim Rewards
-        </button>
       </div>
 
-      {/* Quest Guide */}
-      <div className="mt-6 glass-panel p-4 rounded-lg">
-        <h3 className="font-orbitron text-lg mb-3 text-orange-400">Quest Guide</h3>
-        <div className="text-sm text-gray-300 space-y-2">
-          <p>• Complete quests to build your streak</p>
-          <p>• Higher streaks give better reward multipliers</p>
-          <p>• Claim rewards to reset your streak</p>
-          <p>• New quests unlock as you level up</p>
+      {/* Quest Pool Info */}
+      <div className="mt-4 glass-panel p-3 rounded-lg">
+        <h4 className="font-orbitron text-sm mb-2 text-orange-400">Available Quest Pool</h4>
+        <div className="text-xs text-gray-400 space-y-1">
+          <div className="quest-pool-item">• Monster Hunting (Daily)</div>
+          <div className="quest-pool-item">• Resource Gathering (Daily)</div>
+          <div className="quest-pool-item">• Spell Casting (Daily)</div>
+          <div className="quest-pool-item">• Boss Challenges (Weekly)</div>
         </div>
       </div>
     </div>

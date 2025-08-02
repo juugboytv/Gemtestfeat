@@ -8,8 +8,10 @@ import StatsTab from './tabs/StatsTab';
 import CombatTab from './tabs/CombatTab';
 import QuestTab from './tabs/QuestTab';
 import SettingsTab from './tabs/SettingsTab';
+import SpellsTab from './tabs/SpellsTab';
 import ZoneTeleportModal from './modals/ZoneTeleportModal';
 import ChatSystem from './ChatSystem';
+import MiniMap from './MiniMap';
 import { useGameState } from '../hooks/useGameState';
 
 export function Game() {
@@ -42,8 +44,10 @@ export function Game() {
         return <CombatTab gameState={gameState} updateGameState={updateGameState} />;
       case 'quest':
         return <QuestTab gameState={gameState} updateGameState={updateGameState} />;
+      case 'spells':
+        return <SpellsTab gameState={gameState} updateGameState={updateGameState} />;
       case 'settings':
-        return <SettingsTab />;
+        return <SettingsTab gameState={gameState} updateGameState={updateGameState} />;
       default:
         return <EquipmentTab gameState={gameState} updateGameState={updateGameState} />;
     }
@@ -99,7 +103,7 @@ export function Game() {
                   <div id="mini-map-container" className="relative w-24 h-24" title="World Map">
                     <div className="absolute -inset-1 rounded-full border border-dashed border-orange-500/30 animate-spin" style={{ animationDuration: '20s', animationTimingFunction: 'linear' }}></div>
                     <div className="relative w-full h-full rounded-full overflow-hidden glass-panel border-2 border-[var(--border-color-main)]">
-                      <canvas id="mini-map-canvas"></canvas>
+                      <MiniMap gameState={gameState} />
                     </div>
                   </div>
                   <div className="flex flex-col items-center gap-1">

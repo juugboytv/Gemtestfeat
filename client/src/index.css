@@ -1,8 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Orbitron:wght@400;700;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Orbitron:wght@400;700;900&display=swap');
 
 /* --- Molten Core Theme --- */
 :root {
@@ -473,4 +473,118 @@ body { font-family: 'Inter', sans-serif; color: var(--text-primary); background-
     height: 100%;
     background: var(--glow-red);
     transition: width 0.3s ease-out;
+}
+
+/* Additional Combat Stats - exact match to original */
+#combat-stats-container {
+  background: var(--glass-bg);
+  border: 1px solid var(--border-color-main);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.location-info {
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.stats-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stats-col > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stats-label {
+  font-family: 'Orbitron', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.label-location { color: #a855f7; }
+.label-health { color: #3b82f6; }
+.label-exp { color: #10b981; }
+.label-next-level { color: #f59e0b; }
+.label-drop { color: #ef4444; }
+.label-level { color: #f97316; }
+.label-gold { color: #eab308; }
+
+.stats-value {
+  font-family: 'Orbitron', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+}
+
+/* Quest system styles */
+.quest-item {
+  background: var(--glass-bg);
+  border: 1px solid var(--border-color-main);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 8px;
+}
+
+.quest-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-bottom: 4px;
+}
+
+.quest-objective {
+  font-size: 12px;
+  color: #d1d5db;
+  margin-bottom: 8px;
+}
+
+.quest-rewards {
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+.quest-reward-xp {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.quest-reward-gold {
+  color: #eab308;
+  font-weight: 600;
+}
+
+.quest-streak-panel {
+  background: var(--glass-bg);
+  border: 1px solid var(--border-color-main);
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+}
+
+.quest-streak-value {
+  font-family: 'Orbitron', monospace;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--primary-color);
+  text-shadow: 0 0 10px var(--primary-color);
+}
+
+.quest-pool-item {
+  color: #9ca3af;
+  font-size: 11px;
 }
