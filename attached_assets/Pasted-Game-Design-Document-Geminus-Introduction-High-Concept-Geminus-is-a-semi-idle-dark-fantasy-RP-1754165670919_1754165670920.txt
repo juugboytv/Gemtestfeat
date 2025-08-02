@@ -1,0 +1,1846 @@
+Game Design Document: Geminus
+
+
+Introduction
+
+
+High Concept
+
+Geminus is a semi-idle, dark fantasy RPG architected for deep, long-term, and potentially endless progression. It merges the strategic depth and complex character optimization of classic RPGs with the high-velocity, rewarding grind of modern idle games. The experience is centered on a multi-layered procedural loot system, extensive character customization through 24 distinct races, and a meticulously balanced mathematical foundation that supports gameplay from the first level to beyond level 400,000.1
+
+Target Audience & Platform
+
+The game is designed for players who enjoy classic RPGs (CRPGs), theory-crafting, complex character progression, and loot-based games such as the Diablo or Path of Exile series. It also appeals to the idle and incremental game communities who appreciate long-term optimization and satisfying progression loops. The primary platform is web browsers, featuring a responsive user interface (UI) designed for full functionality on both desktop and mobile devices.1
+
+Core Gameplay Loop: Grind, Grow, Advance, Optimize
+
+The player's journey in Geminus is defined by a central, repeatable cycle that forms the foundation of the entire gameplay experience. This loop is designed to be deeply engaging, offering continuous strategic choices that directly impact a player's efficiency and power.1
+Engage & Grind: The player selects a zone and engages in combat against its monstrous inhabitants. The combat system is balanced to facilitate a high Kills Per Minute (KPM) rate for properly equipped characters, making the grind feel active and rewarding.1
+Grow: Victory yields Gold, Experience Points (XP), and a chance to receive powerful loot in the form of Gems and procedural "Shadow" items. Through XP accumulation, the player levels up, gains Attribute Points (AP) to enhance their character, and grows demonstrably more powerful.1
+Advance & Optimize: As the player progresses, the exponential XP curve creates a "Grind Wall," where leveling slows dramatically. This is not a punitive measure but a deliberate design choice that forces meaningful engagement with the game's deep itemization systems. At this critical juncture, the player must make a strategic decision. They can either Advance by pushing into the next, more dangerous zone to reset the rapid leveling cycle against weaker foes, or they can Optimize by remaining in their current zone to farm for better Shadow gear, Gems, and Enchantments to increase their killing efficiency and break through the wall.1
+This core loop creates a compelling tension between vertical progression (advancing through zones) and horizontal progression (deepening power within a specific tier). The player's ability to balance these two paths is the central strategic challenge of Geminus. The high-KPM combat model provides the means to overcome this wall, creating a self-reinforcing cycle where the grind is both the challenge and the solution.1
+
+Core Design Pillars
+
+All systems and mechanics in Geminus are built upon four foundational design pillars that ensure a cohesive and compelling long-term experience.1
+
+Pillar 1: The Rewarding Grind
+
+The game's combat and economy are balanced around the philosophy that a well-geared player, or "Farmer," should be able to defeat basic monsters in a single hit. This state of high efficiency is the player's primary goal. In contrast, an under-geared player, or "Pusher," will require multiple hits, effectively halving their progression speed. This dynamic creates a powerful and tangible incentive for players to engage deeply with the loot and upgrade systems to achieve optimal farming status.1
+
+Pillar 2: Endless Progression & The Long Tail
+
+The game is architected to provide a near-infinite progression path. With a level cap extending beyond 400,000, over 100 unique zones, 20 tiers of gear, and 9 grades of gems, the core game offers thousands of hours of content. The endgame "Path to Ascension" system provides a repeatable prestige loop, ensuring that the most dedicated players always have a new, meaningful goal to pursue.1
+
+Pillar 3: Perfect Mathematical Balance
+
+All core systems, from combat formulas to racial abilities, are built upon a foundation of standardized mathematical principles. This is most evident in the "Racial Power" system, which ensures that no single race, class, or strategy becomes dominant at any stage of the game. This commitment to balance preserves strategic diversity, ensures all 24 races are viable, and maintains the integrity of player choice from start to finish.1
+
+Pillar 4: Procedural Variety
+
+The "Shadow" and "Enchantment" systems are designed to procedurally generate a near-infinite variety of loot. By combining base item stats with random quality multipliers and enchantments, every drop has the potential to be a significant upgrade. This makes the core grinding loop consistently exciting and ensures long-term item relevance, preventing the "best-in-slot" stagnation common in many RPGs.1
+
+Part I: The Player Character
+
+The player character is the central agent through which the world of Geminus is experienced. The systems governing its creation, attributes, and progression are designed to offer deep customization while adhering to the core pillar of perfect mathematical balance.1
+
+1.1. Races, Archetypes, and Specializations
+
+The choice of one of 24 races is the most significant a player makes, as it pre-determines their fundamental Archetype (Fighter or Caster), their path of statistical growth, their unique racial passive ability, and their starting zone.1
+
+Archetype Definitions
+
+All 24 races in Geminus belong to one of two primary combat archetypes, which governs their primary attributes, equipment slots, and overall combat role.1
+Fighter: These are masters of physical combat, relying on martial prowess and durable equipment. Their effectiveness is governed by the primary attributes of Strength (STR), which dictates weapon damage and the ability to equip heavy weapons and shields; Dexterity (DEX), which determines their chance to hit; and Vitality (VIT), which governs their health pool and the ability to wear heavy armor.1
+Caster: These are wielders of potent magic, channeling raw power to vanquish their foes. Their effectiveness is governed by the primary attributes of Intellect (NTL), which dictates the power of their spells and the ability to equip magical implements, and Wisdom (WIS), which determines their magical accuracy.1
+
+The Hybrid Caster Sub-Archetype
+
+The races Angel, Demon, and Paladin represent a unique sub-archetype: the Hybrid Caster. While the Master Racial Attribute Table unequivocally classifies these races as Caster based on their stat distributions, their specializations cross archetypal boundaries. Altering their base Class to Fighter would fundamentally break their integration with the AP Allocation System and the Racial Power system, which are mathematically balanced on the Fighter/Caster dichotomy.1
+To preserve this critical balance while honoring their unique design, they are mechanically treated as Casters in every respect—they use NTL and WIS as their primary stats and equip Caster-specific gear. However, their "Elite" nature is expressed through specializations that mimic Fighter capabilities. For example, a Demon's "Axe" specialization does not grant the ability to equip a Fighter's axe; instead, it manifests as a unique magical spell with an axe-like animation and theme. Likewise, a Paladin's "Shield" specialization is represented by a powerful defensive off-hand item, not a standard Fighter shield. This approach maintains perfect mathematical consistency with the GDD's core systems while delivering the intended thematic flavor.1
+
+Data Reconciliation
+
+To ensure a single source of truth, minor discrepancies between design documents have been resolved. The "Siren" race, associated with the "Cold" specialization, is not present in the GDD's official 24-race roster. However, the Caster race "Mermaid" is present and thematically similar, yet lacked an assigned specialization. Therefore, the "Cold" specialization has been officially assigned to the Mermaid race. Similarly, the "Elven" specialization for Bows has been mapped to the GDD's "Centaur" race, as the "Elf" race is designated as a Caster. Finally, the "Dragonborn" race is designated as a Fighter in the GDD, superseding other lists; it has been assigned the "Sword" specialization to reflect its draconic might in physical combat. The Master Race, Archetype, and Specialization Matrix located in Appendix A serves as the new, definitive reference linking a player's choice of Race to their combat identity.1
+
+1.2. Core Attributes and Derived Stats
+
+A character's power is defined by five primary attributes, which in turn govern a set of derived combat stats.1
+
+Primary Attributes
+
+Strength (STR): The primary attribute for physical damage. Governs the equip requirements for weapons and shields and directly scales the effectiveness of Weapon Class (WC).1
+Dexterity (DEX): The primary attribute for physical accuracy and critical hits. Governs Hit Chance and Critical Hit Chance for Fighters.1
+Vitality (VIT): The primary attribute for survivability. Governs Maximum HP and scales the effectiveness of Armor Class (AC).1
+Intellect (NTL): The primary attribute for magical damage. Governs the equip requirements for spells and directly scales the effectiveness of Spell Class (SC).1
+Wisdom (WIS): The primary attribute for magical accuracy and critical hits. Governs Hit Chance and Critical Hit Chance for Casters.1
+
+Definitive Derived Stat Formulas
+
+These are the precise, finalized mathematical formulas that translate a character's attributes and gear into their combat effectiveness. These formulas are the bedrock of the game's balance.1
+Maximum HP:
+(100+(VIT∗10))
+* Weapon Class (WC):
+(Sum of WC from Gear)∗(1+(STR∗0.0055))
+* Spell Class (SC):
+(Sum of SC from Gear)∗(1+(NTL∗0.0055))
+* Armor Class (AC):
+(Sum of AC from Gear)∗(1+(VIT∗0.0075))
+* Hit Chance:
+90+(DEX/WIS∗0.05)
+
+Note: Fighters use DEX; Casters use WIS.
+Critical Hit Chance:
+5+(DEX/WIS∗0.01)
+
+Note: Fighters use DEX; Casters use WIS.
+The structure of these formulas reveals a fundamental design choice: the primacy of gear. The core combat values of WC, SC, and AC all begin with the (Sum of... from Gear) term. A character's attributes serve as a multiplier for the power that their equipment provides; attributes do not generate power in a vacuum. A character with immense Strength but no equipped weapon will have a Weapon Class of zero. This mathematical reality reinforces the "Grind, Grow, Advance, Optimize" loop, as the "Optimize" phase—farming for better equipment—is not merely an option but a mechanical necessity for meaningful progression. This elevates the itemization systems (Shadows, Gems, Enchantments) to be the true heart of character advancement, as they are the sole means of increasing the foundational gear values that are then enhanced by stats.1
+
+1.3. Character Progression Systems
+
+Character progression is a continuous process of gaining experience and allocating attribute points to grow stronger.1
+
+Experience Curve
+
+The experience required to advance to the next level is governed by an exponential formula designed to create the "Grind Wall" dynamic central to the core loop. The canonical formula is:
+XPto_Level​=200∗(1.12Current_Level)
+.1
+
+Attribute Point (AP) Allocation System
+
+Upon each level-up, the player is granted a pool of 40 Attribute Points. The allocation of these points is handled through a unique and streamlined single-click system that preserves strategic depth while eliminating tedious point-by-point management.1
+Gaining AP: The player receives a pool of 40 AP on every level-up.
+Spending AP: The player clicks one of the five stat buttons (STR, DEX, VIT, NTL, or WIS). This single choice distributes the entire 40-point pool across all five stats according to the character's unique racial weights, with special modifiers based on the stat chosen.
+Distribution Logic & Modifiers:
+Clicking a Main Stat (STR/DEX for Fighters; NTL/WIS for Casters): The 40 points are distributed normally according to the race's weights, providing a balanced increase that favors their primary role.
+Clicking VIT: The amount of VIT gained is multiplied by 1.5. This bonus amount is then deducted from the DEX (for Fighters) or WIS (for Casters) gained for that level, representing a trade-off between survivability and accuracy.
+Clicking an Off-Stat (e.g., a Fighter clicking NTL): The gain for the clicked Off-Stat is swapped with its corresponding Main Stat, with a 25% penalty applied to the Off-Stat's gain. This allows for hybrid builds at a calculated efficiency cost. The pairs are STR-NTL and DEX-WIS for Fighters, and NTL-DEX and WIS-STR for Casters.
+This system elegantly enforces archetypal roles while allowing for calculated flexibility. It heavily rewards players for investing in their race's pre-determined primary stats, guiding them toward their intended playstyle. However, it does not forbid hybrid builds; it simply assigns them a quantifiable efficiency cost via the 25% penalty. The trade-off for investing in VIT creates a classic "tank vs. glass cannon" decision point on every single level-up. This design upholds the "Perfect Mathematical Balance" pillar by ensuring every race gains exactly 40 total attribute points per level, while still allowing for meaningful strategic choice. The game's balance can be considered stable and predictable, as the cost of deviating from an optimal build is baked directly into the core progression formula.1
+
+1.4. The Racial Power System
+
+The system of racial passives, which unlock at level 101, is the capstone of the character balance philosophy. It replaces potentially unbalanced unique passives with a standardized model that decouples thematic flavor from raw power, ensuring perfect long-term balance. This is achieved through a hidden value called "Racial Power," a universal power currency. Each race's passive grants a Racial Power bonus that scales identically off their primary attribute(s). This standardized value is then applied to a specific combat stat that fits the race's theme. While the expression of power is unique (e.g., raw damage vs. critical damage), the total power budget is identical for all races.1
+
+The "Racial Power" Formula
+
+The calculation of this hidden value is determined by the race's stat focus 1:
+Single Primary Stat Races (e.g., Orc-STR, Tiefling-NTL):
+Racial Power=PrimaryStat∗0.10
+Hybrid/Dual-Stat Races (e.g., Human-STR/DEX):
+Racial Power=(Stat1∗0.05)+(Stat2∗0.05)
+
+Progression Tiers
+
+The effectiveness of these passives increases at major level milestones 1:
+Tier 1: Unlocks at Level 101
+Tier 2: Unlocks at Level 50,000 (200% effectiveness)
+Tier 3: Unlocks at Level 150,000 (300% effectiveness)
+The Finalized Racial Passives table, located in Appendix A, provides a definitive list of how each race applies its "Racial Power" to a specific derived stat.1
+
+Part II: Itemization and the Geminus Economy
+
+The acquisition and enhancement of items is the primary driver of player power and the central focus of the optimization loop. The itemization system is comprised of four interconnected pillars: Gear, Shadows, Gems, and Enchantments.1
+
+2.1. Gear and Equipment
+
+Gear forms the foundational layer of a player's power, providing the base stats that are then augmented by other systems. Characters have 11 equipment slots, with archetypes determining the specific items available for weapon and spell slots.1
+
+The "Dropper" Gear Principle
+
+"Dropper" items are the standard, high-cost gear available for purchase in shops. They span 20 Tiers (I-XX) of power and serve two critical functions: 1) to provide a baseline of power necessary for engaging with content, and 2) to be equipped to enable the dropping of procedural "Shadow" versions of themselves, which is the core of the loot system.1
+
+Equipment Slots
+
+Fighter: Weapon 1, Weapon 2, Helmet, Gloves, Armor, Legs, Boots, Necklace, Ring, Buff Spell 1, Buff Spell 2.1
+Caster: Off-Hand 1, Off-Hand 2, Helmet, Gloves, Armor, Legs, Boots, Necklace, Ring, Damage Spell 1, Damage Spell 2.1
+
+Base Stat Distribution and Special Bonuses
+
+While the master progression table in Appendix B provides the canonical base stats for each gear tier, these values are distributed proportionally across the different equipment slots. Certain slots also provide powerful, unique bonuses that are critical for character optimization.1
+Weapon/Spell Slots: 100% of the tier's base WC/SC value.
+Armor (Chest): 100% of the tier's base AC value.
+Helmet/Boots: 75% of the tier's base AC value each.
+Legs: 50% of the tier's base AC value, plus a special bonus of +10% to final Hit Chance.
+Gloves: 50% of the tier's base AC value, plus a special bonus of +15% to final WC/SC.
+Jewelry (Necklace/Ring): Provides flat stat bonuses instead of base AC/WC/SC.
+
+Starting "Novice" Equipment
+
+All characters begin their journey with a full set of non-magical, Tier I "Novice" equipment. This is a crucial mechanical starting point. The starter zones (Z01-Z24) are balanced around Tier I-II gear, and the game's combat formulas are dependent on player stats derived from equipment.1 Providing a full set of Tier I gear is a mechanical prerequisite that enables a new player to immediately engage with the game's core loop without an initial, gearless period. Furthermore, this starting set serves as the player's first collection of "Droppers," allowing them to begin interacting with the Shadow procedural loot system from their very first kill.1 The complete
+Race-Specific Starting Equipment Kits are detailed in Appendix H.1
+
+2.2. The Shadow System: Procedural Loot
+
+The Shadow system is the primary method of acquiring powerful, procedurally generated equipment. It transforms the static, store-bought "Dropper" gear into unique and improvable items.1
+Shadow Generation: After a certain number of kills (base chance of 1 in 600), a Shadow version of an equipped Dropper item will drop for the player.1
+Quality Multiplier: At the moment of its creation, a Shadow is assigned a random Quality Multiplier between 0.75x and 1.5x. This multiplier is applied directly to the item's base stats, creating a wide spectrum of power for newly dropped items.1
+Progression Through Use: A Shadow's Quality Multiplier is not static. It improves over time as the player accumulates kills while wearing that specific item, eventually reaching the maximum multiplier of 1.5x.1
+This system creates a compelling "project" gear loop. A player who receives a low-quality (e.g., 0.8x) Shadow of a high-tier item is faced with a strategic choice: discard it and hope for a better random drop, or equip it as a "project" and invest time (kills) to improve it. This adds immense value to what would otherwise be considered "vendor trash" in other RPGs, rewarding active playtime and giving players a tangible sense of investment in a specific piece of gear. This system dramatically increases the potential "time to upgrade" for a single gear slot, supporting the "Endless Progression" pillar.1
+
+2.3. The Gem System
+
+Gems are the primary vector for targeted stat customization, allowing players to augment their gear with powerful bonuses. The system is designed to be both deep and accessible, with power scaling tied directly to player level.1 Beyond direct stat enhancement, the gem system offers advanced tactical modifications, including enemy debuffing (e.g.,
+Dullrite, WeakStone) and resource-stealing (Drainrite, SapStone). This allows for specialized "Debuffer" or "Siphoner" builds, adding a new dimension to the "Optimize" phase of the core loop.1
+
+Level-Gated Power and Progression
+
+While a player can find and socket a gem of any grade, its power is "snapped down" to the highest grade for which the player meets the level requirement. This prevents low-level characters from becoming overpowered via high-grade gems obtained through trade, tying gem effectiveness directly to character progression. The level requirements to unlock each of the nine gem grades are detailed in Appendix B.1
+
+Gem Slots as a Progression Gate
+
+The number of gem slots on equipment is a critical economic lever that dictates the pace of progression. This quantity is derived from a core balancing principle: a player fully equipped with the base "Dropper" gear of a given tier should possess approximately 85% of the raw power required to efficiently farm in the zones corresponding to the next gear tier. The remaining 15% power gap must be bridged by socketing gems into their equipment. This principle transforms gems from a simple stat bonus into a critical and necessary tool for progression. It makes the player's choice to "Optimize" a tangible one with a clear, quantifiable goal: acquire and socket enough gems to close the 15% power gap.1
+The following table details the number of gem slots available on equipment by tier:
+Gear Tier
+Weapon/Off-Hand
+Armor/Helm/Legs
+Gloves/Boots
+Jewelry (Ring/Neck)
+Total Slots (Full Set)
+I - IV
+1
+1
+0
+1
+7
+V - IX
+2
+1
+1
+2
+12
+X - XIV
+3
+2
+1
+2
+16
+XV - XX
+4
+3
+2
+3
+23
+
+A complete list of all gems and their effects is located in Appendix D: Master Gem Compendium.1
+
+2.4. The Enchantment System
+
+Enchantments are powerful magical properties that are procedurally generated directly onto Shadow gear at the moment of its creation. Unlike gems, they cannot be added or removed, making them a core part of the hunt for perfect loot.1 Similar to the gem system, enchantments also provide access to debuffing and resource-stealing mechanics, making the hunt for a "perfect" Shadow item more complex and rewarding. A perfect item is not just about maximizing personal power but can also be about finding the ideal combination of offensive debuffs.1
+Generation: The number of enchantments a Shadow spawns with is determined by its initial Quality Multiplier. A flawed item (e.g., 0.8x quality) may have zero enchantments, while a perfect 1.5x item can spawn with up to four.1
+Tiering: The power of these enchantments, ranked from Tier I to IX, is determined by the level of the zone in which the Shadow item dropped. Higher-level zones can produce items with higher-tier enchantments.1
+Rarity: The chance for a dropped Shadow to have an enchantment is not guaranteed and is based on the player's level range, making enchanted items increasingly rare and valuable as the player progresses.1
+The following table outlines the probability of a Shadow item being enchanted:
+Gear Tier Range
+Player Level Range
+Chance for a Shadow to be Enchanted
+I - V
+1 - 280
+75% (Common)
+VI - XIV
+281 - 46,359
+40% (Uncommon)
+XV - XX
+46,360+
+15% (Rare)
+
+A complete list of all enchantments and their effects is located in Appendix E: Master Enchantment Compendium.1
+
+2.5. The Accessory System
+
+Accessories (Rings and Necklaces) provide unique and powerful bonuses that often cannot be obtained through other gear slots. They are acquired through two distinct methods: as high-cost gold sinks from shops or as rare drops from specific Zone Bosses, creating both a consistent economic drain and a compelling reason to hunt specific content. A full list of all available accessories, their acquisition methods, and their effects is detailed in Appendix F: Master Accessory Compendium.1
+
+2.6. Core Economic Principles and Loops
+
+The game's economy is designed to be a closed loop where currency and items flow between systems, with dedicated sinks to manage inflation and maintain the value of progression.1
+Core Drop Rates: The baseline probabilities for acquiring key items are fixed: Base Gem Drop Chance is 1 in 250 kills, and Base Shadow Drop Chance is 1 in 600 kills.1
+Gold Sinks: To ensure Gold remains a valuable resource, numerous systems are designed to remove it from the economy. The primary sinks are the exponentially increasing cost of tiered Dropper gear (see Appendix B), powerful shop-bought accessories, fees for clan creation and trading, and the substantial costs associated with upgrading buildings in the Player Estate and perfecting gear in the Soulforge.1
+
+Part III: Combat and World Systems
+
+This section details the rules of engagement and the structure of the game world, from combat formulas to monster design.1
+
+3.1. Combat Mechanics and Definitive Formulas
+
+The combat system is designed to be fast-paced, deterministic, and strategically deep, directly reflecting the player's gear and stat choices. Combat is turn-based and automated after the player initiates an encounter. On each "turn" or "click," the player and the enemy act simultaneously. The resolution sequence is as follows: A Hit/Miss check occurs, followed by a Critical Hit check if the attack lands. Damage is then calculated and applied.1
+
+Definitive Combat Formulas
+
+The outcome of each combat round is determined by the following finalized formulas, which are tuned to support the "1-Hit Kill" design pillar 1:
+Player Damage vs. Monster:
+PlayerDamage=(90∗Player_WC/SC)/Monster_AC
+* Monster Damage vs. Player:
+MonsterDamage=Monster_Attack−(Player_AC∗0.5)
+The asymmetry in these damage formulas is a deliberate design choice. Player damage is reduced by the monster's Armor Class via division, making monster AC a highly effective form of mitigation. Conversely, monster damage is reduced by the player's AC via subtraction, a much less effective method. This means that even with very high AC, a player will always take some damage if the monster's attack value is high enough. This intentional design makes VIT and AC crucial stats for "Pushers" (under-geared players attempting to progress), but less critical for "Farmers" (optimally-geared players who kill before being hit). It reinforces the core loop by making survivability a key challenge that players must overcome with gear and stats in order to reach the optimal farming state.1
+
+The Impact of Debuffs and Drains
+
+The introduction of advanced gem and enchantment effects adds a new layer of strategy to the combat calculations.1 These effects modify the core variables within the combat formulas before damage is resolved. For instance, an enchantment that applies "Decrease Enemy Strength" would directly lower the
+Monster_Attack variable in the MonsterDamage formula for the duration of the debuff, reducing incoming damage. Similarly, a "Steal Enemy Health" effect would not alter the initial damage calculation but would trigger a post-damage event, healing the player for a percentage of the damage they dealt. The implementation of these effects is critical for enabling advanced character builds focused on weakening foes rather than simply overpowering them.1
+
+3.2. The World of Geminus: Zone Structure and Progression
+
+The game world consists of 101 unique zones, each populated by 10 thematic monsters (9 basic/elite types and 1 zone boss).1 The 24 initial zones (Z01-Z24) are thematically tied to a specific starting race but share an identical, balanced monster stat profile to ensure a fair start for all players. The power of all monsters is calculated with precision based on the Gear Tier associated with their zone, ensuring a smooth and predictable difficulty curve. A full list of all zones and their corresponding monsters can be found in Appendix C.1
+The following table provides a representative sample of the zone progression:
+Zone ID (ZID)
+Zone Name
+Level Req.
+Gear Tier
+Gem Grade
+Z01-Z24
+Various Starter Zones
+1
+I-II
+1
+Z25
+Echoing Chasms
+100
+III
+2
+Z34
+Bone Deserts
+253
+VI
+3
+Z51
+Giant Mushroom Forests
+1,000
+VIII
+4
+Z59
+The Weaving Caves
+6,143
+X
+5
+Z66
+The Bloodfang Jungle
+13,636
+XI
+6
+Z72
+Gravity-Defying Rapids
+35,452
+XIII
+7
+Z79
+The Glittering Grottos
+83,333
+XVI
+8
+Z87
+Gelatinous Jungles
+172,222
+XVIII
+9
+Z101
+The Echoing Gorge of Lost Souls
+400,000
+XX
+9
+
+
+3.3. Monster Design and Hierarchy
+
+To add variety and challenge to the grind, monsters are categorized into a clear hierarchy and further modified by a system of random special titles. All monsters, including those in the starter zones, now have unique, thematic names as detailed in Appendix C, replacing any previous placeholder names.1
+
+Canonical Scaling Formulas
+
+The following exponential formulas are the single source of truth for how a monster's base stats are scaled to their final, in-game power level based on the Gear Tier of their zone.1
+Final HP:
+BaseHP∗(1.20(GearTier−1))
+* Final AC:
+BaseDEF∗(1.20(GearTier−1))
+* Final Attack:
+BaseATK∗(1.22(GearTier−1))
+* Final XP/Gold:
+BaseReward∗(1.27(GearTier−1))
+
+Monster Tier Definitions
+
+Basic: The standard enemy of a zone, designed for high-KPM farming (1x base stats).1
+Elite: A rarer, more powerful version of a basic monster. They offer a moderate challenge and significantly increased rewards, particularly Gold (1.5x HP, 1.2x ATK, 1.2x AC, 1.5x XP, 10x Gold).1
+Zone Boss: A unique, powerful monster that serves as the capstone of a zone and a gatekeeper to further progression (5x HP, 2x ATK, 1.1x AC, with special reward multipliers).1
+
+Special Monster Titles
+
+Any non-boss monster has a chance to spawn with a special title, granting it unique properties and enhanced rewards. These encounters are designed to intentionally break the monotony of high-KPM grinding, creating moments of high-risk, high-reward gameplay. Their rarity makes each encounter feel like a significant event. Furthermore, their specific reward types (e.g., Gilded for Gold, Apex for Shadows) act as targeted resource injections, helping players overcome specific progression hurdles.1
+Title (Suffix)
+Tier
+Rarity (vs. Base)
+Key Effects
+Gilded
+1 (Normal)
+1 in 250
+12x Gold Multiplier
+Echo
+1 (Normal)
+1 in 250
+2x Stats, 2x Gold, 4x Drop Chance
+Marauder
+1 (Normal)
+1 in 250
++70% Double Hit
+Tyrant
+2 (Uncommon)
+2x Rarer
+3x Gold, 2x XP, 4x Drop Chance
+Dreadlord
+2 (Uncommon)
+2x Rarer
+4x Stats, 3x Gold, 4x XP, +3 Alignment
+Juggernaut
+3 (Rare)
+4x Rarer
+10x Health, +5 Armor Class
+Hexer
+3 (Rare)
+4x Rarer
+2x Stats, 5x Drop Chance, +5 Spell Class
+Apex
+4 (Epic)
+12x Rarer
+4x Stats, 4x Gold/XP, +50% Double Hit, Guaranteed Shadow Drop
+Behemoth
+4 (Epic)
+12x Rarer
+5x Health, 2x Gold, 5x XP, +7 AC, Guaranteed Gem Drop
+Terminus
+5 (Mythic)
+Unique
+Instant Death. Player's gold is added to a global jackpot.
+
+
+3.4. Zone Boss Mechanics
+
+Zone Bosses are not merely tougher monsters; they are a core component of the game's progression structure, designed to be memorable milestone events. The "StartZone Boss (24h Bonus)" encountered in the initial 24 zones is the player's first introduction to this system, with its mechanics governed by the rules below.1
+Progression Gate: A player must defeat the Zone Boss of their current zone at least once to unlock the ability to travel to the next tier of zones. For example, defeating The Crystal Heart Cultist in Z01 is required to enter Z25.1
+First-Kill Milestone: The first time a player defeats a specific Zone Boss, they receive a massive one-time reward bonus (10x XP, 1000x Gold). This preserves the feeling of a monumental achievement for clearing a zone.1
+Daily Encounter: After the first kill, the Zone Boss becomes a daily repeatable encounter. It can only be fought once every 24 hours, and on these subsequent kills, it provides rewards equivalent to an Elite monster (1.5x XP, 10x Gold). This system prevents farming exploits while creating valuable daily objectives for players.1
+This multi-faceted design makes bosses a highly efficient and reusable piece of content. The same monster provides a different experience and reward structure depending on the player's history with it, maximizing its value to the game's overall structure and long-term retention.1
+
+Part IV: Player Engagement Systems
+
+To ensure long-term retention beyond the core combat and loot loop, Geminus features a suite of systems designed to encourage strategic planning, daily engagement, and community interaction.1
+
+4.1. The Quest System: Streaks and Bounties
+
+The quest system provides a structured alternative to pure grinding, offering significant rewards to players who can complete objectives efficiently. The core of this system is the high-stakes "Quest Streak" mechanic.1
+Building a Streak: When a quest is completed, its rewards (XP, Gold, Items) are not given immediately but are added to a "Streak Pool."
+The Multiplier: For each consecutive quest completed without failure, a stacking +10% multiplier is applied to the entire pool.
+The Risk: At any time, the player can claim their magnified rewards, which resets the streak to zero. However, if they accept a new quest and fail to complete it before its timer expires, the streak is broken, and the entire reward pool is lost forever.
+This mechanic creates thrilling decisions, rewarding efficient and dedicated players with massive payouts. The system is balanced such that base quest rewards are about 75% as efficient as pure grinding, making them a strategic alternative rather than a replacement. The Streak and Bounty systems allow skilled players to exceed 100% efficiency. A full list of available quests is located in Appendix G: Master Quest Compendium.1
+
+4.2. Social Framework: Clans & Player Estates
+
+These systems provide the social and utility backbone of the game, encouraging cooperation and offering long-term, non-combat progression goals.1
+Clans: Clans are player-run organizations that offer shared resources and powerful, scaling bonuses. Players can donate resources to level up their clan, earning Perk Points that the leader can spend on permanent upgrades like increased member capacity, a global +% Gold Find bonus for all members, or an expanded shared Clan Vault. This system creates a framework for community building and collective achievement.
+Player Estates: The Player Estate is a personal, instanced area that serves as a base of operations. Players can construct and upgrade a variety of functional buildings using Gold and materials. Key buildings include a Personal Stash for expanded storage, a Gemcutter's Workshop for socketing and fusing gems, and a Shadow Forge for advanced item upgrades. This system provides a meaningful resource sink and a long-term progression path outside of direct combat.
+
+4.3. Commerce: The Black Market & P2P Trading
+
+A player-driven economy is facilitated through two distinct trading systems, both of which include transaction fees to serve as gold sinks.1
+The Black Market (Auction House): An asynchronous marketplace where players can list items for auction or buyout. A 10% transaction fee is taken from the final sale price.
+Player-to-Player (P2P) Trading: A secure interface for direct trades between two online players. A two-step confirmation process prevents scams, and a 5% fee is applied to any Gold exchanged.
+The Mercantile Path: A permanent, account-wide quest line that rewards economic activity. By completing objectives like "Earn 10,000,000 Gold from sales," players can earn permanent, cumulative reductions to the transaction fees on both the Black Market and P2P trades.
+
+Part V: The Endgame: The Path to Ascension
+
+The endgame of Geminus is designed for the most dedicated players, providing a repeatable and increasingly challenging progression loop intended to last approximately 5-6 months per "round." This cycle is centered around perfecting gear at the Soulforge and ultimately achieving Ascension.1
+
+5.1. The Soulforge: Advanced Shadow Upgrades
+
+The Soulforge is an endgame crafting station where players can invest massive amounts of resources to transform their best Shadow items into perfect, legendary gear. It is the primary sink for "Essence," a material gained by disenchanting unwanted Shadow items. The Soulforge, combined with the Shadow and Enchantment systems, creates a multi-stage, resource-intensive path to creating a single "perfect" item. A player must first acquire a desirable high-tier Shadow through luck, then invest enormous resources to maximize its Quality Multiplier and perfect its enchantments, before finally ascending it beyond the normal power cap. This multi-layered system provides an incredibly long "long tail" of progression for a single equipment slot, fulfilling the "Endless Progression" pillar.1
+The Soulforge offers three powerful upgrade paths:
+Quality Infusion: Allows a player to spend Essence and Gold to directly increase a Shadow's Quality Multiplier, bypassing the need for kill-based progression. The cost scales exponentially, making the final steps toward the 1.5x maximum incredibly expensive.
+Enchantment Rerolling: For items with a high Quality Multiplier but undesirable enchantments, this option allows a player to spend resources to reroll a single enchantment or all enchantments on the item, seeking a perfect combination.
+Tier Ascension: The ultimate upgrade. A player can take a "Perfect" Tier XX item (with a 1.5x multiplier) and, by spending a colossal amount of resources and a special material from the highest-level bosses, ascend it to "Ascended I" (effectively Tier XXI). This process recalculates the item's base stats to the next tier, making it significantly more powerful. This system is endless, allowing for Ascended II, III, and beyond.
+
+5.2. The Prestige Loop: Requirements & Consequences of Ascension
+
+The Path to Ascension is the game's prestige system and the ultimate goal of each 5-6 month round. It is a monumental, irreversible choice that offers greater permanent power at the cost of starting over. This system provides the ultimate purpose for the immense grind of perfecting gear at the Soulforge, converting a player's time investment in one round into permanent, account-wide power for all future rounds.1
+The final zone, Z101 "The Echoing Gorge of Lost Souls," serves as the ultimate gear-check and the final, mandatory step before a player can Ascend. The monster statistics in this zone are mathematically insurmountable using standard Tier XX equipment.1 The level requirement for Z101 (400,000) also aligns with the level requirement to begin the Ascension process. This establishes a clear endgame objective: players must utilize the Soulforge's "Tier Ascension" mechanic to create gear that surpasses the Tier XX power cap. This makes the Soulforge a critical, non-optional part of the endgame loop, providing a direct and tangible reason for players to engage with its resource-intensive upgrade systems.1
+
+Requirements to Ascend
+
+To begin the Path to Ascension, a player must meet a stringent set of requirements, representing the pinnacle of achievement within a round 1:
+Level Requirement: Reach the effective level cap of the main world (Level 400,000).
+Gear Requirement: All 11 equipment slots must be filled with "Perfect" (1.5x) Shadow gear that has been upgraded to its maximum "Ascended" tier via the Soulforge.
+Quest Requirement: All major, non-repeatable quests in the main world must be completed.
+
+Consequences of Ascension
+
+Upon choosing to ascend, the character undergoes a fundamental transformation 1:
+New Realm: The player is transported to a new, randomized, and completely separate game world instance.
+Character Reset: The character's level is reset to 1. Their inventory, gear, gold, and Essence are all wiped clean.
+Permanent Bonuses: The player gains permanent, passive "Ascended Bonuses" that carry over to all future characters and rounds (e.g., +5% to all XP gain, +2% to all governing attribute gains). These bonuses are cumulative with each subsequent ascension.
+Forced Race Change: The player must choose a different race than any they have played in previous ascensions, forcing mastery of all playstyles over time.
+Economic Isolation: The ascended player cannot trade or interact economically with players in the non-ascended (main) world. They can only trade with other players within the same Ascended Realm, creating a unique "Ironman" experience.
+
+Part VI: Technical Implementation & Data Schemas
+
+This final section provides an actionable blueprint for the development of Geminus, outlining core data structures and a strategic plan for implementation.1
+
+6.1. Core Data Structure Blueprints
+
+To facilitate development, all game systems should be driven by clear and robust data structures. The following JavaScript-inspired object skeleton serves as a blueprint for the game's database, containing the static data, numbers, and scaling factors for the game's core systems 1:
+
+JavaScript
+
+
+const gameData = {
+    // Defines all racial base stats and weights for leveling up
+    races: {
+        dwarf: { class: 'Fighter', weights: { str: 12, dex: 8, vit: 10, ntl: 12, wis: 8 } },
+        //... all 24 races defined here
+    },
+    // Defines the base stats for each of the 20 gear tiers
+    gearTiers: {
+        scalingFactor: 1.75,
+        tiers: [ /*... array of tier objects... */ ]
+    },
+    // Defines all enchantments and their scaling values per tier
+    enchantments: {
+        empowerment: { name: 'Empowerment', values: [0.01, 0.02, 0.03, 0.05, 0.07, 0.09, 0.12, 0.15, 0.20] },
+        //... all enchantments defined here
+    },
+    // Defines all gems and their scaling values per grade
+    gems: {
+        titansCore: { name: "Titan's Core", effect: 'Increase Str', values: [0.05, 0.075, 0.10, 0.125, 0.15, 0.20, 0.30, 0.40, 0.50] },
+        //... all gems defined here
+    },
+    // Defines all monsters and their base stats before scaling
+    monsters: {
+        glimmeringGolem: { name: 'Glimmering Golem', baseHp: 25, baseAtk: 10, baseDef: 13, baseXP: 15, baseGold: 3 },
+        //... all base monster definitions here
+    }
+};
+
+
+
+6.2. Finalized Item ID Schema
+
+To ensure a consistent and queryable item database, all equipment will use a standardized ID schema. This structure allows the game engine to quickly identify an item's core properties from its ID alone.1
+Item ID Structure: EID-SLOT-R-ID-C-ID-TID
+EID: Equipment Identifier (A unique string for the base item, e.g., greataxe).
+SLOT: The equipment slot (e.g., WPN1, HELM, SPLL1).
+R-ID: The Race Identifier (e.g., DRF for Dwarf, HMN for Human).
+C-ID: The Class Identifier (e.g., FTR for Fighter, CST for Caster).
+TID: The Tier Identifier (e.g., 01 for Tier I, 20 for Tier XX).
+Example: A Tier X Dwarven Greataxe would have the ID: greataxe-WPN1-DRF-FTR-10.
+
+Conclusion and Redundancy Analysis
+
+This document represents the complete and finalized design for Geminus, created by merging and reconciling all available source materials into a single, authoritative GDD. During this consolidation, several pieces of information were identified as redundant or superseded by more refined, finalized versions. This section documents those resolutions to ensure clarity for the development team.1
+Racial Stat Tables: Multiple, conflicting racial stat tables were present across source documents. The table from the master balancing plan was chosen as the canonical version due to its direct and balanced integration with the AP Allocation and Racial Power systems.1
+Combat Formulas: Simpler, early-draft combat formulas were superseded by the more refined, finalized multiplier-based formulas (e.g.,
+PlayerDamage=(90∗Player_WC/SC)/Monster_AC
+) which provide better scaling and balance for long-term progression.1
+Core Loop Descriptions: Brief descriptions of the core gameplay loop were made redundant by the detailed, four-stage explanation of the "Grind, Grow, Advance, Optimize" loop, which includes the "Grind Wall" concept as a core mechanic.1
+Fragmented System Descriptions: Various scattered descriptions of systems such as Clans, Trading, and the Soulforge have been consolidated and replaced by the more structured and complete explanations found within this document, drawing from all relevant sources.1
+Data Consolidation: The placeholder monster names from initial zone data have been replaced with thematic names.1 The partial gem and enchantment lists have been superseded by the complete, canonical lists.1 The raw notes on starting items have been formalized and integrated into a developer-ready table in Appendix H, consistent with all established game rules and schemas.1
+The result is a comprehensive and internally consistent blueprint, providing the development team with the necessary data, formulas, and design rationale to build the world of Geminus as intended.
+
+Appendix A: Master Character Creation Data
+
+
+Master Race, Archetype, and Specialization Matrix
+
+This table serves as the definitive reference linking a player's choice of Race to their combat identity. It consolidates all racial data into a single, actionable matrix for designers and developers.1
+Race
+GDD Class
+Archetype
+Primary Specialization
+Secondary Specialization
+Angel
+Caster
+Hybrid Caster
+Arcane
+Shield
+Baba Yaga
+Caster
+Caster
+Death
+N/A
+Banshee
+Caster
+Caster
+Death
+N/A
+Centaur
+Fighter
+Fighter
+Bow
+N/A
+Demon
+Caster
+Hybrid Caster
+Axe
+Fire
+Dragonborn
+Fighter
+Fighter
+Sword
+N/A
+Draugr
+Caster
+Caster
+Death
+N/A
+Dwarf
+Fighter
+Fighter
+Axe
+N/A
+Elf
+Caster
+Caster
+Arcane
+N/A
+Gnome
+Caster
+Caster
+Earth
+N/A
+Griffin
+Caster
+Caster
+Air
+N/A
+Halfling
+Fighter
+Fighter
+Dagger
+N/A
+Hobbit
+Fighter
+Fighter
+Dagger
+N/A
+Human
+Fighter
+Fighter
+Sword
+N/A
+Mermaid
+Caster
+Caster
+Cold
+N/A
+Minotaur
+Fighter
+Fighter
+Axe
+N/A
+Orc
+Fighter
+Fighter
+Mace
+N/A
+Paladin
+Caster
+Hybrid Caster
+Arcane
+Shield
+Phoenix
+Caster
+Caster
+Fire
+N/A
+Tiefling
+Caster
+Caster
+Fire
+N/A
+Troll
+Fighter
+Fighter
+Staff
+N/A
+Unicorn
+Caster
+Caster
+Arcane
+N/A
+Vampire
+Caster
+Caster
+Drain
+N/A
+Werewolf
+Fighter
+Fighter
+Claw
+N/A
+
+
+Master Racial Attribute Table
+
+These values dictate a race's starting prowess and their aptitude for growth in each of the five primary attributes. They also serve as the "stat weights" for the AP Allocation System.1
+Race
+Class
+STR
+DEX
+VIT
+NTL
+WIS
+Dwarf
+Fighter
+12
+8
+10
+12
+8
+Elf
+Caster
+6
+14
+6
+12
+12
+Halfling
+Fighter
+4
+18
+8
+2
+8
+Human
+Fighter
+8
+14
+8
+5
+5
+Gnome
+Caster
+2
+2
+6
+12
+18
+Dragonborn
+Fighter
+18
+8
+8
+9
+7
+Tiefling
+Caster
+2
+6
+6
+18
+8
+Hobbit
+Fighter
+4
+20
+12
+2
+2
+Orc
+Fighter
+18
+6
+12
+2
+2
+Troll
+Fighter
+14
+8
+14
+2
+2
+Minotaur
+Fighter
+16
+8
+8
+2
+2
+Centaur
+Fighter
+12
+16
+8
+2
+2
+Griffin
+Caster
+4
+4
+8
+12
+12
+Phoenix
+Caster
+2
+4
+6
+20
+8
+Unicorn
+Caster
+2
+4
+6
+12
+16
+Baba Yaga
+Caster
+2
+2
+6
+18
+12
+Draugr
+Caster
+4
+4
+4
+16
+12
+Mermaid
+Caster
+2
+4
+4
+16
+14
+Vampire
+Caster
+4
+2
+16
+4
+14
+Werewolf
+Fighter
+16
+12
+8
+2
+2
+Banshee
+Caster
+2
+2
+6
+18
+12
+Paladin
+Caster
+8
+4
+4
+12
+12
+Demon
+Caster
+16
+4
+10
+16
+4
+Angel
+Caster
+9
+9
+6
+16
+10
+
+
+Finalized Racial Passives (Tier 1)
+
+This table details the mechanical application of Racial Power for each race, unlocked at level 101.1
+Race
+Passive Name
+Standardized Mechanical Effect
+Dwarf
+Runic Power
+Racial Power from STR applied to Weapon Class.
+Elf
+Elven Grace
+Racial Power from WIS applied to Spell Class.
+Halfling
+Lethal Precision
+Racial Power from DEX applied to Critical Hit Damage %.
+Human
+Adaptable Combatant
+Racial Power from STR/DEX applied to Double Hit Chance %.
+Gnome
+Arcane Attunement
+Racial Power from WIS applied to Spell Critical Hit Chance %.
+Dragonborn
+Draconic Might
+Racial Power from STR applied to Weapon Class.
+Tiefling
+Infernal Pact
+Racial Power from NTL applied to Spell Class.
+Hobbit
+Unseen Strike
+Racial Power from DEX applied to Critical Hit Damage %.
+Orc
+Savage Blows
+Racial Power from STR applied to Weapon Class.
+Troll
+Regenerative Fury
+Racial Power from VIT applied to Weapon Class.
+Minotaur
+Overpower
+Racial Power from STR applied to Critical Hit Damage %.
+Centaur
+Unerring Aim
+Racial Power from DEX applied to Hit Chance %.
+Werewolf
+Feral Frenzy
+Racial Power from STR/DEX applied to Double Hit Chance %.
+Griffin
+Sky's Wrath
+Racial Power from NTL/WIS applied to Spell Class.
+Phoenix
+Immolate
+Racial Power from NTL applied to Critical Hit Damage %.
+Unicorn
+Pure Magic
+Racial Power from WIS applied to Spell Critical Hit Chance %.
+Baba Yaga
+Witch's Curse
+Racial Power from NTL/WIS applied to Spell Class.
+Draugr
+Undying Cold
+Racial Power from NTL/WIS applied to Critical Hit Damage %.
+Mermaid
+Crushing Depths
+Racial Power from WIS applied to Spell Class.
+Vampire
+Blood Rush
+Racial Power from VIT applied to Spell Class.
+Banshee
+Wail of Doom
+Racial Power from NTL applied to Spell Critical Hit Damage %.
+Paladin
+Divine Judgment
+Racial Power from NTL/WIS applied to Spell Class.
+Demon
+Demonic Fury
+Racial Power from NTL applied to Spell Class.
+Angel
+Angelic Vengeance
+Racial Power from NTL/WIS applied to Double Hit Chance %.
+
+
+Appendix B: Master Progression Tables
+
+
+Gear Tier Progression, Costs, and Requirements
+
+This table shows the base stats for each tier of "Dropper" gear, the minimum level required to equip it, and the associated gold cost for a full set of 7 pieces (Weapon/Spell, Armor, Helmet, Legs, Gloves, Boots, Ring/Necklace). The Base AC and WC/SC values are for Tier-equivalent chest plates and weapons, respectively; other slots use a proportional value as defined in Section 2.1.1
+Tier
+Base AC (Armor)
+Base WC/SC (Weapon/Spell)
+Min. Level Req.
+Gold Cost per Set (7 pcs)
+I
+10
+8
+1
+350,000
+II
+18
+14
+1
+612,500
+III
+31
+24
+100
+1,071,875
+IV
+54
+42
+135
+1,875,776
+V
+98
+77
+184
+3,282,615
+VI
+165
+130
+253
+5,744,578
+VII
+289
+227
+386
+10,053,015
+VIII
+506
+398
+1,000
+17,592,771
+IX
+885
+696
+3,571
+30,787,351
+X
+1,607
+1,264
+6,143
+53,877,866
+XI
+2,812
+2,212
+8,714
+94,286,269
+XII
+4,921
+3,870
+17,272
+165,000,969
+XIII
+8,612
+6,773
+28,180
+288,751,694
+XIV
+15,071
+11,853
+39,088
+505,315,468
+XV
+26,378
+20,746
+50,000
+884,302,069
+XVI
+46,162
+36,306
+83,333
+1,547,528,619
+XVII
+80,783
+63,535
+127,777
+2,708,175,085
+XVIII
+141,370
+111,186
+172,222
+4,739,306,397
+XIX
+247,398
+194,576
+216,666
+8,293,786,193
+XX
+432,940
+340,508
+400,000
+14,514,125,843
+
+
+Gem Grade Unlock Timeline
+
+This table shows the player level required to unlock the full power of each gem grade.1
+Gem Grade
+Player Level to Unlock
+Corresponding Zone (ZID)
+Grade 1
+Level 1
+Z01-Z24
+Grade 2
+Level 100
+Z25
+Grade 3
+Level 253
+Z34
+Grade 4
+Level 1,000
+Z51
+Grade 5
+Level 6,143
+Z59
+Grade 6
+Level 13,636
+Z66
+Grade 7
+Level 35,452
+Z72
+Grade 8
+Level 83,333
+Z79
+Grade 9
+Level 172,222
+Z87
+
+
+Appendix C: Complete Bestiary (Z01-Z101)
+
+The following tables detail the base stats for all monsters in the game. The final in-game stats are calculated using the canonical scaling formulas defined in Section 3.3, based on the Gear Tier of the monster's zone.1
+
+Starter Zone Monsters (Z01-Z24)
+
+This table establishes a balanced and thematic early-game experience for all 24 races. The generic "StartZone Monster" placeholders have been replaced with unique, thematic names that fit each race's starting zone, creating a more immersive world from the very first minute of gameplay. All zones share the same base stats to ensure a fair start.1
+Zone (ZID)
+Monster Name
+Base HP
+Base ATK
+Base AC
+Base XP
+Base Gold
+Z01-E01
+Glimmering Golem
+25
+10
+13
+15
+3
+Z01-E02
+Deep Earth Shaper
+28
+11
+14
+16
+3
+Z01-E03
+Crystal Crawler
+31
+12
+15
+18
+4
+Z01-E04
+Tunnel Lurker
+34
+13
+16
+20
+4
+Z01-E05
+Geode Spider
+37
+14
+17
+22
+5
+Z01-E06
+Cavern Bat
+41
+15
+18
+25
+5
+Z01-E07
+Runic Stoneguard
+45
+16
+20
+28
+6
+Z01-E08
+Mine Spirit
+49
+17
+21
+31
+6
+Z01-E09
+Bearded Miner
+54
+18
+23
+35
+7
+Z01-E10
+The Crystal Heart Cultist
+59
+19
+25
+39
+8
+Z01-E10*
+The Crystal Heart Cultist
+60
+20
+25
+100
+20
+
+
+Advanced Zone Monsters (Z25-Z101)
+
+This table contains the canonical data for every monster players will face after the starting areas. The data is directly sourced from the final zone data files.1
+Zone (ZID)
+Monster Name
+Base HP
+Base ATK
+Base AC
+Base XP
+Base Gold
+Z25-E01
+Shrieker
+185
+93
+123
+1500
+300
+Z25-E02
+Rocklurker
+204
+102
+135
+1650
+330
+Z25-E03
+Deep Crawler
+224
+112
+149
+1815
+363
+Z25-E04
+Echo Bat
+246
+123
+164
+1997
+399
+Z25-E05
+Chasm Worm
+271
+135
+180
+2196
+439
+Z25-E06
+Gloom Elemental
+298
+149
+198
+2416
+483
+Z25-E07
+Pit Spider
+328
+164
+218
+2657
+531
+Z25-E08
+Stone Sentinel
+361
+180
+240
+2923
+585
+Z25-E09
+Whisper Wraith
+397
+198
+264
+3215
+643
+Z25-E10
+Abyss Stalker
+433
+216
+288
+3507
+701
+Z25-E10*
+Abyss Stalker - Boss
+437
+218
+290
+10000
+2000
+Z26-E01
+Sand Serpent
+185
+93
+123
+1500
+300
+...
+...
+...
+...
+...
+...
+...
+Z101-E09
+Tormented Soul
+3.97e38
+1.98e37
+2.64e37
+3.22e50
+6.43e48
+Z101-E10
+Echo of Regret
+4.33e38
+2.16e37
+2.88e37
+3.51e50
+7.01e48
+Z101-E10*
+Echo of Regret - Boss
+4.37e38
+2.18e37
+2.90e37
+1.00e51
+2.00e49
+
+
+Appendix D: Master Gem Compendium
+
+Designer's Note: The introduction of "Steal" gems (e.g., Drainrite, SapStone, Leechrite) creates a powerful new gameplay dynamic. Unlike simple debuffs, these gems offer both offensive and defensive benefits simultaneously—weakening the enemy while strengthening the player. This "double-dip" effect makes Steal-based gems and enchantments potentially the most powerful and efficient affixes in the game, especially against single, high-stat enemies like Zone Bosses. This will likely shape the high-level metagame, making gear with these affixes extremely valuable and creating a new "holy grail" for players to hunt.
+Gems provide powerful bonuses to gear and come in 9 distinct grades of quality. The values listed are percentages (%).1
+
+Caster Gems
+
+Gem Name
+Effect
+Grade 1-9 Values (%)
+LoreStone
+Increase Base Spell Class
+1.5, 2.5, 3.5, 5, 7, 9, 11, 13, 15
+LoreHeart
+Inc Base SC & Armor Class
+SC: 1, 1.5, 2.5, 3.5, 5, 7, 8.5, 10, 12 AC: 1.5, 2.5, 3.5, 5, 7, 9, 11, 13, 15
+Mindrite
+Increase Wisdom
+5, 7.5, 10, 12.5, 15, 20, 30, 40, 50
+Dullrite
+Decrease Enemy Wisdom
+8, 10, 12, 14, 16, 19, 22, 26, 30
+Drainrite
+Steal Enemy Wisdom
+4, 6, 9, 15, 25, 40, 50, 60, 75
+MindStone
+Increase Intellect
+5, 7.5, 10, 12.5, 15, 20, 30, 40, 50
+DullStone
+Decrease Enemy Intellect
+8, 10, 12, 14, 16, 19, 22, 26, 30
+DrawStone
+Steal Enemy Intellect
+4, 6, 9, 15, 25, 40, 50, 60, 75
+Sagerite
+Increase Ntl & Wisdom (each)
+5, 7.5, 10, 12.5, 15, 20, 30, 40, 50
+Drowseite
+Decrease Enemy Ntl & Wisdom (each)
+8, 10, 12, 14, 16, 19, 22, 26, 30
+Leechrite
+Steal Enemy Ntl & Wisdom (each)
+4, 6, 9, 15, 25, 40, 50, 60, 75
+
+
+Fighter Gems
+
+Gem Name
+Effect
+Grade 1-9 Values (%)
+WarStone
+Increase Base Weapon Class
+1.5, 2.5, 3.5, 5, 7, 9, 11, 13, 15
+WarHeart
+Inc Base WC & Armor Class
+WC: 1, 1.5, 2.5, 3.5, 5, 7, 8.5, 10, 12 AC: 1.5, 2.5, 3.5, 5, 7, 9, 11, 13, 15
+Agilite
+Increase Dexterity
+5, 7.5, 10, 12.5, 15, 20, 30, 40, 50
+Cripplite
+Decrease Enemy Dexterity
+8, 10, 12, 14, 16, 19, 22, 26, 30
+Siphilite
+Steal Enemy Dexterity
+4, 6, 9, 15, 25, 40, 50, 60, 75
+MightStone
+Increase Strength
+5, 7.5, 10, 12.5, 15, 20, 30, 40, 50
+WeakStone
+Decrease Enemy Strength
+8, 10, 12, 14, 16, 19, 22, 26, 30
+SapStone
+Steal Enemy Strength
+4, 6, 9, 15, 25, 40, 50, 60, 75
+Vigorite
+Increase STR & DEX (each)
+5, 7.5, 10, 12.5, 15, 20, 30, 40, 50
+Debilitate
+Decrease Enemy STR & DEX (each)
+8, 10, 12, 14, 16, 19, 22, 26, 30
+Syphonite
+Steal Enemy STR & DEX (each)
+4, 6, 9, 15, 25, 40, 50, 60, 75
+
+
+Miscellaneous Gems
+
+Gem Name
+Effect
+Grade 1-9 Values (%)
+Obsidian Heart
+Increase Base Armor Class
+1.5, 2.5, 3.5, 5, 7, 9, 11, 13, 15
+Spike-Core
+Increase Critical Hit Chance
+1, 2.5, 5, 7.5, 10, 12.5, 15, 17.5, 20
+True-Core
+Increase Hit Chance
+3, 6, 9, 12, 15, 18, 21, 25, 30
+Veil-Core
+Decrease Enemy Hit Chance
+2.7, 5.4, 8.1, 10.8, 13.5, 16.2, 18.9, 22.5, 27
+Vital-Core
+Heals
+5, 7.5, 10, 12.5, 15, 20, 30, 40, 50
+Blood-Core
+Steal Enemy Health
+4, 6, 9, 15, 25, 40, 50, 60, 75
+Flame-Core
+Damages Enemy
+8, 10, 12, 14, 16, 19, 22, 26, 30
+Treasure-Core
+Increase Drop Chance
+2, 3, 4, 5, 6, 7, 8, 9, 10
+Ascend-Core
+Increase Experience Gain
+2, 4, 6, 9, 12, 15, 19, 24, 30
+Midas’s-Core
+Increase Gold Earned
+2, 4, 6, 9, 12, 15, 19, 24, 30
+Masterwork-Core
+Increase Mastery Chance
+5, 10, 15, 20, 25, 30, 35, 40, 50
+Echoing-Core
+Increase Double Hit Chance
+2, 3, 4, 5, 6, 7, 8, 10, 12
+Harvester-Core
+Increase Resource Drop Chance
+5, 10, 15, 20, 30, 50, 55, 60, 75
+
+
+Appendix E: Master Enchantment Compendium
+
+Enchantments are powerful affixes that can appear on Shadow gear. Their power scales with the gear's tier. The values listed are percentages (%).1
+
+Caster Enchantments
+
+Enchantment Name
+Effect
+Tier 1-9 Values (%)
+LoreStone Imbuement
+Increase Spell Class
+0.25, 0.5, 0.5, 1, 1.25, 2, 3.25, 4, 5
+LoreHeart Binding
+Inc SC / Inc AC
+SC: 0.25, 0.5, 0.5, 1, 1.25, 2, 2.5, 3, 3.75 AC: 0.25, 0.5, 0.75, 1.25, 1.75, 2.5, 3.25, 4, 5
+Mindrite Weave
+Increase Wis
+1.25, 1.875, 2.5, 3.125, 3.75, 5, 7.5, 10, 12.5
+Dullrite Shroud
+Decrease Enemy Wis
+2, 2.5, 3, 3.5, 4, 4.75, 5.5, 6.5, 7.5
+Drainrite Touch
+Steal Enemy Wis
+1, 1.5, 2.25, 3.75, 6.25, 10, 12.5, 15, 18.75
+MindStone Infusion
+Increase Ntl
+1.25, 1.875, 2.5, 3.125, 3.75, 5, 7.5, 10, 12.5
+DullStone Dampening
+Decrease Enemy Ntl
+2, 2.5, 3, 3.5, 4, 4.75, 5.5, 6.5, 7.5
+DrawStone Drain
+Steal Enemy Ntl
+1, 1.5, 2.25, 3.75, 6.25, 10, 12.5, 15, 18.75
+
+
+Fighter Enchantments
+
+Enchantment Name
+Effect
+Tier 1-9 Values (%)
+WarStone Imbuement
+Increase Weapon Class
+0.25, 0.5, 0.75, 1.25, 1.75, 2.5, 3.25, 4, 5
+WarHeart Tempering
+Inc WC / Inc AC
+WC: 0.25, 0.5, 0.5, 1, 1.25, 2, 2.5, 3, 3.75 AC: 0.25, 0.5, 0.75, 1.25, 1.75, 2.5, 3.25, 4, 5
+Agilite's Swiftness
+Increase Dex
+1.25, 1.875, 2.5, 3.125, 3.75, 5, 7.5, 10, 12.5
+Cripplite's Restraint
+Decrease Enemy Dex
+2, 2.5, 3, 3.5, 4, 4.75, 5.5, 6.5, 7.5
+Siphilite's Grip
+Steal Enemy Dex
+1, 1.5, 2.25, 3.75, 6.25, 10, 12.5, 15, 18.75
+MightStone's Strength
+Increase Str
+1.25, 1.875, 2.5, 3.125, 3.75, 5, 7.5, 10, 12.5
+WeakStone's Weight
+Decrease Enemy Str
+2, 2.5, 3, 3.5, 4, 4.75, 5.5, 6.5, 7.5
+SapStone's Grasp
+Steal Enemy Str
+1, 1.5, 2.25, 3.75, 6.25, 10, 12.5, 15, 18.75
+
+
+Miscellaneous Enchantments
+
+Enchantment Name
+Effect
+Tier 1-9 Values (%)
+Obsidian Ward
+Increase Armor Class
+0.25, 0.5, 0.75, 1.25, 1.75, 2.5, 3.25, 4, 5
+Spike-Core's Edge
+Increase Crit
+0.25, 0.625, 1.25, 1.875, 2.5, 3.125, 3.75, 4.375, 5
+True-Core's Aim
+Increase Hit
+0.75, 1.5, 2.25, 3, 3.75, 4.5, 5.25, 6.25, 7.5
+Veil-Core's Mist
+Decrease Enemy Hit
+0.675, 1.35, 2.025, 2.7, 3.375, 4.05, 4.725, 5.625, 6.75
+Vital-Core's Restoration
+Heals
+1.25, 1.875, 2.5, 3.125, 3.75, 5, 7.5, 10, 12.5
+Blood-Core's Drain
+Steal Enemy Health
+1, 1.5, 2.25, 3.75, 6.25, 10, 12.5, 15, 18.75
+Flame-Core's Curse
+Damages Enemy
+2, 2.5, 3, 3.5, 4, 4.75, 5.5, 6.5, 7.5
+
+
+Appendix F: Master Accessory Compendium
+
+Accessories are acquired as high-cost gold sinks from shops or as rare drops from specific Zone Bosses.1
+
+Shop Accessories (Gold Sinks)
+
+Accessory Name
+Type
+Gold Cost
+Min. Level
+Effect
+Ring of Earthen Might
+Ring
+5,000,000
+100
++500 to STR and NTL.
+Band of Astral Insight
+Ring
+5,000,000
+100
++500 to DEX and WIS.
+The Inevitable Eye
+Necklace
+75,000,000
+250
+Increases base Hit Chance by +1%.
+Goblet of Found Fortunes
+Necklace
+500,000,000
+500
+Increases Gem & Shadow Drop Chance by +3%.
+Shard of Pure Dominion
+Necklace
+1,000,000,000
+750
+Increases final WC and SC by +1%.
+Gilded Hand of Avarice
+Ring
+1,500,000,000
+750
+Increases Gold Earned from monsters by +3%.
+
+
+Boss Drop Accessories (Rare Hunts)
+
+Accessory Name
+Type
+Drop Location
+Effect
+Talisman of Echoing Souls
+Necklace
+Zone 25 Boss: Abyss Stalker
+Increases Experience Gain by +5%.
+The Reckless Fang
+Necklace
+Zone 34 Boss: Skull Spider
+Increases Critical Hit Damage by +10%, but reduces total AC by 5%.
+Sky-Whale Heart Locket
+Necklace
+Zone 58 Boss: Skeletal Flyer
+Increases Max HP by +10%.
+Obsidian Monolith Shard
+Ring
+Zone 65 Boss: Silent Stalker
+Increases Double Hit Chance by +2%.
+
+
+Appendix G: Master Quest Compendium
+
+This table consolidates all quest data, including unique accessory rewards.1
+
+Level 100-250 Bracket (Gear Tiers: III-V, Gem Grades: 2-3)
+
+Quest Name
+Type
+Objective
+Zone
+Base XP Reward
+Base Gold Reward
+Bonus Item/Reward
+Echoes of the Deep
+Standard
+Hunt a special monster on a Deep Crawler
+Z25: Echoing Chasms
+4.3M
+290k
+None
+Desert Scourge
+Standard
+Hunt a special monster on a Dune Strider
+Z26: Starfall Deserts
+4.5M
+310k
+None
+Spirelands Shard
+Item
+Hunt a special monster on an Ice Drake
+Z28: Frozen Spirelands
+1.5M
+100k
+Random T3 Gem
+Mountain Heart Shadow
+Item
+Hunt a special monster on a Geomancer
+Z29: Living Mountain
+1.6M
+110k
+Random T5 Shadow Helmet
+The First Hunt
+Special
+Hunt a special monster on a Corrupt Elemental
+Z32: Corrupted Jungles
+1.0M
+75k
+Talisman of the Apprentice
+
+
+Level 251-500 Bracket (Gear Tiers: VI-VII, Gem Grades: 3)
+
+Quest Name
+Type
+Objective
+Zone
+Base XP Reward
+Base Gold Reward
+Bonus Item/Reward
+Boneyard Secrets
+Standard
+Hunt a special monster on a Skeleton Warrior
+Z34: Bone Deserts
+6.8M
+451k
+None
+Web of Shadows
+Item
+Hunt a special monster on a Giant Spider
+Z39: Webbed Caverns
+3.0M
+200k
+Random T7 Shadow Weapon
+The Scarred Peaks
+Special
+Hunt a special monster on a Crag Horror
+Z40: The Scarred Peaks
+2.5M
+180k
+Band of the Relentless
+
+
+Level 501-1000 Bracket (Gear Tiers: VII-VIII, Gem Grades: 3-4)
+
+Quest Name
+Type
+Objective
+Zone
+Base XP Reward
+Base Gold Reward
+Bonus Item/Reward
+Sea of Glass
+Item
+Hunt a special monster on a Glass Serpent
+Z45: Glass Sea
+4.5M
+300k
+Random T4 Gem
+The Grand Hunt
+Special
+Hunt a special monster on a Cacophony Spirit
+Z47: Singing Sands
+5.0M
+350k
+Medallion of the Bounty Hunter
+
+
+Appendix H: Race-Specific Starting Equipment Kits
+
+This master table provides the exact Tier I starting loadout for the four specialized slots for every race. This developer-ready blueprint translates design notes into precise, actionable data, ensuring every race starts with the correct, balanced loadout. Item IDs are spells provide a base WC or SC of 8, as per Tier I standards.1eticulously generated using the GDD's schema. All weapons and 
+Starting items for each race.docx
+
+
+— Casters —
+Griffin (Air Caster)
+Tier 1 Air Spell (1)
+Tier 1 Air Spell (2)
+Caster Off-Hand Tier I (1)
+Caster Off-Hand Tier I (2)
+Tier 1 Armor Helmet
+Tier 1 Armor Gloves
+Tier 1 Armor Chest Plate
+Tier 1 Armor Leggings
+Tier 1 Armor Boots
+Tier 1 Necklace
+Tier 1 Ring
+
+
+Unicorn (Arcane Caster)
+Tier 1 Arcane Spell (1)
+Tier 1 Arcane Spell (2)
+Caster Off-Hand Tier I (1)
+Caster Off-Hand Tier I (2)
+(Universal Armor & Jewelry Set)
+Siren (Cold Caster)
+Tier 1 Cold Spell (1)
+Tier 1 Cold Spell (2)
+Caster Off-Hand Tier I (1)
+Caster Off-Hand Tier I (2)
+(Universal Armor & Jewelry Set)
+Baba Yaga, Banshee, Draugr (Death Casters)
+Tier 1 Death Spell (1)
+Tier 1 Death Spell (2)
+Caster Off-Hand Tier I (1)
+Caster Off-Hand Tier I (2)
+(Universal Armor & Jewelry Set)
+
+
+Race
+Spell 1
+Spell 2
+Off-Hand
+Off-Hand
+Armor & Jewelry
+Vampire (Drain Caster)
+Tier 1 Drain Spell (1)
+Tier 1 Drain Spell (2)
+Caster Off-Hand Tier I (1)
+Caster Off-Hand Tier I (2)
+(Universal Armor & Jewelry Set)
+Gnome (Earth Caster)
+Tier 1 Earth Spell (1)
+Tier 1 Earth Spell (2)
+Caster Off-Hand Tier I (1)
+Caster Off-Hand Tier I (2)
+(Universal Armor & Jewelry Set)
+Dragonborn, Phoenix, Tiefling (Fire Casters)
+Tier 1 Fire Spell (1)
+Tier 1 Fire Spell (2)
+Caster Off-Hand Tier I (1)
+Caster Off-Hand Tier I (2)
+(Universal Armor & Jewelry Set)
+
+--- Fighters ---
+Dwarf, Minotaur (Axe Fighters)
+Tier 1 Axe (1)
+Tier 1 Axe (2)
+Fighter Buff Spell Tier I (1)
+Fighter Buff Spell Tier I (2)
+(Universal Armor & Jewelry Set)
+Centaur, Elven (Bow Fighters)
+Tier 1 Bow (1)
+Tier 1 Bow (2)
+Fighter Buff Spell Tier I (1)
+Fighter Buff Spell Tier I (2)
+(Universal Armor & Jewelry Set)
+Werewolf (Claw Fighter)
+Tier 1 Claw (1)
+Tier 1 Claw (2)
+Fighter Buff Spell Tier I (1)
+Fighter Buff Spell Tier I (2)
+(Universal Armor & Jewelry Set)
+Halfling (Dagger Fighter)
+Tier 1 Dagger (1)
+Tier 1 Dagger (2)
+Fighter Buff Spell Tier I (1)
+Fighter Buff Spell Tier I (2)
+(Universal Armor & Jewelry Set)
+
+
+Orc (Mace Fighter)
+Tier 1 Mace (1)
+Tier 1 Mace (2)
+Fighter Buff Spell Tier I (1)
+Fighter Buff Spell Tier I (2)
+(Universal Armor & Jewelry Set)
+Troll (Staff Fighter)
+Tier 1 Staff (1)
+Tier 1 Staff (2)
+Fighter Buff Spell Tier I (1)
+Fighter Buff Spell Tier I (2)
+(Universal Armor & Jewelry Set)
+Human (Sword Fighter)
+Tier 1 Sword (1)
+Tier 1 Sword (2)
+Fighter Buff Spell Tier I (1)
+Fighter Buff Spell Tier I (2)
+(Universal Armor & Jewelry Set)
+
+
+— Elites —
+Angel (Arcane & Shield Elite)
+Tier 1 Arcane Spell (1)
+Tier 1 Arcane Spell (2)
+Tier 1 Shield (1)
+Tier 1 Shield (2)
+(Universal Armor & Jewelry Set)
+
+
+Demon (Axe & Fire Elite)
+Tier 1 Axe (1)
+Tier 1 Axe (2)
+Tier 1 Fire Spell (1)
+Tier 1 Fire Spell (2)
+(Universal Armor & Jewelry Set)
+
+
+Paladin (Arcane & Shield Elite)
+Tier 1 Arcane Spell (1)
+Tier 1 Arcane Spell (2)
+Tier 1 Shield (1)
+Tier 1 Shield (2)
+(Universal Armor & Jewelry Set)
+
+
+
+7.4. Code-Ready Master Prompt for Gemini Canvas
+This is the final, consolidated prompt designed to be pasted directly into Google Gemini Canvas. It contains the instructional preamble and the full body of the Game Design Document, creating a self-contained and powerful tool for AI-assisted game development.
+(Start of Prompt)
+Preamble:
+You are an expert game development assistant for the dark fantasy RPG, Geminus. The document that follows this preamble is the complete and official Game Design Document (GDD) for the project. Your primary task is to use this GDD as your single source of truth to answer questions, generate code snippets, create data tables in specified formats (like JSON or CSV), and assist in all development tasks related to Geminus.
+When responding to prompts, adhere strictly to the formulas, mechanics, naming conventions, and systems defined herein. Do not invent new mechanics or contradict the established design pillars. Your goal is to serve as a perfect, interactive knowledge base for the development team, ensuring consistency and accuracy in the implementation of the game's design.
+Body:
+(The full text of this Game Design Document, from "Part I: Core Vision & Design Pillars" to "Part VI: The Endgame," is to be inserted here.)
+
