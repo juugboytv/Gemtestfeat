@@ -1,6 +1,22 @@
 import { useState, useEffect, useRef } from 'react';
 
 // Game state interface matching the original structure
+interface GameItem {
+  instanceId: string;
+  name: string;
+  type: string;
+  imageUrl: string;
+  baseItemId: string;
+  socketedGems?: GemInfo[];
+  sockets?: number;
+}
+
+interface GemInfo {
+  id: string;
+  grade: number;
+  abbreviation: string;
+}
+
 interface GameState {
   player: {
     name: string;
@@ -27,21 +43,15 @@ interface GameState {
       reward: { gold: number; xp: number };
     }>;
   };
-  equipment: {
-    helmet: any;
-    armor: any;
-    leggings: any;
-    boots: any;
-    gauntlets: any;
-    amulet: any;
-    ring: any;
-    weapon: any;
-    offhand: any;
-    spellbook: any;
-  };
-  inventory: any[];
-  gemPouch: any[];
-  zones: Record<string, any>;
+  equipment: Record<string, GameItem | null>;
+  inventory: GameItem[];
+  gemPouch: GemInfo[];
+  zones: Record<string, {
+    name: string;
+    levelReq: number;
+    biome: string;
+    gearTier: number;
+  }>;
   currentTab: string;
   focusMode: boolean;
   combatState: {
@@ -51,14 +61,40 @@ interface GameState {
     inCombat: boolean;
   };
   infusionState: {
-    selectedItem: any;
-    selectedGems: any[];
+    selectedItem: GameItem | null;
+    selectedGems: GemInfo[];
   };
 }
 
 export default function GeminusGame() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const miniMapCanvasRef = useRef<HTMLCanvasElement>(null);
+
+  // Sample equipment item for testing
+  const sampleHelmet: GameItem = {
+    instanceId: "helmet_001",
+    name: "Steel Helmet",
+    type: "Helmet",
+    imageUrl: "https://placehold.co/48x48/1f2937/f97316?text=H",
+    baseItemId: "steel_helmet",
+    socketedGems: [
+      { id: "ruby", grade: 1, abbreviation: "R" },
+      { id: "sapphire", grade: 2, abbreviation: "S" }
+    ],
+    sockets: 3
+  };
+
+  const sampleWeapon: GameItem = {
+    instanceId: "weapon_001", 
+    name: "Iron Sword",
+    type: "Weapon",
+    imageUrl: "https://placehold.co/48x48/1f2937/f97316?text=W",
+    baseItemId: "iron_sword",
+    socketedGems: [
+      { id: "emerald", grade: 1, abbreviation: "E" }
+    ],
+    sockets: 2
+  };
 
   // Game state matching the original structure
   const [gameState, setGameState] = useState<GameState>({
@@ -81,16 +117,17 @@ export default function GeminusGame() {
       activeQuests: []
     },
     equipment: {
-      helmet: null,
-      armor: null,
-      leggings: null,
-      boots: null,
-      gauntlets: null,
-      amulet: null,
-      ring: null,
-      weapon: null,
-      offhand: null,
-      spellbook: null
+      "Helmet": sampleHelmet,
+      "Weapon 1": sampleWeapon,
+      "Armor": null,
+      "Weapon 2": null,
+      "Gauntlets": null,
+      "Leggings": null,
+      "Boots": null,
+      "Necklace": null,
+      "Spell 1": null,
+      "Ring": null,
+      "Spell 2": null
     },
     inventory: [],
     gemPouch: [],
@@ -116,6 +153,22 @@ export default function GeminusGame() {
   const [zoneModalOpen, setZoneModalOpen] = useState(false);
   const [statInfoModal, setStatInfoModal] = useState({ open: false, stat: "", info: "" });
   const [itemActionModal, setItemActionModal] = useState({ open: false, item: null });
+  const [equipmentView, setEquipmentView] = useState("equipment"); // "equipment" or "socket"
+  
+  // Equipment slot configuration from original
+  const equipmentSlotConfig = [
+    { name: 'Helmet', type: 'Helmet' },
+    { name: 'Weapon 1', type: 'Weapon' },
+    { name: 'Armor', type: 'Armor' },
+    { name: 'Weapon 2', type: 'Weapon' },
+    { name: 'Gauntlets', type: 'Gauntlets' },
+    { name: 'Leggings', type: 'Leggings' },
+    { name: 'Boots', type: 'Boots' },
+    { name: 'Necklace', type: 'Amulet' },
+    { name: 'Spell 1', type: 'Spellbook' },
+    { name: 'Ring', type: 'Ring' },
+    { name: 'Spell 2', type: 'Spellbook' }
+  ];
 
   // Tab switching function
   const switchTab = (tabName: string) => {
@@ -325,29 +378,73 @@ export default function GeminusGame() {
                   {/* Equipment Tab */}
                   {gameState.currentTab === 'equipment' && (
                     <div className="h-full">
-                      <h2 className="font-orbitron text-xl mb-4 text-orange-400">Equipment</h2>
-                      
-                      <div className="equipment-grid">
-                        {Object.entries(gameState.equipment).map(([slot, item]) => (
-                          <div key={slot} className="equipment-slot-wrapper">
-                            <div className="equipment-slot-title">
-                              {slot.charAt(0).toUpperCase() + slot.slice(1)}
-                            </div>
-                            <div className="equipment-slot-content">
-                              {item ? (
-                                <div className="flex items-center gap-2">
-                                  <img src={item.imageUrl} alt={item.name} className="w-12 h-12" />
-                                  <div className="flex flex-col">
-                                    <span className="text-xs text-white">{item.name}</span>
-                                    <span className="text-xs text-gray-400">{item.type}</span>
+                      {/* Equipment View Toggle Buttons */}
+                      <div className="flex gap-2 mb-2">
+                        <button 
+                          className={`glass-button flex-1 py-1 text-sm rounded-md ${equipmentView === 'equipment' ? 'active' : ''}`}
+                          onClick={() => setEquipmentView('equipment')}
+                        >
+                          Equipment
+                        </button>
+                        <button 
+                          className={`glass-button flex-1 py-1 text-sm rounded-md ${equipmentView === 'socket' ? 'active' : ''}`}
+                          onClick={() => setEquipmentView('socket')}
+                        >
+                          Socket
+                        </button>
+                      </div>
+
+                      {/* Equipment View Content */}
+                      <div id="equipment-view-content">
+                        {equipmentView === 'equipment' ? (
+                          <div className="equipment-grid">
+                            {equipmentSlotConfig.map((slot) => {
+                              const item = gameState.equipment[slot.name];
+                              return (
+                                <div key={slot.name} className="equipment-slot-wrapper">
+                                  <div className="equipment-slot-title">
+                                    {slot.name}
+                                  </div>
+                                  <div className="equipment-slot-content">
+                                    {item ? (
+                                      <div className="flex items-center gap-2 relative">
+                                        <img src={item.imageUrl} alt={item.name} className="w-12 h-12" />
+                                        <div className="flex flex-col">
+                                          <span className="text-xs text-white">{item.name}</span>
+                                          <span className="text-xs text-gray-400">{item.type}</span>
+                                        </div>
+                                        {/* Gem dots indicator */}
+                                        {item.socketedGems && item.socketedGems.filter((g: GemInfo | null) => g).length > 0 && (
+                                          <div className="gem-dot-container">
+                                            {item.socketedGems.filter((g: GemInfo | null) => g).map((_: GemInfo | null, index: number) => (
+                                              <div key={index} className="gem-dot"></div>
+                                            ))}
+                                          </div>
+                                        )}
+                                        {/* Equipment gem list */}
+                                        {item.socketedGems && item.socketedGems.filter((g: GemInfo | null) => g).length > 0 && (
+                                          <div className="equipment-gem-list">
+                                            {item.socketedGems.filter((g: GemInfo | null) => g).map((gemInfo: GemInfo | null, index: number) => (
+                                              <div key={index}>
+                                                {gemInfo?.abbreviation}{gemInfo?.grade}
+                                              </div>
+                                            ))}
+                                          </div>
+                                        )}
+                                      </div>
+                                    ) : (
+                                      <span className="text-xs text-gray-500">Empty</span>
+                                    )}
                                   </div>
                                 </div>
-                              ) : (
-                                <span className="text-gray-500 text-xs">Empty</span>
-                              )}
-                            </div>
+                              );
+                            })}
                           </div>
-                        ))}
+                        ) : (
+                          <div className="text-center p-8 font-orbitron">
+                            Select an item from your inventory to socket gems.
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
