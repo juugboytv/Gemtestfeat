@@ -1,270 +1,1104 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Geminus - Dark Fantasy RPG (GDD Integrated)</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Geminus - Dark Fantasy RPG (GDD Integrated)</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
 
-  <script src="https://cdn.tailwindcss.com"></script>
+<style>
+    /* --- Molten Core Theme --- */
+    :root {
+        --highlight-orange: #f97316;
+        --glow-red: #ef4444;
+        --text-primary: #f0f0f0;
+        --text-secondary: #a0a0a0;
+        --panel-bg: rgba(20, 20, 22, 0.75);
+        --input-bg: rgba(0, 0, 0, 0.4);
+        --border-color-main: rgba(249, 115, 22, 0.4);
+        --border-color-pulse: rgba(239, 68, 68, 0.7);
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
-  
-  <link rel="stylesheet" href="style.css">
+        /* --- Combat & UI Colors (PRESERVED) --- */
+        --color-text-health: #00BFFF; /* 🔵 */
+        --color-text-exp: #0BDA51; /* 🟢 */
+        --color-text-next-level: #BF00FF; /* 🟣 */
+        --color-text-drop: #FF7518; /* 🟠 */
+        --color-text-level: #00BFFF; /* 🔵 */
+        --color-text-gold: #EFBF04; /* 🟡 */
+        --color-text-location: #FF1D15; /* 🔴 */
+        --color-status-ok: #7CB342;
+        --color-status-warn: #FDD835;
+        --color-status-danger: #D32F2F;
+        --hp-color: #E53935;
+    }
+
+    @keyframes pulse-border {
+        0%, 100% {
+            border-color: var(--border-color-main);
+            box-shadow: 0 0 15px rgba(249, 115, 22, 0.2), 0 4px 30px rgba(0, 0, 0, 0.6);
+        }
+        50% {
+            border-color: var(--border-color-pulse);
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.4), 0 4px 30px rgba(0, 0, 0, 0.6);
+        }
+    }
+    
+    @keyframes pulse-main-tab-glow {
+        0%, 100% {
+            border-bottom-color: var(--highlight-orange);
+            text-shadow: 0 0 8px var(--highlight-orange);
+        }
+        50% {
+            border-bottom-color: var(--glow-red);
+            text-shadow: 0 0 12px var(--glow-red);
+        }
+    }
+
+    html, body { height: 100%; overflow: hidden; }
+    body { font-family: 'Inter', sans-serif; color: var(--text-primary); background-color: #121212; -webkit-user-select: none; user-select: none; touch-action: none; }
+    .font-orbitron { font-family: 'Orbitron', sans-serif; color: var(--text-primary); text-shadow: 0 0 8px rgba(249, 115, 22, 0.5); }
+    
+    .glass-panel { 
+        background: var(--panel-bg); 
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        border: 1px solid;
+        animation: pulse-border 4s ease-in-out infinite;
+    }
+    
+    .glass-button { 
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(249, 115, 22, 0.25);
+        color: var(--text-primary);
+        transition: all 0.2s ease-in-out;
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        font-family: 'Orbitron', sans-serif;
+        text-shadow: 0 0 5px rgba(249, 115, 22, 0.3);
+    }
+    .glass-button:not(:disabled):hover { 
+        background: rgba(249, 115, 22, 0.15);
+        border-color: rgba(249, 115, 22, 0.6);
+        transform: translateY(-2px);
+        color: var(--highlight-orange);
+        text-shadow: 0 0 10px var(--highlight-orange);
+    }
+    .glass-button:disabled { 
+        background: rgba(60, 60, 60, 0.4) !important; border-color: rgba(100, 100, 100, 0.8) !important; 
+        cursor: not-allowed; color: #6b7280 !important; text-shadow: none !important; box-shadow: none !important; animation: none;
+    }
+    .glass-button:not(:disabled):active { transform: translateY(1px) scale(0.98); }
+
+    .progress-bar-track { background-color: rgba(0,0,0,0.5); border-radius: 9999px; overflow: hidden; border: 1px solid rgba(0,0,0,0.7); }
+    .progress-bar-fill { border-radius: 9999px; height: 100%; transition: width 0.3s ease-out; }
+    
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background-color: rgba(249, 115, 22, 0.4); border-radius: 3px; }
+    .custom-scrollbar-x::-webkit-scrollbar { height: 4px; }
+    .custom-scrollbar-x::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar-x::-webkit-scrollbar-thumb { background-color: rgba(249, 115, 22, 0.4); border-radius: 2px; }
+
+    #main-content { transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out; }
+    #main-content.focused { position: fixed; inset: 0; z-index: 50; width: 100vw; height: 100vh; border-radius: 0; padding: 0; }
+    
+    .main-tab-button {
+        flex-shrink: 0;
+        font-family: 'Orbitron', sans-serif;
+        font-size: 0.8rem;
+        padding: 0.75rem 1rem;
+        background: transparent;
+        border: none;
+        border-bottom: 3px solid transparent;
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: color 0.3s;
+    }
+    .main-tab-button.active {
+        color: var(--highlight-orange);
+        animation: pulse-main-tab-glow 4s ease-in-out infinite;
+    }
+    .main-tab-panel { display: none; }
+    .main-tab-panel.active { display: block; }
+    
+    .modal-backdrop { position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.8); display: flex; align-items: center; justify-content: center; z-index: 60; padding: 1rem; }
+    
+    #toast-notification { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 8px; font-weight: 600; transition: bottom 0.5s ease-in-out; z-index: 100; border: 1px solid; }
+    .toast-error { background-color: rgba(255, 80, 80, 0.2); border-color: #ff5050; color: #ff5050; }
+    .toast-success { background-color: rgba(249, 115, 22, 0.2); border-color: var(--highlight-orange); color: var(--highlight-orange); }
+    
+    #smoke-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 0.5; }
+    
+    .equipment-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    .equipment-slot-wrapper { background-color: transparent; border-radius: 0.5rem; padding: 0.5rem; border: 2px solid transparent; }
+    .equipment-slot-title { display: flex; align-items: center; gap: 0.5rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; font-size: 0.8rem; }
+    .equipment-slot-content { display: flex; align-items: center; justify-content: center; gap: 0.5rem; border-radius: 0.375rem; min-height: 60px; padding: 4px; position: relative; background-color: transparent; cursor:pointer; border: 1px solid transparent; transition: all 0.2s; }
+    .equipment-slot-content:hover { border-color: var(--highlight-orange); }
+    
+    .inventory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 0.5rem; }
+    .inventory-slot { position: relative; width: 100%; padding-bottom: 100%; height: 0; /* Aspect ratio fix */ border: 2px solid transparent; border-radius: 0.375rem; background: transparent; cursor: pointer; transition: all 0.2s; }
+    .inventory-slot:hover { border-color: var(--highlight-orange); }
+    .inventory-slot.selected { border-color: var(--glow-red); box-shadow: 0 0 10px var(--glow-red); }
+    .inventory-slot img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; padding: 4px; }
+    .item-label { position: absolute; bottom: 2px; right: 2px; background: rgba(0,0,0,0.7); font-size: 0.6rem; padding: 1px 3px; border-radius: 3px; }
+    
+    .gem-pouch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap: 0.5rem; }
+    .gem-item { position: relative; border: 2px solid transparent; border-radius: 0.375rem; background: transparent; cursor: pointer; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+    .gem-item:hover { border-color: var(--highlight-orange); }
+    .gem-item.selected { border-color: var(--glow-red); box-shadow: 0 0 10px var(--glow-red); }
+    
+    .stat-accordion-item { background: rgba(0,0,0,0.2); border-radius: 0.5rem; margin-bottom: 0.75rem; overflow: hidden; border: 1px solid rgba(249, 115, 22, 0.15); }
+    .stat-accordion-header { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 0.75rem 1rem; background: rgba(249, 115, 22, 0.05); cursor: pointer; }
+    .stat-accordion-header h3 { font-family: 'Orbitron', serif; font-size: 1.1rem; color: var(--text-primary); }
+    .accordion-arrow { transition: transform 0.3s ease; }
+    .stat-accordion-item.open .accordion-arrow { transform: rotate(90deg); }
+    .stat-accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, padding 0.4s ease-out; padding: 0 1rem; }
+    .stat-accordion-item.open .stat-accordion-content { max-height: 1000px; padding: 1rem; }
+    .stat-line { display: flex; align-items: center; padding: 0.5rem 0; font-size: 0.9rem; border-bottom: 1px solid rgba(249, 115, 22, 0.1); }
+    .stat-line:last-child { border-bottom: none; }
+    .stat-icon { font-size: 1.1rem; margin-right: 0.75rem; width: 20px; text-align: center; }
+    .stat-name { flex-grow: 1; }
+    .stat-value { font-weight: 600; color: #fff; }
+    .info-btn { background: none; border: 1px solid var(--text-secondary); color: var(--text-secondary); border-radius: 50%; width: 20px; height: 20px; font-size: 0.7rem; line-height: 18px; text-align: center; cursor: pointer; margin-left: 0.75rem; }
+    .attr-btn { background: rgba(249, 115, 22, 0.2); border: 1px solid var(--border-color-main); color: var(--highlight-orange); border-radius: 6px; width: 28px; height: 28px; font-weight: bold; cursor: pointer; transition: all 0.2s; margin-left: 0.5rem; font-size: 1.2rem; }
+    .attr-btn:hover:not(:disabled) { background: rgba(249, 115, 22, 0.4); }
+    .attr-btn:disabled { background: rgba(75, 85, 99, 0.2); border-color: #4b5563; color: #6b7280; cursor: not-allowed; }
+    @keyframes flash { 0% { color: #fff; text-shadow: 0 0 10px #fff; } 50% { color: var(--highlight-orange); text-shadow: 0 0 15px var(--highlight-orange); } 100% { color: #fff; text-shadow: none; } }
+    .flash-update { animation: flash 0.5s ease-out; }
+    #stat-info-modal { position: fixed; inset: 0; z-index: 1001; background-color: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; }
+    #stat-info-backdrop { position: absolute; inset: 0; }
+    .stat-info-content { background: var(--panel-bg); border: 1px solid var(--border-color-main); padding: 1.5rem; border-radius: 0.5rem; max-width: 300px; text-align: center; }
+
+    .game-key {
+        display: flex; align-items: center; justify-content: center;
+        font-family: 'Orbitron', sans-serif; font-weight: 900;
+        color: var(--highlight-orange); background: var(--panel-bg);
+        border: 2px solid var(--border-color-main); border-radius: 8px;
+        cursor: pointer; user-select: none; transition: all 0.1s ease-in-out;
+        text-shadow: 0 0 8px var(--highlight-orange);
+    }
+    .move-key { width: 40px; height: 40px; font-size: 20px; }
+    .move-key svg { width: 1.2em; height: 1.2em; fill: currentColor; }
+    #d-pad-controls { display: grid; grid-template-areas: ". up ." "left down right"; gap: 5px; }
+    #key-up { grid-area: up; } #key-left { grid-area: left; } #key-down { grid-area: down; } #key-right { grid-area: right; }
+    #key-interact { width: 130px; height: 40px; font-size: 16px; font-weight: 700; }
+    .game-key.pressed { background: rgba(10, 10, 12, 0.85); border-color: var(--glow-red); transform: scale(0.95); box-shadow: 0 0 15px var(--glow-red), 0 0 20px rgba(0,0,0,0.6) inset; color: var(--glow-red); }
+
+    #player-status-container .level-label { color: var(--text-secondary); }
+    #player-status-container .name-value { color: var(--highlight-orange); font-weight: bold; }
+    #player-status-container .level-value { color: var(--text-primary); }
+    #player-status-container #player-health-numeric { color: var(--text-secondary); font-size: 0.7rem; text-align: center; display: block; }
+    
+    .teleport-trigger-btn { background: transparent; border: none; font-size: 1.5rem; cursor: pointer; padding: 0; line-height: 1; transition: transform 0.2s, text-shadow 0.2s; }
+    .teleport-trigger-btn:hover { transform: scale(1.1); text-shadow: 0 0 10px var(--highlight-orange); }
+    
+    #zone-popup-modal { position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+    #zone-popup-modal.hidden { display: none; }
+    #zone-list-container li { padding: 0.75rem; background-color: rgba(249, 115, 22, 0.05); border-radius: 0.375rem; cursor: pointer; transition: background-color 0.2s; border: 1px solid rgba(249, 115, 22, 0.1); font-size: 0.9rem; }
+    #zone-list-container li:hover { background-color: rgba(249, 115, 22, 0.15); border-color: var(--highlight-orange); }
+    #zone-list-container li.disabled { color: #888; cursor: not-allowed; background-color: rgba(255, 255, 255, 0.02); }
+
+    /* --- PRESERVED COMBAT STATS STYLES --- */
+    #combat-stats-container { padding: 0.5rem; background: rgba(0,0,0,0.2); border-radius: 0.5rem; }
+    .location-info { text-align: center; margin-bottom: 0.5rem; }
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    .stats-col div { margin-bottom: 2px; }
+    .stats-label { font-family: Impact, sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; text-shadow: 1px 1px 2px rgba(0,0,0,0.7); }
+    .stats-value { font-family: 'Inter', sans-serif; font-weight: 600; color: white; margin-left: 0.5rem; }
+    .label-location { color: var(--color-text-location); }
+    .label-health { color: var(--color-text-health); }
+    .label-exp { color: var(--color-text-exp); }
+    .label-next-level { color: var(--color-text-next-level); }
+    .label-drop { color: var(--color-text-drop); }
+    .label-level { color: var(--color-text-level); }
+    .label-gold { color: var(--color-text-gold); }
+    #gold-value { color: var(--color-text-gold); }
+    .status-ok { color: var(--color-status-ok) !important; }
+    .status-warn { color: var(--color-status-warn) !important; }
+    .status-danger { color: var(--color-status-danger) !important; }
+    /* --- END PRESERVED STYLES --- */
+
+    #focus-mode-btn {
+        position: absolute;
+        bottom: 8px;
+        right: 8px;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background-color: var(--glow-red);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        z-index: 51; /* Ensures button is above the focused panel */
+    }
+    #focus-mode-btn:hover { background-color: #ff4d48; }
+    #focus-mode-btn svg { width: 18px; height: 18px; stroke: white; stroke-width: 2; }
+
+    #monsterSelect {
+        background: var(--input-bg);
+        border: 1px solid var(--border-color-main);
+        color: var(--text-primary);
+        font-family: 'Orbitron', sans-serif;
+        padding: 0.5rem;
+        border-radius: 0.375rem;
+        transition: all 0.2s;
+    }
+    #monsterSelect:focus {
+        outline: none;
+        border-color: var(--highlight-orange);
+        box-shadow: 0 0 10px rgba(249, 115, 22, 0.4);
+    }
+
+    #monster-hp-text { color: var(--glow-red); font-weight: bold; text-shadow: 0 0 5px var(--glow-red); }
+    #enemy-defeated-msg { font-size: 1.5rem; color: var(--glow-red); font-weight: bold; display: none; font-family: 'Orbitron'; }
+
+    /* --- Smart Tooltip / Action Modal --- */
+    #item-action-modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1100;
+    }
+    #item-action-modal {
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color-main);
+        border-radius: 8px;
+        padding: 1.5rem;
+        text-align: center;
+        min-width: 250px;
+        backdrop-filter: blur(20px);
+        animation: pulse-border 4s ease-in-out infinite;
+    }
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+        margin-top: 1rem;
+    }
+
+    /* --- Banking Interface --- */
+    .bank-interface { display: none; }
+    .bank-deposit-input { max-width: 200px; margin: 0 auto; }
+    .bank-status { min-height: 20px; }
+
+    /* --- Shop Interface --- */
+    .shop-interface { display: none; }
+    .shop-categories { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    .shop-category-btn {
+        padding: 0.5rem 1rem;
+        background: rgba(249, 115, 22, 0.1);
+        border: 1px solid var(--border-color-main);
+        color: var(--text-primary);
+        border-radius: 0.375rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.8rem;
+    }
+    .shop-category-btn.active,
+    .shop-category-btn:hover {
+        background: rgba(249, 115, 22, 0.2);
+        border-color: var(--highlight-orange);
+        color: var(--highlight-orange);
+    }
+    .shop-items-list { 
+        display: grid; 
+        grid-template-columns: 1fr; 
+        gap: 0.5rem; 
+        max-height: 300px; 
+        overflow-y: auto; 
+    }
+    .shop-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--border-color-main);
+        border-radius: 0.375rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .shop-item:hover {
+        border-color: var(--highlight-orange);
+        background: rgba(249, 115, 22, 0.1);
+    }
+    .shop-item-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .shop-item-name {
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 0.9rem;
+    }
+    .shop-item-details {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+    }
+    .shop-item-price {
+        font-family: 'Orbitron', sans-serif;
+        font-weight: bold;
+        color: var(--color-text-gold);
+    }
+
+    /* --- Monster Combat Interface --- */
+    .monster-selection { margin-bottom: 1rem; }
+    .combat-display { 
+        display: none; 
+        text-align: center; 
+        border: 1px solid var(--border-color-main);
+        border-radius: 8px;
+        padding: 1rem;
+        background: rgba(0, 0, 0, 0.2);
+    }
+    .combat-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        justify-content: center;
+    }
+    .combat-action-btn {
+        padding: 0.75rem 1.5rem;
+        background: rgba(249, 115, 22, 0.2);
+        border: 1px solid var(--border-color-main);
+        color: var(--highlight-orange);
+        border-radius: 0.375rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-family: 'Orbitron', sans-serif;
+        font-weight: bold;
+    }
+    .combat-action-btn:hover {
+        background: rgba(249, 115, 22, 0.4);
+        border-color: var(--highlight-orange);
+    }
+    .combat-action-btn:disabled {
+        background: rgba(60, 60, 60, 0.4);
+        border-color: rgba(100, 100, 100, 0.8);
+        color: #6b7280;
+        cursor: not-allowed;
+    }
+
+    /* --- Quest Interface --- */
+    .quest-section { margin-bottom: 1.5rem; }
+    .quest-item {
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--border-color-main);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+    }
+    .quest-title {
+        font-family: 'Orbitron', sans-serif;
+        font-weight: bold;
+        color: var(--highlight-orange);
+        margin-bottom: 0.5rem;
+    }
+    .quest-description {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+    }
+    .quest-progress {
+        font-size: 0.8rem;
+        color: var(--color-text-exp);
+    }
+    .quest-reward {
+        font-size: 0.8rem;
+        color: var(--color-text-gold);
+        margin-top: 0.5rem;
+    }
+
+    /* --- Settings Interface --- */
+    .settings-section {
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid var(--border-color-main);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    .settings-title {
+        font-family: 'Orbitron', sans-serif;
+        font-weight: bold;
+        color: var(--highlight-orange);
+        margin-bottom: 0.75rem;
+        font-size: 1.1rem;
+    }
+    .setting-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid rgba(249, 115, 22, 0.1);
+    }
+    .setting-item:last-child {
+        border-bottom: none;
+    }
+    .setting-label {
+        color: var(--text-primary);
+        font-size: 0.9rem;
+    }
+    .setting-control {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* --- Chat Interface --- */
+    .chat-container {
+        border: 1px solid var(--border-color-main);
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.2);
+        height: 200px;
+        display: flex;
+        flex-direction: column;
+    }
+    .chat-messages {
+        flex: 1;
+        padding: 0.5rem;
+        overflow-y: auto;
+        font-size: 0.8rem;
+        line-height: 1.4;
+    }
+    .chat-input-container {
+        padding: 0.5rem;
+        border-top: 1px solid var(--border-color-main);
+        display: flex;
+        gap: 0.5rem;
+    }
+    .chat-input {
+        flex: 1;
+        background: var(--input-bg);
+        border: 1px solid var(--border-color-main);
+        color: var(--text-primary);
+        padding: 0.5rem;
+        border-radius: 0.375rem;
+        font-size: 0.8rem;
+    }
+    .chat-send-btn {
+        padding: 0.5rem 1rem;
+        background: rgba(249, 115, 22, 0.2);
+        border: 1px solid var(--border-color-main);
+        color: var(--highlight-orange);
+        border-radius: 0.375rem;
+        cursor: pointer;
+        font-size: 0.8rem;
+    }
+    .chat-message {
+        margin-bottom: 0.25rem;
+        padding: 0.25rem 0;
+    }
+    .chat-message.system {
+        color: var(--color-text-exp);
+        font-style: italic;
+    }
+    .chat-message.combat {
+        color: var(--glow-red);
+        font-weight: bold;
+    }
+    .chat-message.loot {
+        color: var(--color-text-drop);
+    }
+    .chat-message.level {
+        color: var(--color-text-level);
+        font-weight: bold;
+    }
+
+    /* --- Inventory Bag Tabs --- */
+    .inventory-bag-tabs {
+        display: flex;
+        gap: 0.25rem;
+        margin-bottom: 0.75rem;
+        overflow-x: auto;
+    }
+    .inventory-bag-tab {
+        padding: 0.25rem 0.5rem;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--border-color-main);
+        color: var(--text-secondary);
+        border-radius: 0.25rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.7rem;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+    .inventory-bag-tab.active,
+    .inventory-bag-tab:hover {
+        background: rgba(249, 115, 22, 0.2);
+        border-color: var(--highlight-orange);
+        color: var(--highlight-orange);
+    }
+
+    /* --- World Map --- */
+    .world-map-container {
+        position: relative;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--border-color-main);
+        border-radius: 8px;
+        overflow: hidden;
+        height: 300px;
+    }
+    .world-map-canvas {
+        width: 100%;
+        height: 100%;
+    }
+
+    /* --- Developer Tools Modal --- */
+    #game-data-editor-modal {
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.9);
+        z-index: 2000;
+    }
+    .editor-container {
+        display: flex;
+        height: 100vh;
+        max-width: 100vw;
+        overflow: hidden;
+    }
+    .editor-sidebar {
+        width: 200px;
+        background: var(--panel-bg);
+        border-right: 1px solid var(--border-color-main);
+        overflow-y: auto;
+        flex-shrink: 0;
+    }
+    .editor-main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    .editor-header {
+        padding: 1rem;
+        border-bottom: 1px solid var(--border-color-main);
+        background: var(--panel-bg);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .editor-content-area {
+        flex: 1;
+        padding: 1rem;
+        overflow-y: auto;
+        background: rgba(0, 0, 0, 0.3);
+    }
+    .editor-tab-btn {
+        display: block;
+        width: 100%;
+        padding: 0.75rem 1rem;
+        background: transparent;
+        border: none;
+        color: var(--text-secondary);
+        text-align: left;
+        cursor: pointer;
+        transition: all 0.2s;
+        border-bottom: 1px solid rgba(249, 115, 22, 0.1);
+    }
+    .editor-tab-btn:hover,
+    .editor-tab-btn.active {
+        background: rgba(249, 115, 22, 0.1);
+        color: var(--highlight-orange);
+    }
+    .editor-tab-content {
+        display: none;
+    }
+    .editor-tab-content.active {
+        display: block;
+    }
+    .editor-accordion {
+        margin-bottom: 1rem;
+        border: 1px solid var(--border-color-main);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .editor-accordion-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        background: rgba(249, 115, 22, 0.05);
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    .editor-accordion-header:hover {
+        background: rgba(249, 115, 22, 0.1);
+    }
+    .editor-accordion-content {
+        padding: 0;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease, padding 0.3s ease;
+    }
+    .editor-accordion.open .editor-accordion-content {
+        max-height: 1000px;
+        padding: 1rem;
+    }
+    .editor-input {
+        width: 100%;
+        background: var(--input-bg);
+        border: 1px solid var(--border-color-main);
+        color: var(--text-primary);
+        padding: 0.5rem;
+        border-radius: 0.375rem;
+        margin-bottom: 0.5rem;
+    }
+    .editor-select {
+        width: 100%;
+        background: var(--input-bg);
+        border: 1px solid var(--border-color-main);
+        color: var(--text-primary);
+        padding: 0.5rem;
+        border-radius: 0.375rem;
+        margin-bottom: 0.5rem;
+    }
+    .editor-textarea {
+        width: 100%;
+        background: var(--input-bg);
+        border: 1px solid var(--border-color-main);
+        color: var(--text-primary);
+        padding: 0.5rem;
+        border-radius: 0.375rem;
+        margin-bottom: 0.5rem;
+        min-height: 100px;
+        resize: vertical;
+    }
+    .editor-status {
+        color: var(--color-text-exp);
+        font-size: 0.8rem;
+        min-height: 1rem;
+    }
+
+    /* --- Character Creation --- */
+    #creation-modal {
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+    }
+    .creation-container {
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color-main);
+        border-radius: 12px;
+        padding: 2rem;
+        max-width: 400px;
+        width: 90%;
+        backdrop-filter: blur(20px);
+        animation: pulse-border 4s ease-in-out infinite;
+    }
+    .creation-title {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.5rem;
+        text-align: center;
+        margin-bottom: 1.5rem;
+        color: var(--highlight-orange);
+        text-shadow: 0 0 10px var(--highlight-orange);
+    }
+    .creation-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    .creation-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .creation-label {
+        font-family: 'Orbitron', sans-serif;
+        color: var(--text-primary);
+        font-size: 0.9rem;
+    }
+    .creation-input,
+    .creation-select {
+        background: var(--input-bg);
+        border: 1px solid var(--border-color-main);
+        color: var(--text-primary);
+        padding: 0.75rem;
+        border-radius: 0.375rem;
+        font-family: 'Orbitron', sans-serif;
+        font-size: 0.9rem;
+    }
+    .creation-input:focus,
+    .creation-select:focus {
+        outline: none;
+        border-color: var(--highlight-orange);
+        box-shadow: 0 0 10px rgba(249, 115, 22, 0.4);
+    }
+    .creation-submit {
+        padding: 1rem 2rem;
+        background: rgba(249, 115, 22, 0.2);
+        border: 1px solid var(--highlight-orange);
+        color: var(--highlight-orange);
+        border-radius: 0.375rem;
+        cursor: pointer;
+        font-family: 'Orbitron', sans-serif;
+        font-weight: bold;
+        font-size: 1rem;
+        transition: all 0.2s;
+        margin-top: 1rem;
+    }
+    .creation-submit:hover {
+        background: rgba(249, 115, 22, 0.4);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(249, 115, 22, 0.3);
+    }
+
+    /* --- Responsive adjustments --- */
+    @media (max-width: 480px) {
+        .equipment-grid { grid-template-columns: 1fr; }
+        .inventory-grid { grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); }
+        .gem-pouch-grid { grid-template-columns: repeat(auto-fill, minmax(45px, 1fr)); }
+        .main-tab-button { padding: 0.5rem 0.75rem; font-size: 0.75rem; }
+        .creation-container { padding: 1.5rem; }
+        .editor-sidebar { width: 150px; }
+    }
+
+    /* Additional styles for specific game elements */
+    .rarity-common { color: #ffffff; }
+    .rarity-uncommon { color: #1eff00; }
+    .rarity-rare { color: #0070dd; }
+    .rarity-epic { color: #a335ee; }
+    .rarity-legendary { color: #ff8000; }
+    .rarity-mythic { color: #e6cc80; }
+
+    .tier-indicator {
+        font-size: 0.7rem;
+        padding: 0.1rem 0.3rem;
+        border-radius: 0.2rem;
+        background: rgba(0, 0, 0, 0.5);
+        margin-left: 0.5rem;
+    }
+
+    .socket-indicator {
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--highlight-orange);
+        border: 1px solid rgba(0, 0, 0, 0.5);
+    }
+
+    .socket-indicator.filled {
+        background: var(--glow-red);
+    }
+
+    .item-tooltip {
+        position: absolute;
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color-main);
+        border-radius: 8px;
+        padding: 0.75rem;
+        font-size: 0.8rem;
+        z-index: 1000;
+        max-width: 250px;
+        backdrop-filter: blur(10px);
+        pointer-events: none;
+    }
+
+    .enhancement-glow {
+        box-shadow: 0 0 15px var(--highlight-orange), 0 0 25px rgba(249, 115, 22, 0.3);
+        border-color: var(--highlight-orange) !important;
+    }
+
+    .loading-spinner {
+        border: 2px solid rgba(249, 115, 22, 0.2);
+        border-top: 2px solid var(--highlight-orange);
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Hide elements by default that should be shown by JavaScript */
+    .js-only {
+        display: none;
+    }
+
+    .js-enabled .js-only {
+        display: block;
+    }
+
+    /* Ensure proper stacking order */
+    .glass-panel {
+        position: relative;
+        z-index: 1;
+    }
+
+    .modal-backdrop,
+    #zone-popup-modal,
+    #stat-info-modal,
+    #item-action-modal-backdrop,
+    #game-data-editor-modal,
+    #creation-modal {
+        z-index: 1000;
+    }
+
+    #toast-notification {
+        z-index: 2000;
+    }
+</style>
 </head>
-<body>
-  <!-- Background smoke canvas -->
-  <canvas id="smoke-canvas"></canvas>
-  
-  <!-- Toast notification -->
-  <div id="toast-notification"></div>
-  
-  <!-- Stat info modal -->
-  <div id="stat-info-modal">
-    <div id="stat-info-backdrop"></div>
-    <div class="stat-info-content">
-      <h3 class="font-orbitron text-lg mb-2" id="stat-info-title"></h3>
-      <p id="stat-info-description"></p>
+<body class="js-enabled">
+    <canvas id="smoke-canvas"></canvas>
+    
+    <!-- Toast Notification -->
+    <div id="toast-notification"></div>
+    
+    <!-- Stat Info Modal -->
+    <div id="stat-info-modal">
+        <div id="stat-info-backdrop"></div>
+        <div class="stat-info-content">
+            <h4 id="stat-info-title" class="font-orbitron text-lg text-white mb-2"></h4>
+            <p id="stat-info-description" class="text-gray-300"></p>
+        </div>
     </div>
-  </div>
-  
-  <!-- Zone teleport modal -->
-  <div id="zone-popup-modal" class="hidden">
-    <div class="glass-panel p-6 rounded-lg max-w-md w-full max-h-[80vh] overflow-hidden flex flex-col">
-      <h2 class="font-orbitron text-xl mb-4 text-center">Select Zone</h2>
-      <ul id="zone-list-container" class="space-y-2 overflow-y-auto custom-scrollbar flex-grow">
-        <!-- Zone options will be populated here -->
-      </ul>
-      <button id="close-zone-popup" class="glass-button mt-4 py-2 px-4 rounded">Close</button>
-    </div>
-  </div>
-
-  <!-- Main content container -->
-  <div id="main-content" class="glass-panel p-4 mx-auto max-w-md min-h-screen flex flex-col">
-    <!-- Main tab navigation -->
-    <div class="flex-shrink-0 flex overflow-x-auto border-b border-orange-500/30 mb-4 custom-scrollbar-x">
-      <button class="main-tab-button active" data-tab="equipment">Equipment</button>
-      <button class="main-tab-button" data-tab="infusion">Infusion</button>
-      <button class="main-tab-button" data-tab="inventory">Inventory</button>
-      <button class="main-tab-button" data-tab="stats">Stats</button>
-      <button class="main-tab-button" data-tab="combat">Combat</button>
-      <button class="main-tab-button" data-tab="quest">Quest</button>
-      <button class="main-tab-button" data-tab="settings">Settings</button>
+    
+    <!-- Zone Teleport Modal -->
+    <div id="zone-popup-modal" class="hidden">
+        <div class="glass-panel p-6 rounded-lg max-w-md w-full max-h-[80vh] overflow-hidden flex flex-col">
+            <h2 class="font-orbitron text-xl mb-4 text-center">Teleport to Zone</h2>
+            <ul id="zone-list-container" class="space-y-2 overflow-y-auto custom-scrollbar flex-grow">
+                <!-- Zone options will be populated here -->
+            </ul>
+            <button id="close-zone-popup" class="glass-button mt-4 py-2 px-4 rounded">Close</button>
+        </div>
     </div>
 
-    <!-- Adventure Tab -->
-    <div id="adventure-tab" class="main-tab-panel active flex-grow flex flex-col">
-      <!-- Player status -->
-      <div id="player-status-container" class="glass-panel p-3 mb-4 rounded-lg">
-        <div class="flex justify-between items-center mb-2">
-          <div class="flex items-center gap-2">
-            <span class="level-label text-sm">Lv.</span>
-            <span id="player-level" class="level-value font-orbitron text-lg">1</span>
-            <span id="player-name" class="name-value font-orbitron text-sm ml-2">Hero</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span id="player-gold" class="text-yellow-400 font-orbitron text-sm">0</span>
-            <span class="text-yellow-400">👑</span>
-            <button class="teleport-trigger-btn" id="teleport-btn">🌀</button>
-          </div>
-        </div>
-        
-        <!-- Health bar -->
-        <div class="mb-2">
-          <div class="progress-bar-track h-4 relative">
-            <div id="player-health-bar" class="progress-bar-fill h-full" style="width: 100%; background: linear-gradient(90deg, #dc2626, #ef4444);"></div>
-            <span id="player-health-numeric" class="absolute inset-0 flex items-center justify-center text-xs">100/100</span>
-          </div>
-        </div>
-        
-        <!-- Experience bar -->
-        <div>
-          <div class="progress-bar-track h-2">
-            <div id="player-exp-bar" class="progress-bar-fill h-full bg-gradient-to-r from-green-600 to-green-400" style="width: 0%;"></div>
-          </div>
-          <div class="flex justify-between text-xs mt-1">
-            <span id="player-exp" class="text-green-400">0</span>
-            <span id="player-exp-next" class="text-purple-400">100</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Current location -->
-      <div class="glass-panel p-3 mb-4 rounded-lg">
-        <div class="text-center">
-          <div class="text-sm text-gray-400 mb-1">Current Location</div>
-          <div id="current-location" class="font-orbitron text-orange-400">World Map</div>
-        </div>
-      </div>
-
-      <!-- Mini map -->
-      <div class="glass-panel p-3 mb-4 rounded-lg flex-grow min-h-[200px]">
-        <div class="text-center text-sm text-gray-400 mb-2">Mini Map</div>
-        <div id="minimap-container" class="w-full h-full min-h-[150px] relative">
-          <canvas id="minimap-canvas" class="w-full h-full"></canvas>
-        </div>
-      </div>
-
-      <!-- Controls -->
-      <div class="flex-shrink-0 flex justify-between items-center gap-4">
-        <!-- D-pad controls -->
-        <div id="d-pad-controls">
-          <div id="key-up" class="game-key move-key">
-            <svg viewBox="0 0 24 24"><path d="M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14l-6-6z"/></svg>
-          </div>
-          <div id="key-left" class="game-key move-key">
-            <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12l4.58-4.59z"/></svg>
-          </div>
-          <div id="key-down" class="game-key move-key">
-            <svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
-          </div>
-          <div id="key-right" class="game-key move-key">
-            <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
-          </div>
-        </div>
-        
-        <!-- Interact button -->
-        <div id="key-interact" class="game-key">Interact</div>
-      </div>
-
-      <!-- Combat section -->
-      <div id="combat-section" class="mt-4">
-        <!-- Monster list -->
-        <div id="monster-list-container" class="glass-panel p-3 rounded-lg mb-4" style="display: none;">
-          <div class="text-center text-sm text-gray-400 mb-2">Available Monsters</div>
-          <div id="monster-list" class="space-y-2">
-            <!-- Monsters will be populated here -->
-          </div>
-        </div>
-
-        <!-- Combat interface -->
-        <div id="combat-interface" class="glass-panel p-3 rounded-lg" style="display: none;">
-          <div class="text-center mb-4">
-            <div id="selected-monster-name" class="font-orbitron text-lg text-orange-400 mb-2"></div>
-            <div id="selected-monster-image" class="flex justify-center mb-2">
-              <!-- Monster image will go here -->
+    <!-- Item Action Modal -->
+    <div id="item-action-modal-backdrop">
+        <div id="item-action-modal">
+            <h3 id="item-action-title" class="font-orbitron text-lg mb-3"></h3>
+            <p id="item-action-description" class="text-sm text-gray-300 mb-4"></p>
+            <div class="action-buttons">
+                <!-- Action buttons will be populated here -->
             </div>
-            <div class="text-sm text-gray-400">
-              <div>Level: <span id="selected-monster-level"></span></div>
-              <div>Health: <span id="selected-monster-health"></span></div>
+        </div>
+    </div>
+
+    <!-- Character Creation Modal -->
+    <div id="creation-modal">
+        <div class="creation-container">
+            <h1 class="creation-title">Create Your Character</h1>
+            <form class="creation-form" id="character-creation-form">
+                <div class="creation-group">
+                    <label class="creation-label" for="character-name">Character Name</label>
+                    <input type="text" id="character-name" class="creation-input" placeholder="Enter your name" required>
+                </div>
+                
+                <div class="creation-group">
+                    <label class="creation-label" for="character-race">Race</label>
+                    <select id="character-race" class="creation-select" required>
+                        <option value="">Select a race</option>
+                        <option value="Human">Human - Balanced attributes</option>
+                        <option value="Elf">Elf - High magic affinity</option>
+                        <option value="Dwarf">Dwarf - Strong and resilient</option>
+                        <option value="Orc">Orc - Powerful warriors</option>
+                    </select>
+                </div>
+                
+                <div class="creation-group">
+                    <label class="creation-label" for="character-class">Class</label>
+                    <select id="character-class" class="creation-select" required>
+                        <option value="">Select a class</option>
+                        <option value="Fighter">Fighter - Melee combat specialist</option>
+                        <option value="Mage">Mage - Master of magic</option>
+                        <option value="Ranger">Ranger - Balanced combat and magic</option>
+                        <option value="Paladin">Paladin - Holy warrior</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="creation-submit">Begin Adventure</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Game Data Editor Modal -->
+    <div id="game-data-editor-modal" class="hidden">
+        <div class="editor-container">
+            <div class="editor-sidebar">
+                <button class="editor-tab-btn active" data-tab="dashboard">Dashboard</button>
+                <button class="editor-tab-btn" data-tab="constants">Constants</button>
+                <button class="editor-tab-btn" data-tab="races">Races</button>
+                <button class="editor-tab-btn" data-tab="zones">Zones</button>
+                <button class="editor-tab-btn" data-tab="monsters">Monsters</button>
+                <button class="editor-tab-btn" data-tab="base_items">Base Items</button>
+                <button class="editor-tab-btn" data-tab="gear_tiers">Gear Tiers</button>
+                <button class="editor-tab-btn" data-tab="gems">Gems</button>
+                <button class="editor-tab-btn" data-tab="enchantments">Enchantments</button>
+                <button class="editor-tab-btn" data-tab="quests">Quests</button>
+                <button class="editor-tab-btn" data-tab="loot_tables">Loot Tables</button>
             </div>
-          </div>
-          
-          <div class="grid grid-cols-2 gap-2">
-            <button id="attack-btn" class="glass-button py-2 rounded">Attack</button>
-            <button id="cast-btn" class="glass-button py-2 rounded">Cast</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Character Tab -->
-    <div id="character-tab" class="main-tab-panel flex-grow">
-      <div class="space-y-4">
-        <!-- Character info -->
-        <div class="glass-panel p-4 rounded-lg">
-          <div class="text-center mb-4">
-            <div class="font-orbitron text-lg" id="char-name">Hero</div>
-            <div class="text-sm text-gray-400">
-              <span id="char-race">Human</span> <span id="char-class">Fighter</span>
+            
+            <div class="editor-main">
+                <div class="editor-header">
+                    <h2 class="font-orbitron text-xl">Game Data Editor</h2>
+                    <div class="flex gap-2">
+                        <button id="gdd-editor-save-btn" class="glass-button px-4 py-2 rounded">Save</button>
+                        <button id="gdd-editor-reset-btn" class="glass-button px-4 py-2 rounded">Reset</button>
+                        <button id="gdd-editor-close-btn" class="glass-button px-4 py-2 rounded">Close</button>
+                    </div>
+                </div>
+                
+                <div class="editor-content-area">
+                    <div id="gdd-editor-content">
+                        <!-- Editor content will be populated here -->
+                    </div>
+                    <div id="editor-status" class="editor-status mt-4"></div>
+                </div>
             </div>
-          </div>
-          
-          <!-- Attribute points -->
-          <div class="text-center mb-4">
-            <div class="text-sm text-gray-400">Attribute Points</div>
-            <div id="attribute-points" class="font-orbitron text-xl text-orange-400">0</div>
-          </div>
         </div>
-
-        <!-- Stats accordion -->
-        <div id="stats-container">
-          <!-- Stats will be populated here -->
-        </div>
-      </div>
     </div>
 
-    <!-- Inventory Tab -->
-    <div id="inventory-tab" class="main-tab-panel flex-grow">
-      <!-- Inventory bags -->
-      <div class="space-y-4">
-        <div class="glass-panel p-4 rounded-lg">
-          <h3 class="font-orbitron text-lg mb-3 text-center">Inventory</h3>
-          
-          <!-- Bag tabs -->
-          <div class="flex overflow-x-auto mb-4 custom-scrollbar-x">
-            <button class="inventory-bag-tab active" data-bag="all">All</button>
-            <button class="inventory-bag-tab" data-bag="Weapon Chest">Weapons</button>
-            <button class="inventory-bag-tab" data-bag="Bag of Gear">Gear</button>
-            <button class="inventory-bag-tab" data-bag="Jewelry Box">Jewelry</button>
-            <button class="inventory-bag-tab" data-bag="Spell Satchel">Spells</button>
-          </div>
-          
-          <!-- Inventory grid -->
-          <div id="inventory-grid" class="inventory-grid">
-            <!-- Inventory items will be populated here -->
-          </div>
-        </div>
+    <!-- Main Game Container -->
+    <div class="h-full">
+        <div class="max-w-md mx-auto h-full flex flex-col p-2 gap-2">
+            
+            <!-- Header -->
+            <header class="glass-panel p-3 rounded-lg flex justify-between items-center flex-shrink-0">
+                <section class="flex-1">
+                    <div class="flex flex-col items-start space-y-2 flex-grow">
+                        <div class="flex items-center gap-4">
+                            <div>
+                                <span class="level-label font-orbitron">Level: </span>
+                                <span id="player-level-value" class="level-value font-orbitron">1</span>
+                                <span id="player-name-value" class="name-value ml-2 font-orbitron">Player</span>
+                            </div>
+                            <div>
+                                <button id="zone-teleport-trigger" class="teleport-trigger-btn" title="Teleport to Zone">🌀</button>
+                            </div>
+                        </div>
+                        <div class="health-bar-container w-full max-w-[150px]">
+                            <div class="progress-bar-track h-3">
+                                <div id="hp-bar" class="progress-bar-fill h-full" style="width: 100%; background-color: var(--hp-color);"></div>
+                            </div>
+                            <span id="player-health-numeric">100 / 100</span>
+                        </div>
+                    </div>
+                </section>
 
-        <!-- Gem pouch -->
-        <div class="glass-panel p-4 rounded-lg">
-          <h3 class="font-orbitron text-lg mb-3 text-center">Gem Pouch</h3>
-          <div id="gem-pouch-grid" class="gem-pouch-grid">
-            <!-- Gems will be populated here -->
-          </div>
+                <section class="flex-1 flex justify-end">
+                    <div class="flex items-center gap-2">
+                        <div id="mini-map-container" class="relative w-24 h-24" title="World Map">
+                            <div class="absolute -inset-1 rounded-full border border-dashed border-orange-500/30 animate-spin" style="animation-duration: 20s; animation-timing-function: linear;"></div>
+                            <div class="relative w-full h-full rounded-full overflow-hidden glass-panel border-2 border-[var(--border-color-main)]">
+                                <canvas id="mini-map-canvas"></canvas>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-center gap-1">
+                            <div id="d-pad-controls">
+                                <div class="game-key move-key" id="key-up" data-key="up"><svg viewBox="0 0 24 24"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path></svg></div>
+                                <div class="game-key move-key" id="key-left" data-key="left"><svg viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"></path></svg></div>
+                                <div class="game-key move-key" id="key-down" data-key="down"><svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"></path></svg></div>
+                                <div class="game-key move-key" id="key-right" data-key="right"><svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"></path></svg></div>
+                            </div>
+                            <div class="game-key" id="key-interact" data-key="interact">Interact</div>
+                        </div>
+                    </div>
+                </section>
+            </header>
+
+            <!-- Main Content Panel -->
+            <section id="main-content-panel" class="flex-grow flex flex-col overflow-hidden">
+                <main id="main-content" class="flex-grow flex flex-col overflow-hidden glass-panel rounded-lg relative">
+
+                    <!-- Main Tabs Container -->
+                    <div id="main-tabs-container" class="flex-shrink-0 flex items-center overflow-x-auto whitespace-nowrap custom-scrollbar-x border-b border-[var(--border-color-main)]">
+                        <button class="main-tab-button active" data-tab="equipment">Equipment</button>
+                        <button class="main-tab-button" data-tab="infusion">Infusion</button>
+                        <button class="main-tab-button" data-tab="inventory">Inventory</button>
+                        <button class="main-tab-button" data-tab="stats">Stats</button>
+                        <button class="main-tab-button" data-tab="combat">Combat</button>
+                        <button class="main-tab-button" data-tab="quest">Quest</button>
+                        <button class="main-tab-button" data-tab="settings">Settings</button>
+                    </div>
+
+                    <!-- Main Tab Content -->
+                    <div id="main-tab-content" class="flex-grow p-2 md:p-4 overflow-y-auto custom-scrollbar relative">
+                        <div id="tab-content-equipment" class="main-tab-panel active"></div>
+                        <div id="tab-content-infusion" class="main-tab-panel"></div>
+                        <div id="tab-content-inventory" class="main-tab-panel"></div>
+                        <div id="tab-content-stats" class="main-tab-panel"></div>
+                        <div id="tab-content-combat" class="main-tab-panel"></div>
+                        <div id="tab-content-quest" class="main-tab-panel"></div>
+                        <div id="tab-content-settings" class="main-tab-panel"></div>
+                    </div>
+
+                    <!-- Focus Mode Button -->
+                    <button id="focus-mode-btn" title="Toggle Focus Mode">
+                        <svg id="focus-icon-expand" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 0h-4m4 0l-5-5"></path></svg>
+                        <svg id="focus-icon-collapse" class="hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
+                    </button>
+                </main>
+            </section>
+
+            <!-- Communication Panel -->
+            <section id="communication-panel" class="flex-shrink-0">
+                <div id="footer-chat-container" class="glass-panel w-full p-2 rounded-lg flex flex-col">
+                    <!-- Combat Stats Container -->
+                    <div id="combat-stats-container">
+                        <div class="location-info">
+                            <span class="stats-label label-location">LOCATION</span>
+                            <span class="stats-value" id="location-value">World Map</span>
+                        </div>
+                        <div class="stats-grid">
+                            <div class="stats-col">
+                                <div>
+                                    <span class="stats-label label-health">HP</span>
+                                    <span class="stats-value" id="health-value">100/100</span>
+                                </div>
+                                <div>
+                                    <span class="stats-label label-exp">EXP</span>
+                                    <span class="stats-value" id="exp-value">0</span>
+                                </div>
+                                <div>
+                                    <span class="stats-label label-next-level">NEXT</span>
+                                    <span class="stats-value" id="next-lvl-value">100</span>
+                                </div>
+                            </div>
+                            <div class="stats-col">
+                                <div>
+                                    <span class="stats-label label-level">LVL</span>
+                                    <span class="stats-value" id="level-value">1</span>
+                                </div>
+                                <div>
+                                    <span class="stats-label label-gold">GOLD</span>
+                                    <span class="stats-value" id="gold-value">0</span>
+                                </div>
+                                <div>
+                                    <span class="stats-label label-drop">INV</span>
+                                    <span class="stats-value" id="inv-value">0/200</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
-      </div>
     </div>
 
-    <!-- Equipment Tab -->
-    <div id="equipment-tab" class="main-tab-panel flex-grow">
-      <div class="glass-panel p-4 rounded-lg">
-        <h3 class="font-orbitron text-lg mb-4 text-center">Equipment</h3>
-        <div id="equipment-grid" class="equipment-grid">
-          <!-- Equipment slots will be populated here -->
-        </div>
-      </div>
-    </div>
-
-    <!-- Spells Tab -->
-    <div id="spells-tab" class="main-tab-panel flex-grow">
-      <div class="glass-panel p-4 rounded-lg">
-        <h3 class="font-orbitron text-lg mb-4 text-center">Spells & Magic</h3>
-        <div class="text-center text-gray-400">
-          Spell system coming soon...
-        </div>
-      </div>
-    </div>
-
-    <!-- Settings Tab -->
-    <div id="settings-tab" class="main-tab-panel flex-grow">
-      <div class="space-y-4">
-        <div class="glass-panel p-4 rounded-lg">
-          <h3 class="font-orbitron text-lg mb-4 text-center">Settings</h3>
-          
-          <!-- Save/Load -->
-          <div class="space-y-2 mb-4">
-            <button id="save-game-btn" class="glass-button w-full py-2 rounded">Save Game</button>
-            <button id="load-game-btn" class="glass-button w-full py-2 rounded">Load Game</button>
-            <button id="reset-game-btn" class="glass-button w-full py-2 rounded">Reset Game</button>
-          </div>
-
-          <!-- Chat -->
-          <div class="mb-4">
-            <div class="text-sm text-gray-400 mb-2">Game Chat</div>
-            <div id="chat-log" class="bg-black/30 p-2 rounded h-32 overflow-y-auto custom-scrollbar text-xs">
-              <div class="text-green-400">[System] Welcome to Geminus!</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal container -->
-  <div id="modal-container"></div>
-
-  <script type="module" src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

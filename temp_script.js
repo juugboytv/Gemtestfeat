@@ -1,4 +1,4 @@
-
+    <script type="module">
     // --- App State & Config ---
     let state = {
         player: {}, 
@@ -2854,4 +2854,4 @@ const InfusionManager = {
     }
 
     document.addEventListener('DOMContentLoaded', main);
-
+</script>
