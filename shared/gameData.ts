@@ -1,4 +1,4 @@
-import { BaseItem, Gem, Zone } from './schema';
+import { BaseItem, Gem } from './schema';
 
 // Base item templates from your game
 export const BASE_ITEMS: BaseItem[] = [
@@ -54,7 +54,7 @@ export const GEMS: Record<string, Omit<Gem, 'tier'>> = {
 };
 
 // Zones data from your game
-export const ZONES: Record<string, Zone> = {
+export const ZONES: Record<string, any> = {
   "1": { "name": "Crystal Caves (Dwarf)", "levelReq": 1, "biome": "mountain", "gearTier": 1 },
   "2": { "name": "Glimmerwood (Elf)", "levelReq": 1, "biome": "forest", "gearTier": 1 },
   "3": { "name": "The Shifting Maze (Halfling)", "levelReq": 1, "biome": "plains", "gearTier": 1 },
@@ -96,17 +96,15 @@ export class ItemFactory {
       classValue: 0
     };
 
-    if (type === 'Shadow') {
-      newItem.quality = options.quality || (0.75 + (Math.random() * 0.75));
-      newItem.kills = 0;
-    } else if (type === 'Echo') {
-      newItem.quality = options.quality;
-    }
-    
     // Calculate final class value
     let finalClassValue = baseClassValue * baseItem.proportion;
-    if (newItem.quality) {
-      finalClassValue *= newItem.quality;
+    
+    // Handle quality and kills for Shadow/Echo items (temporarily simplified)
+    if (type === 'Shadow') {
+      const quality = options.quality || (0.75 + (Math.random() * 0.75));
+      finalClassValue *= quality;
+    } else if (type === 'Echo' && options.quality) {
+      finalClassValue *= options.quality;
     }
     newItem.classValue = finalClassValue;
 
