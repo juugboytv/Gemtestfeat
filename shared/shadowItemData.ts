@@ -23,7 +23,7 @@ export interface ShadowTier {
   };
 }
 
-// Base shadow item types from GDD
+// Base shadow item types from GDD with GitHub image URLs
 export const SHADOW_ITEM_TYPES: Record<string, ShadowItemType> = {
   // Fighter Weapons
   'shadow_sword': {
@@ -32,6 +32,7 @@ export const SHADOW_ITEM_TYPES: Record<string, ShadowItemType> = {
     archetype: 'Fighter',
     equipSlot: 'weapon',
     primaryStat: 'WC',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Shadow%20sword%20weapon.PNG',
   },
   'shadow_axe': {
     id: 'shadow_axe',
@@ -39,6 +40,7 @@ export const SHADOW_ITEM_TYPES: Record<string, ShadowItemType> = {
     archetype: 'Fighter',
     equipSlot: 'weapon',
     primaryStat: 'WC',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Shadow%20Axe%20Weapon.PNG',
   },
   'shadow_mace': {
     id: 'shadow_mace',
@@ -46,6 +48,7 @@ export const SHADOW_ITEM_TYPES: Record<string, ShadowItemType> = {
     archetype: 'Fighter',
     equipSlot: 'weapon',
     primaryStat: 'WC',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Shadow%20Mace%20weapon.PNG',
   },
   'shadow_dagger': {
     id: 'shadow_dagger',
@@ -53,50 +56,123 @@ export const SHADOW_ITEM_TYPES: Record<string, ShadowItemType> = {
     archetype: 'Fighter',
     equipSlot: 'weapon',
     primaryStat: 'WC',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Shadow%20dagger%20weapon.PNG',
+  },
+  'shadow_claw': {
+    id: 'shadow_claw',
+    name: 'Shadow Claw',
+    archetype: 'Fighter',
+    equipSlot: 'weapon',
+    primaryStat: 'WC',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Shadow%20Claw%20Weapon.PNG',
   },
   'shadow_bow': {
     id: 'shadow_bow',
     name: 'Shadow Bow',
     archetype: 'Fighter',
-    equipSlot: 'weapon',
+    equipSlot: 'weapon1',
     primaryStat: 'WC',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Shadow%20Bow%20Weapon.PNG',
   },
-  'shadow_spear': {
-    id: 'shadow_spear',
-    name: 'Shadow Spear',
+  'shadow_arrow': {
+    id: 'shadow_arrow',
+    name: 'Shadow Arrow',
+    archetype: 'Fighter',
+    equipSlot: 'weapon2',
+    primaryStat: 'WC',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Shadow%20Arrow.PNG',
+  },
+  'shadow_fighter_staff': {
+    id: 'shadow_fighter_staff',
+    name: 'Shadow Fighter Staff',
     archetype: 'Fighter',
     equipSlot: 'weapon',
     primaryStat: 'WC',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Shadow%20Fighter%20Staff%20weapon.PNG',
   },
 
   // Caster Weapons
-  'shadow_staff': {
-    id: 'shadow_staff',
-    name: 'Shadow Staff',
+  'shadow_caster_staff': {
+    id: 'shadow_caster_staff',
+    name: 'Shadow Caster Staff',
     archetype: 'Caster',
     equipSlot: 'weapon',
     primaryStat: 'SC',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Shadow%20Caster%20Staff.PNG',
   },
-  'shadow_wand': {
-    id: 'shadow_wand',
-    name: 'Shadow Wand',
+  'shadow_caster_offhand': {
+    id: 'shadow_caster_offhand',
+    name: 'Shadow Caster Off-hand',
     archetype: 'Caster',
-    equipSlot: 'weapon',
+    equipSlot: 'weapon2',
     primaryStat: 'SC',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Shadow%20Caster%20Off%20hand%20weapon.PNG',
   },
-  'shadow_orb': {
-    id: 'shadow_orb',
-    name: 'Shadow Orb',
+
+  // Spells (Caster abilities)
+  'shadow_air_spell': {
+    id: 'shadow_air_spell',
+    name: 'Shadow Air Spell',
     archetype: 'Caster',
-    equipSlot: 'weapon',
+    equipSlot: 'spell',
     primaryStat: 'SC',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Shadow%20Air%20Spell.PNG',
   },
-  'shadow_tome': {
-    id: 'shadow_tome',
-    name: 'Shadow Tome',
+  'shadow_arcane_spell': {
+    id: 'shadow_arcane_spell',
+    name: 'Shadow Arcane Spell',
     archetype: 'Caster',
-    equipSlot: 'weapon',
+    equipSlot: 'spell',
     primaryStat: 'SC',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Shadow%20Arcane%20Spell.PNG',
+  },
+  'shadow_cold_spell': {
+    id: 'shadow_cold_spell',
+    name: 'Shadow Cold Spell',
+    archetype: 'Caster',
+    equipSlot: 'spell',
+    primaryStat: 'SC',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Shadow%20Cold%20Spell.PNG',
+  },
+  'shadow_death_spell': {
+    id: 'shadow_death_spell',
+    name: 'Shadow Death Spell',
+    archetype: 'Caster',
+    equipSlot: 'spell',
+    primaryStat: 'SC',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Shadow%20Death%20Spell.PNG',
+  },
+  'shadow_drain_spell': {
+    id: 'shadow_drain_spell',
+    name: 'Shadow Drain Spell',
+    archetype: 'Caster',
+    equipSlot: 'spell',
+    primaryStat: 'SC',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Shadow%20Drain%20Spell.PNG',
+  },
+  'shadow_earth_spell': {
+    id: 'shadow_earth_spell',
+    name: 'Shadow Earth Spell',
+    archetype: 'Caster',
+    equipSlot: 'spell',
+    primaryStat: 'SC',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Shadow%20Earth%20Spell.PNG',
+  },
+  'shadow_fire_spell': {
+    id: 'shadow_fire_spell',
+    name: 'Shadow Fire Spell',
+    archetype: 'Caster',
+    equipSlot: 'spell',
+    primaryStat: 'SC',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Shadow%20Fire%20Spell.PNG',
+  },
+  'shadow_fighter_buff_spell': {
+    id: 'shadow_fighter_buff_spell',
+    name: 'Shadow Fighter Buff Spell',
+    archetype: 'Both',
+    equipSlot: 'spell',
+    primaryStat: 'SC',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Shadow%20fighter%20Buff%20Spell.PNG',
   },
 
   // Armor (Both archetypes)
@@ -106,6 +182,7 @@ export const SHADOW_ITEM_TYPES: Record<string, ShadowItemType> = {
     archetype: 'Both',
     equipSlot: 'helmet',
     primaryStat: 'AC',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Shadow%20helmet.PNG',
   },
   'shadow_armor': {
     id: 'shadow_armor',
@@ -113,6 +190,7 @@ export const SHADOW_ITEM_TYPES: Record<string, ShadowItemType> = {
     archetype: 'Both',
     equipSlot: 'armor',
     primaryStat: 'AC',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Shadow%20chest%20Armor.PNG',
   },
   'shadow_leggings': {
     id: 'shadow_leggings',
@@ -120,6 +198,7 @@ export const SHADOW_ITEM_TYPES: Record<string, ShadowItemType> = {
     archetype: 'Both',
     equipSlot: 'leggings',
     primaryStat: 'AC',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Shadow%20Leggings%20.PNG',
   },
   'shadow_boots': {
     id: 'shadow_boots',
@@ -127,6 +206,15 @@ export const SHADOW_ITEM_TYPES: Record<string, ShadowItemType> = {
     archetype: 'Both',
     equipSlot: 'boots',
     primaryStat: 'AC',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Shadow%20Boot%201.PNG',
+  },
+  'shadow_boots_alt': {
+    id: 'shadow_boots_alt',
+    name: 'Shadow Boots (Alt)',
+    archetype: 'Both',
+    equipSlot: 'boots',
+    primaryStat: 'AC',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Shadow%20Boot%202.PNG',
   },
   'shadow_gauntlets': {
     id: 'shadow_gauntlets',
@@ -134,6 +222,7 @@ export const SHADOW_ITEM_TYPES: Record<string, ShadowItemType> = {
     archetype: 'Both',
     equipSlot: 'gauntlets',
     primaryStat: 'AC',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Shadow%20gauntlets%20.PNG',
   },
 
   // Shields (Fighter only)
@@ -143,15 +232,17 @@ export const SHADOW_ITEM_TYPES: Record<string, ShadowItemType> = {
     archetype: 'Fighter',
     equipSlot: 'shield',
     primaryStat: 'AC',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Shadow%20Shield%20.PNG',
   },
 
   // Jewelry (Both archetypes)
-  'shadow_amulet': {
-    id: 'shadow_amulet',
-    name: 'Shadow Amulet',
+  'shadow_necklace': {
+    id: 'shadow_necklace',
+    name: 'Shadow Necklace',
     archetype: 'Both',
     equipSlot: 'amulet',
     primaryStat: 'WC', // Mixed stats
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Shadow%20Necklace.PNG',
   },
   'shadow_ring': {
     id: 'shadow_ring',
@@ -159,6 +250,7 @@ export const SHADOW_ITEM_TYPES: Record<string, ShadowItemType> = {
     archetype: 'Both',
     equipSlot: 'ring',
     primaryStat: 'WC', // Mixed stats
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Shadow%20Ring.PNG',
   },
 };
 

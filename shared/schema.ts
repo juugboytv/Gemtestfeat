@@ -207,7 +207,7 @@ export const shadowItems = pgTable('shadow_items', {
   // Equipment properties
   equipRequirements: jsonb('equip_requirements'), // Level and stat requirements
   isEquipped: boolean('is_equipped').default(false),
-  equipSlot: text('equip_slot'), // weapon, armor, shield, etc.
+  equipSlot: text('equip_slot'), // weapon, weapon1, weapon2, armor, shield, spell, etc.
   
   // Economy
   value: integer('value').notNull(),
