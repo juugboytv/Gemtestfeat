@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { GameState, GameStateSchema } from '@shared/schema';
+import { GameState, GameStateSchema } from '@/../../shared/schema';
 
 const STORAGE_KEY = 'geminus-save';
 
@@ -11,22 +11,28 @@ const defaultGameState: GameState = {
     maxHealth: 100,
     experience: 0,
     gold: 0,
-    attributes: {
-      strength: 10,
-      agility: 10,
-      intelligence: 10,
-      vitality: 10
-    },
-    availablePoints: 0
+    currentZone: '1',
+    activeQuests: [],
+    questStreak: 0,
+    questPool: { xp: 0, gold: 0, items: [] }
   },
-  currentZone: 'tutorial-cave',
-  inventory: {},
-  equipment: {},
-  spells: ['heal'],
-  settings: {
-    animations: true,
-    sounds: true
-  }
+  equipment: {
+    helmet: null,
+    armor: null,
+    leggings: null,
+    boots: null,
+    gauntlets: null,
+    amulet: null,
+    ring: null,
+    weapon: null,
+    offhand: null,
+    spellbook: null
+  },
+  inventory: [],
+  gemPouch: [],
+  zones: {},
+  currentTab: 'equipment',
+  focusMode: false
 };
 
 export function useGameState() {
@@ -62,6 +68,13 @@ export function useGameState() {
     return { success: true, message: 'New game started!' };
   }, []);
 
+  const updateGameState = useCallback((updates: Partial<GameState>) => {
+    setGameState(prev => ({
+      ...prev,
+      ...updates
+    }));
+  }, []);
+
   const updatePlayer = useCallback((updater: (player: GameState['player']) => GameState['player']) => {
     setGameState(prev => ({
       ...prev,
@@ -69,17 +82,13 @@ export function useGameState() {
     }));
   }, []);
 
-  const updateSettings = useCallback((updater: (settings: GameState['settings']) => GameState['settings']) => {
-    setGameState(prev => ({
-      ...prev,
-      settings: updater(prev.settings)
-    }));
-  }, []);
-
   const setCurrentZone = useCallback((zone: string) => {
     setGameState(prev => ({
       ...prev,
-      currentZone: zone
+      player: {
+        ...prev.player,
+        currentZone: zone
+      }
     }));
   }, []);
 
@@ -98,11 +107,11 @@ export function useGameState() {
 
   return {
     gameState,
+    updateGameState,
     saveGame,
     loadGame,
     newGame,
     updatePlayer,
-    updateSettings,
     setCurrentZone
   };
 }
