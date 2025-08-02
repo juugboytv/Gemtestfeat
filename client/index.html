@@ -2329,7 +2329,7 @@ const EquipmentManager = {
     },
     inventoryBags: {
         'Weapon Chest': ['Weapon'],
-        'Bag of Gear': ['Helmet', 'Armor', 'Leggings', 'Boots', 'Gauntlets'],
+        'Armory': ['Helmet', 'Armor', 'Leggings', 'Boots', 'Gauntlets'],
         'Jewelry Box': ['Amulet', 'Ring'],
         'Spell Satchel': ['Spellbook'],
     },
@@ -2346,10 +2346,6 @@ const EquipmentManager = {
 
     renderEquipmentTab() {
         ui.tabContentEquipment.innerHTML = `
-            <div class="flex gap-2 mb-2">
-                <button class="glass-button flex-1 py-1 text-sm rounded-md active" data-view="equipment">Equipment</button>
-                <button class="glass-button flex-1 py-1 text-sm rounded-md" data-view="socket">Socket</button>
-            </div>
             <div id="equipment-view-content"></div>
         `;
     },
@@ -4110,7 +4106,7 @@ const InfusionManager = {
     },
     inventoryBags: {
         'Weapon Chest': ['Weapon'],
-        'Bag of Gear': ['Helmet', 'Armor', 'Leggings', 'Boots', 'Gauntlets'],
+        'Armory': ['Helmet', 'Armor', 'Leggings', 'Boots', 'Gauntlets'],
         'Jewelry Box': ['Amulet', 'Ring'],
         'Spell Satchel': ['Spellbook'],
     },
