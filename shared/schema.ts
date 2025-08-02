@@ -72,6 +72,13 @@ export const ZoneSchema = z.object({
   gearTier: z.number()
 });
 
+// Legacy Zone type for backwards compatibility
+export const LegacyZoneSchema = z.object({
+  id: z.string(),
+  levelRequirement: z.number(),
+  description: z.string().optional()
+});
+
 // Game State
 export const GameStateSchema = z.object({
   player: PlayerSchema,
@@ -110,6 +117,7 @@ export type Item = z.infer<typeof ItemSchema>;
 export type BaseItem = z.infer<typeof BaseItemSchema>;
 export type EquipmentSlots = z.infer<typeof EquipmentSlotsSchema>;
 export type Zone = z.infer<typeof ZoneSchema>;
+export type LegacyZone = z.infer<typeof LegacyZoneSchema>;
 export type GameState = z.infer<typeof GameStateSchema>;
 export type ChatMessage = z.infer<typeof ChatMessageSchema>;
 export type ChatState = z.infer<typeof ChatStateSchema>;
