@@ -53,8 +53,8 @@ export const characters = pgTable('characters', {
   updatedAt: timestamp('updated_at').defaultNow(),
 });
 
-// Items table - comprehensive equipment system with 20 gear tiers
-export const items = pgTable('items', {
+// Dropper items table - store-bought equipment with 20 gear tiers
+export const dropperItems = pgTable('dropper_items', {
   id: serial('id').primaryKey(),
   characterId: integer('character_id').notNull().references(() => characters.id, { onDelete: 'cascade' }),
   
@@ -62,12 +62,11 @@ export const items = pgTable('items', {
   name: text('name').notNull(),
   type: text('type').notNull(), // weapon, armor, shield, helmet, boots, gloves, ring, amulet
   gearTier: integer('gear_tier').notNull(), // 1-20 (Crude to Ascended)
-  quality: text('quality').notNull().default('normal'), // normal, enhanced, superior, legendary
   
   // Stats - following GDD mathematical progression
-  attackBonus: integer('attack_bonus').default(0),
-  defenseBonus: integer('defense_bonus').default(0),
-  healthBonus: integer('health_bonus').default(0),
+  weaponClass: integer('weapon_class').default(0),
+  spellClass: integer('spell_class').default(0),
+  armorClass: integer('armor_class').default(0),
   
   // Special properties
   enchantments: jsonb('enchantments'), // Special effects and bonuses
@@ -75,8 +74,38 @@ export const items = pgTable('items', {
   maxDurability: integer('max_durability').default(100),
   
   // Trading and economy
-  value: integer('value').notNull(),
+  purchasePrice: integer('purchase_price').notNull(),
   isEquipped: boolean('is_equipped').default(false),
+  inBank: boolean('in_bank').default(false),
+  
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
+// Echo items table - another type of procedural gear
+export const echoItems = pgTable('echo_items', {
+  id: serial('id').primaryKey(),
+  characterId: integer('character_id').notNull().references(() => characters.id, { onDelete: 'cascade' }),
+  
+  // Echo item identification
+  baseItemName: text('base_item_name').notNull(),
+  echoTier: integer('echo_tier').notNull(), // Echo-specific tier system
+  quality: text('quality').notNull(),
+  
+  // Echo-specific stats
+  weaponClass: integer('weapon_class').default(0),
+  spellClass: integer('spell_class').default(0),
+  armorClass: integer('armor_class').default(0),
+  
+  // Special echo properties
+  echoEnchantments: jsonb('echo_enchantments'),
+  resonance: integer('resonance').default(0), // Echo-specific property
+  
+  // Equipment properties
+  isEquipped: boolean('is_equipped').default(false),
+  equipSlot: text('equip_slot'),
+  
+  // Economy
+  value: integer('value').notNull(),
   inBank: boolean('in_bank').default(false),
   
   createdAt: timestamp('created_at').defaultNow(),
@@ -211,9 +240,16 @@ export const charactersRelations = relations(characters, ({ one, many }) => ({
   zoneProgress: many(zoneProgress),
 }));
 
-export const itemsRelations = relations(items, ({ one }) => ({
+export const dropperItemsRelations = relations(dropperItems, ({ one }) => ({
   character: one(characters, {
-    fields: [items.characterId],
+    fields: [dropperItems.characterId],
+    references: [characters.id],
+  }),
+}));
+
+export const echoItemsRelations = relations(echoItems, ({ one }) => ({
+  character: one(characters, {
+    fields: [echoItems.characterId],
     references: [characters.id],
   }),
 }));
@@ -259,7 +295,12 @@ export const insertCharacterSchema = createInsertSchema(characters).omit({
   updatedAt: true,
 });
 
-export const insertItemSchema = createInsertSchema(items).omit({
+export const insertDropperItemSchema = createInsertSchema(dropperItems).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertEchoItemSchema = createInsertSchema(echoItems).omit({
   id: true,
   createdAt: true,
 });
@@ -294,8 +335,10 @@ export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type Character = typeof characters.$inferSelect;
 export type InsertCharacter = z.infer<typeof insertCharacterSchema>;
-export type Item = typeof items.$inferSelect;
-export type InsertItem = z.infer<typeof insertItemSchema>;
+export type DropperItem = typeof dropperItems.$inferSelect;
+export type InsertDropperItem = z.infer<typeof insertDropperItemSchema>;
+export type EchoItem = typeof echoItems.$inferSelect;
+export type InsertEchoItem = z.infer<typeof insertEchoItemSchema>;
 export type CombatLog = typeof combatLogs.$inferSelect;
 export type InsertCombatLog = z.infer<typeof insertCombatLogSchema>;
 export type ZoneProgress = typeof zoneProgress.$inferSelect;
