@@ -1,83 +1,212 @@
-// Complete game data extracted from original Geminus 4,000 line implementation
+// GDD Mathematical Balancing System for Geminus
+// Implements the complete 400,000 level cap with 20 gear tiers
 
-export const GameData = {
-  ItemFactory: {
-    baseItemTemplates: [
-      // Armor & Apparel - All sockets set to 2
-      { id: 'base_helm_1', name: 'Iron Helm', type: 'Helmet', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/juugboytv-equipment1/IMG_1396.png', proportion: 0.75, sockets: 2 },
-      { id: 'base_armor_1', name: 'Steel Plate Armor', type: 'Armor', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/juugboytv-equipment1/IMG_1401.png', proportion: 1.0, sockets: 2 },
-      { id: 'base_leggings_1', name: 'Steel Greaves', type: 'Leggings', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/juugboytv-equipment1/IMG_1402.png', proportion: 0.5, sockets: 2, special: { hitChanceBonus: 0.10 } },
-      { id: 'base_boots_1', name: 'Steel Sabatons', type: 'Boots', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/juugboytv-equipment1/IMG_1403.png', proportion: 0.75, sockets: 2 },
-      { id: 'base_gauntlets_1', name: 'Steel Gauntlets', type: 'Gauntlets', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/juugboytv-equipment1/IMG_1404.png', proportion: 0.5, sockets: 2, special: { classBonus: 0.15 } },
-      { id: 'base_necklace_1', name: 'Amulet of Power', type: 'Amulet', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/juugboytv-equipment1/IMG_1405.png', proportion: 0.0, sockets: 2 },
-      { id: 'base_ring_1', name: 'Ring of Vitality', type: 'Ring', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/juugboytv-equipment1/IMG_1406.png', proportion: 0.0, sockets: 2 },
-      
-      // Weapons - SubTypes added and sockets set to 2
-      { id: 'base_shield_1', name: 'Heater Shield', type: 'Weapon', subType: 'Shield', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/IMG_1408.png', proportion: 1.0, sockets: 2 },
-      { id: 'base_coh_1', name: 'Caster Off-Hand', type: 'Weapon', subType: 'Caster Off-Hand', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/IMG_1409.png', proportion: 1.0, sockets: 2 },
-      { id: 'base_bow_1', name: 'Longbow', type: 'Weapon', subType: 'Bow', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/IMG_1410.png', proportion: 1.0, sockets: 2 },
-      { id: 'base_axe_1', name: 'Battle Axe', type: 'Weapon', subType: 'Axe', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/IMG_1411.png', proportion: 1.0, sockets: 2 },
-      { id: 'base_sword_1', name: 'Knightly Sword', type: 'Weapon', subType: 'Sword', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/Weapons/IMG_1412.png', proportion: 1.0, sockets: 2 },
-      { id: 'base_dagger_1', name: 'Rondel Dagger', type: 'Weapon', subType: 'Dagger', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/IMG_1413.png', proportion: 1.0, sockets: 2 },
-      { id: 'base_mace_1', name: 'Flanged Mace', type: 'Weapon', subType: 'Mace', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/IMG_1414.png', proportion: 1.0, sockets: 2 },
-      { id: 'base_cstaff_1', name: 'Caster Staff', type: 'Weapon', subType: 'Caster Staff', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/IMG_1415.png', proportion: 1.0, sockets: 2 },
-      { id: 'base_fstaff_1', name: 'Fighter Staff', type: 'Weapon', subType: 'Fighter Staff', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/IMG_1416.png', proportion: 1.0, sockets: 2 },
-      
-      // Spells - Sockets set to 2
-      { id: 'base_book_1', name: 'Tome of Arcane Lore', type: 'Spellbook', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/juugboytv-equipment1/IMG_1407.png', proportion: 0.25, sockets: 2 }
-    ]
-  },
+export interface GearTier {
+  id: number;
+  name: string;
+  levelRequirement: number;
+  statMultiplier: number;
+  rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'mythic' | 'ascended';
+}
 
-  equipmentSlotConfig: [
-    { name: 'Helmet', type: 'Helmet' },
-    { name: 'Weapon 1', type: 'Weapon' },
-    { name: 'Armor', type: 'Armor' },
-    { name: 'Weapon 2', type: 'Weapon' },
-    { name: 'Gauntlets', type: 'Gauntlets' },
-    { name: 'Leggings', type: 'Leggings' },
-    { name: 'Boots', type: 'Boots' },
-    { name: 'Necklace', type: 'Amulet' },
-    { name: 'Spell 1', type: 'Spellbook' },
-    { name: 'Ring', type: 'Ring' },
-    { name: 'Spell 2', type: 'Spellbook' }
-  ],
+export interface ZoneData {
+  id: number;
+  name: string;
+  levelRange: { min: number; max: number };
+  monsterMultiplier: number;
+  xpMultiplier: number;
+  goldMultiplier: number;
+  unlockLevel: number;
+}
 
-  Gems: {
-    lorestone: { name: 'LoreStone', abbreviation: 'LST', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Gems/IMG_1500.png', effect: "Increase Base Spell Class", values: [1.5, 2.5, 3.5, 5, 7, 9, 11, 13, 15] },
-    loreheart: { name: 'LoreHeart', abbreviation: 'LHT', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Gems/IMG_1501.png', effect: "Increase Base SC & AC", values: { sc: [1, 1.5, 2.5, 3.5, 5, 7, 8.5, 10, 12], ac: [1.5, 2.5, 3.5, 5, 7, 9, 11, 13, 15] } },
-    mindrite: { name: 'Mindrite', abbreviation: 'MDR', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Gems/IMG_1504.png', effect: "Increase Wisdom", values: [5, 7.5, 10, 12.5, 15, 20, 30, 40, 50] },
-    dullrite: { name: 'Dullrite', abbreviation: 'DLR', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Gems/IMG_1505.png', effect: "Decrease Enemy Wisdom", values: [8, 10, 12, 14, 16, 19, 22, 26, 30] },
-    drainrite: { name: 'Drainrite', abbreviation: 'DRR', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Gems/IMG_1506.png', effect: "Steal Enemy Wisdom", values: [4, 6, 9, 15, 25, 40, 50, 60, 75] },
-    mindstone: { name: 'MindStone', abbreviation: 'MDS', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Gems/IMG_1507.png', effect: "Increase Intelligence", values: [5, 7.5, 10, 12.5, 15, 20, 30, 40, 50] },
-    dullstone: { name: 'DullStone', abbreviation: 'DLS', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Gems/IMG_1508.png', effect: "Decrease Enemy Intelligence", values: [8, 10, 12, 14, 16, 19, 22, 26, 30] },
-    drawstone: { name: 'DrawStone', abbreviation: 'DRS', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Gems/IMG_1509.png', effect: "Steal Enemy Intelligence", values: [4, 6, 9, 15, 25, 40, 50, 60, 75] },
-    sagerite: { name: 'Sagerite', abbreviation: 'SGR', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Gems/IMG_1510.png', effect: "Increase Ntl & Wisdom", values: [5, 7.5, 10, 12.5, 15, 20, 30, 40, 50] },
-    drowseite: { name: 'Drowseite', abbreviation: 'DWS', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Gems/IMG_1511.png', effect: "Decrease Enemy Ntl & Wisdom", values: [8, 10, 12, 14, 16, 19, 22, 26, 30] },
-    leechrite: { name: 'Leechrite', abbreviation: 'LCR', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Gems/IMG_1512.png', effect: "Steal Enemy Ntl & Wisdom", values: [4, 6, 9, 15, 25, 40, 50, 60, 75] },
-    warstone: { name: 'WarStone', abbreviation: 'WST', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Gems/IMG_1503.png', effect: "Increase Base Weapon Class", values: [1.5, 2.5, 3.5, 5, 7, 9, 11, 13, 15] },
-    warheart: { name: 'WarHeart', abbreviation: 'WHT', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Gems/IMG_1502.png', effect: "Increase Base WC & AC", values: { wc: [1, 1.5, 2.5, 3.5, 5, 7, 8.5, 10, 12], ac: [1.5, 2.5, 3.5, 5, 7, 9, 11, 13, 15] } },
-    true_core: { name: 'True-Core', abbreviation: 'TRC', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Gemsmisc/IMG_1538.png', effect: "Increase Hit Chance", values: [3, 6, 9, 12, 15, 18, 21, 25, 30] },
-    veil_core: { name: 'Veil-Core', abbreviation: 'VLC', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Gemsmisc/IMG_1534.png', effect: "Decrease Enemy Hit Chance", values: [2.7, 5.4, 8.1, 10.8, 13.5, 16.2, 18.9, 22.5, 27] },
-    vital_core: { name: 'Vital-Core', abbreviation: 'VTC', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Gemsmisc/IMG_1533.png', effect: "Heals", values: [5, 7.5, 10, 12.5, 15, 20, 30, 40, 50] },
-    blood_core: { name: 'Blood-Core', abbreviation: 'BDC', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Gemsmisc/IMG_1532.png', effect: "Steal Enemy Health", values: [4, 6, 9, 15, 25, 40, 50, 60, 75] },
-    flame_core: { name: 'Flame-Core', abbreviation: 'FLC', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Gemsmisc/IMG_1530.png', effect: "Damages Enemy", values: [8, 10, 12, 14, 16, 19, 22, 26, 30] },
-    treasure_core: { name: 'Treasure-Core', abbreviation: 'TRC', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Gemsmisc/IMG_1529.png', effect: "Increase Drop Chance", values: [2, 3, 4, 5, 6, 7, 8, 9, 10] }
-  },
+export interface MonsterScaling {
+  baseHP: number;
+  baseAttack: number;
+  baseDefense: number;
+  baseXP: number;
+  baseGold: number;
+  levelMultiplier: number;
+  bossMultiplier: number;
+}
 
-  // This will be populated from the full zone data
-  AllZones: {} as Record<string, any>
+// 20 Gear Tiers with Mathematical Progression
+export const GEAR_TIERS: GearTier[] = [
+  { id: 1, name: 'Crude', levelRequirement: 1, statMultiplier: 1.0, rarity: 'common' },
+  { id: 2, name: 'Rough', levelRequirement: 5, statMultiplier: 1.2, rarity: 'common' },
+  { id: 3, name: 'Basic', levelRequirement: 10, statMultiplier: 1.5, rarity: 'common' },
+  { id: 4, name: 'Sturdy', levelRequirement: 20, statMultiplier: 1.8, rarity: 'uncommon' },
+  { id: 5, name: 'Quality', levelRequirement: 35, statMultiplier: 2.2, rarity: 'uncommon' },
+  { id: 6, name: 'Superior', levelRequirement: 55, statMultiplier: 2.7, rarity: 'uncommon' },
+  { id: 7, name: 'Refined', levelRequirement: 80, statMultiplier: 3.3, rarity: 'rare' },
+  { id: 8, name: 'Masterwork', levelRequirement: 115, statMultiplier: 4.0, rarity: 'rare' },
+  { id: 9, name: 'Exceptional', levelRequirement: 160, statMultiplier: 4.8, rarity: 'rare' },
+  { id: 10, name: 'Elite', levelRequirement: 220, statMultiplier: 5.8, rarity: 'epic' },
+  { id: 11, name: 'Royal', levelRequirement: 300, statMultiplier: 7.0, rarity: 'epic' },
+  { id: 12, name: 'Ancient', levelRequirement: 400, statMultiplier: 8.5, rarity: 'epic' },
+  { id: 13, name: 'Mythical', levelRequirement: 550, statMultiplier: 10.3, rarity: 'legendary' },
+  { id: 14, name: 'Legendary', levelRequirement: 750, statMultiplier: 12.5, rarity: 'legendary' },
+  { id: 15, name: 'Artifact', levelRequirement: 1000, statMultiplier: 15.2, rarity: 'legendary' },
+  { id: 16, name: 'Divine', levelRequirement: 1500, statMultiplier: 18.5, rarity: 'mythic' },
+  { id: 17, name: 'Celestial', levelRequirement: 2500, statMultiplier: 22.5, rarity: 'mythic' },
+  { id: 18, name: 'Ethereal', levelRequirement: 5000, statMultiplier: 27.5, rarity: 'mythic' },
+  { id: 19, name: 'Transcendent', levelRequirement: 10000, statMultiplier: 33.5, rarity: 'ascended' },
+  { id: 20, name: 'Ascended', levelRequirement: 25000, statMultiplier: 40.8, rarity: 'ascended' }
+];
+
+// Zone Configuration with Proper Level Scaling
+export const ZONE_DATA: ZoneData[] = [
+  // Starter Zones (1-24) - Racial Starting Areas
+  ...Array.from({ length: 24 }, (_, i) => ({
+    id: i + 1,
+    name: `Starting Zone ${i + 1}`,
+    levelRange: { min: 1, max: 50 },
+    monsterMultiplier: 1.0 + (i * 0.1),
+    xpMultiplier: 1.0,
+    goldMultiplier: 1.0,
+    unlockLevel: 1
+  })),
+  
+  // Advanced Zones (25-101) with Exponential Scaling
+  { id: 25, name: 'Echoing Chasms', levelRange: { min: 25, max: 100 }, monsterMultiplier: 3.5, xpMultiplier: 1.5, goldMultiplier: 1.5, unlockLevel: 25 },
+  { id: 26, name: 'Fungal Depths', levelRange: { min: 30, max: 120 }, monsterMultiplier: 4.2, xpMultiplier: 1.6, goldMultiplier: 1.6, unlockLevel: 30 },
+  { id: 27, name: 'Crystal Caverns', levelRange: { min: 35, max: 140 }, monsterMultiplier: 5.0, xpMultiplier: 1.7, goldMultiplier: 1.7, unlockLevel: 35 },
+  { id: 28, name: 'Sunken Ruins', levelRange: { min: 40, max: 160 }, monsterMultiplier: 6.0, xpMultiplier: 1.8, goldMultiplier: 1.8, unlockLevel: 40 },
+  { id: 29, name: 'Bone Gardens', levelRange: { min: 45, max: 180 }, monsterMultiplier: 7.2, xpMultiplier: 1.9, goldMultiplier: 1.9, unlockLevel: 45 },
+  { id: 30, name: 'Chrono-Distorted Fields', levelRange: { min: 50, max: 200 }, monsterMultiplier: 8.6, xpMultiplier: 2.0, goldMultiplier: 2.0, unlockLevel: 50 },
+  
+  // Mid-tier zones continue scaling exponentially
+  { id: 50, name: 'Abyssal Depths', levelRange: { min: 500, max: 2000 }, monsterMultiplier: 50.0, xpMultiplier: 5.0, goldMultiplier: 5.0, unlockLevel: 500 },
+  { id: 75, name: 'Void Nexus', levelRange: { min: 2500, max: 10000 }, monsterMultiplier: 250.0, xpMultiplier: 12.5, goldMultiplier: 12.5, unlockLevel: 2500 },
+  { id: 100, name: 'Reality\'s Edge', levelRange: { min: 50000, max: 200000 }, monsterMultiplier: 2500.0, xpMultiplier: 50.0, goldMultiplier: 50.0, unlockLevel: 50000 },
+  { id: 101, name: 'The Terminus', levelRange: { min: 100000, max: 400000 }, monsterMultiplier: 10000.0, xpMultiplier: 100.0, goldMultiplier: 100.0, unlockLevel: 100000 }
+];
+
+// Monster Scaling Following GDD Mathematical Progression
+export const MONSTER_SCALING: MonsterScaling = {
+  baseHP: 100,
+  baseAttack: 10,
+  baseDefense: 5,
+  baseXP: 10,
+  baseGold: 5,
+  levelMultiplier: 1.1, // 10% increase per level
+  bossMultiplier: 5.0   // Bosses are 5x stronger
 };
 
-// Equipment inventory bag configuration
-export const inventoryBags = {
-  'Weapon Chest': ['Weapon'],
-  'Bag of Gear': ['Helmet', 'Armor', 'Leggings', 'Boots', 'Gauntlets'],
-  'Jewelry Box': ['Amulet', 'Ring'],
-  'Spell Satchel': ['Spellbook'],
-};
+// Experience Requirements with Exponential Growth to Level 400,000
+export function getExperienceRequired(level: number): number {
+  if (level <= 1) return 0;
+  
+  // Base XP requirement with exponential scaling
+  const baseXP = 100;
+  const scalingFactor = 1.05; // 5% increase per level
+  
+  // For very high levels, use logarithmic dampening to prevent overflow
+  if (level > 10000) {
+    return Math.floor(baseXP * Math.pow(scalingFactor, 10000) * Math.log(level / 10000 + 1) * 50);
+  }
+  
+  return Math.floor(baseXP * Math.pow(scalingFactor, level - 1));
+}
 
-// Load complete zone data (will be populated)
-export function loadGameData() {
-  // Zone data will be loaded here from your original 4000-line implementation
-  // This includes all the zone definitions, monster data, etc.
+// Calculate monster stats based on zone and level
+export function calculateMonsterStats(zoneId: number, level: number, isBoss: boolean = false): {
+  hp: number;
+  attack: number;
+  defense: number;
+  xp: number;
+  gold: number;
+} {
+  const zoneData = ZONE_DATA.find(z => z.id === zoneId);
+  const multiplier = zoneData?.monsterMultiplier || 1.0;
+  const bossMultiplier = isBoss ? MONSTER_SCALING.bossMultiplier : 1.0;
+  
+  // Level-based scaling
+  const levelScale = Math.pow(MONSTER_SCALING.levelMultiplier, level);
+  
+  return {
+    hp: Math.floor(MONSTER_SCALING.baseHP * levelScale * multiplier * bossMultiplier),
+    attack: Math.floor(MONSTER_SCALING.baseAttack * levelScale * multiplier * bossMultiplier),
+    defense: Math.floor(MONSTER_SCALING.baseDefense * levelScale * multiplier * bossMultiplier),
+    xp: Math.floor(MONSTER_SCALING.baseXP * levelScale * (zoneData?.xpMultiplier || 1.0) * bossMultiplier),
+    gold: Math.floor(MONSTER_SCALING.baseGold * levelScale * (zoneData?.goldMultiplier || 1.0) * bossMultiplier)
+  };
+}
+
+// Equipment stat calculation based on gear tier and level
+export function calculateEquipmentStats(gearTier: number, level: number, equipmentType: string): {
+  attack: number;
+  defense: number;
+  health: number;
+  value: number;
+} {
+  const tier = GEAR_TIERS.find(t => t.id === gearTier);
+  if (!tier) return { attack: 0, defense: 0, health: 0, value: 0 };
+  
+  const baseStat = 10;
+  const levelScale = Math.pow(1.08, level); // 8% increase per level
+  const tierMultiplier = tier.statMultiplier;
+  
+  // Different equipment types have different stat focuses
+  const typeMultipliers = {
+    weapon: { attack: 2.0, defense: 0.2, health: 0.1 },
+    armor: { attack: 0.1, defense: 2.0, health: 1.0 },
+    shield: { attack: 0.1, defense: 1.5, health: 0.5 },
+    helmet: { attack: 0.2, defense: 1.0, health: 0.3 },
+    boots: { attack: 0.3, defense: 0.8, health: 0.2 },
+    gloves: { attack: 0.8, defense: 0.5, health: 0.2 },
+    ring: { attack: 0.5, defense: 0.3, health: 0.7 },
+    amulet: { attack: 0.6, defense: 0.4, health: 0.8 }
+  };
+  
+  const typeMultiplier = typeMultipliers[equipmentType as keyof typeof typeMultipliers] || 
+                        { attack: 0.5, defense: 0.5, health: 0.5 };
+  
+  return {
+    attack: Math.floor(baseStat * levelScale * tierMultiplier * typeMultiplier.attack),
+    defense: Math.floor(baseStat * levelScale * tierMultiplier * typeMultiplier.defense),
+    health: Math.floor(baseStat * levelScale * tierMultiplier * typeMultiplier.health),
+    value: Math.floor(baseStat * levelScale * tierMultiplier * 10)
+  };
+}
+
+// Player stat calculation based on level
+export function calculatePlayerStats(level: number): {
+  baseHealth: number;
+  baseAttack: number;
+  baseDefense: number;
+} {
+  const baseHealth = 100;
+  const baseAttack = 10;
+  const baseDefense = 5;
+  
+  // Player stats scale more modestly than monster stats
+  const healthScale = Math.pow(1.06, level); // 6% per level
+  const attackScale = Math.pow(1.05, level);  // 5% per level
+  const defenseScale = Math.pow(1.04, level); // 4% per level
+  
+  return {
+    baseHealth: Math.floor(baseHealth * healthScale),
+    baseAttack: Math.floor(baseAttack * attackScale),
+    baseDefense: Math.floor(baseDefense * defenseScale)
+  };
+}
+
+// Zone unlock requirements
+export function isZoneUnlocked(zoneId: number, playerLevel: number): boolean {
+  const zoneData = ZONE_DATA.find(z => z.id === zoneId);
+  return zoneData ? playerLevel >= zoneData.unlockLevel : false;
+}
+
+// Combat damage calculation with critical hits
+export function calculateDamage(attack: number, defense: number, isCritical: boolean = false): number {
+  const baseDamage = Math.max(1, attack - defense);
+  const criticalMultiplier = isCritical ? 2.0 : 1.0;
+  const randomVariance = 0.8 + (Math.random() * 0.4); // 80-120% damage variance
+  
+  return Math.floor(baseDamage * criticalMultiplier * randomVariance);
+}
+
+// Critical hit chance (10% base chance from GDD)
+export function rollCriticalHit(): boolean {
+  return Math.random() < 0.1;
 }
