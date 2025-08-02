@@ -1,62 +1,97 @@
+import { GameState, EQUIPMENT_SLOTS, EquipmentSlots } from '@/../../shared/schema';
+import { BASE_ITEMS } from '@/../../shared/gameData';
+
 interface EquipmentTabProps {
-  equipment: Record<string, any>;
-  gems: Record<string, any>;
+  gameState: GameState;
+  updateGameState: (updates: Partial<GameState>) => void;
 }
 
-export function EquipmentTab({ equipment, gems }: EquipmentTabProps) {
-  const equipmentSlots = [
-    { id: 'weapon', icon: '⚔️', name: 'Weapon' },
-    { id: 'armor', icon: '🛡️', name: 'Armor' },
-    { id: 'helmet', icon: '⛑️', name: 'Helmet' },
-    { id: 'accessory', icon: '💍', name: 'Accessory' }
-  ];
+export default function EquipmentTab({ gameState, updateGameState }: EquipmentTabProps) {
+  const equipment = gameState.equipment;
 
-  const gemSlots = Array.from({ length: 8 }, (_, index) => index);
+  const handleEquipmentClick = (slotId: string) => {
+    const item = equipment[slotId as keyof EquipmentSlots];
+    if (item) {
+      // Handle item actions (unequip, socket gems, etc.)
+      console.log('Equipment clicked:', item);
+    }
+  };
+
+  const renderEquipmentSlot = (slot: typeof EQUIPMENT_SLOTS[0]) => {
+    const item = equipment[slot.id as keyof EquipmentSlots];
+    const baseItem = item ? BASE_ITEMS.find(b => b.id === item.baseItemId) : null;
+
+    return (
+      <div key={slot.id} className="equipment-slot-wrapper">
+        <div className="equipment-slot-title">
+          <span>{slot.icon}</span>
+          <span className="font-orbitron">{slot.name}</span>
+        </div>
+        <div 
+          className="equipment-slot-content"
+          onClick={() => handleEquipmentClick(slot.id)}
+        >
+          {item && baseItem ? (
+            <div className="flex flex-col items-center relative">
+              <img src={baseItem.imageUrl} alt={baseItem.name} className="w-12 h-12 object-contain" />
+              <div className="text-xs text-center mt-1">
+                <div className="font-orbitron text-orange-400">{baseItem.name}</div>
+                <div className="text-gray-400">T{item.tier}</div>
+                {item.socketedGems.length > 0 && (
+                  <div className="gem-dot-container">
+                    {item.socketedGems.map((_, index) => (
+                      <div key={index} className="gem-dot" />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="text-gray-500 text-sm">Empty</div>
+          )}
+        </div>
+      </div>
+    );
+  };
 
   return (
-    <div className="glass-panel p-4 rounded-lg h-full">
-      <h2 className="font-orbitron text-lg mb-4">Equipment</h2>
-      
+    <div className="h-full">
+      <h2 className="font-orbitron text-xl mb-4 text-orange-400">Equipment</h2>
       <div className="equipment-grid">
-        {equipmentSlots.map(slot => (
-          <div key={slot.id} className="equipment-slot-wrapper">
-            <div className="equipment-slot-title">
-              <span>{slot.icon}</span>
-              <span>{slot.name}</span>
+        {EQUIPMENT_SLOTS.map(renderEquipmentSlot)}
+      </div>
+      
+      <div className="mt-6 glass-panel p-4 rounded-lg">
+        <h3 className="font-orbitron text-lg mb-3 text-orange-400">Equipment Stats</h3>
+        <div className="grid grid-cols-2 gap-4 text-sm">
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <span className="text-gray-400">Weapon Class:</span>
+              <span className="text-white">0</span>
             </div>
-            <div className="equipment-slot-content" data-slot={slot.id}>
-              {equipment[slot.id] ? (
-                <div className="flex items-center gap-2">
-                  <img 
-                    src={equipment[slot.id].image} 
-                    alt={equipment[slot.id].name}
-                    className="w-8 h-8"
-                  />
-                  <span className="text-sm">{equipment[slot.id].name}</span>
-                </div>
-              ) : (
-                <span className="text-gray-500">No {slot.name}</span>
-              )}
+            <div className="flex justify-between">
+              <span className="text-gray-400">Armor Class:</span>
+              <span className="text-white">0</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-400">Spell Class:</span>
+              <span className="text-white">0</span>
             </div>
           </div>
-        ))}
-      </div>
-
-      {/* Gem Pouch */}
-      <div className="mt-6">
-        <h3 className="font-orbitron text-base mb-3">Gem Pouch</h3>
-        <div className="gem-pouch-grid">
-          {gemSlots.map(slot => (
-            <div key={slot} className="gem-item" data-gem={slot}>
-              {gems[slot] && (
-                <img 
-                  src={gems[slot].image} 
-                  alt={gems[slot].name}
-                  className="w-full h-full object-contain"
-                />
-              )}
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <span className="text-gray-400">Hit Chance:</span>
+              <span className="text-white">100%</span>
             </div>
-          ))}
+            <div className="flex justify-between">
+              <span className="text-gray-400">Critical:</span>
+              <span className="text-white">5%</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-400">Dodge:</span>
+              <span className="text-white">10%</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

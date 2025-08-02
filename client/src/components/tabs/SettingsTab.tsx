@@ -1,84 +1,70 @@
-import { GameSettings } from '@shared/schema';
-
-interface SettingsTabProps {
-  settings: GameSettings;
-  playerName: string;
-  onSave: () => void;
-  onLoad: () => void;
-  onNewGame: () => void;
-  onResetCharacter: () => void;
-  onToggleAnimations: () => void;
-  onToggleSounds: () => void;
-  onNameChange: (name: string) => void;
-}
-
-export function SettingsTab({
-  settings,
-  playerName,
-  onSave,
-  onLoad,
-  onNewGame,
-  onResetCharacter,
-  onToggleAnimations,
-  onToggleSounds,
-  onNameChange
-}: SettingsTabProps) {
+export default function SettingsTab() {
   return (
-    <div className="glass-panel p-4 rounded-lg h-full">
-      <h2 className="font-orbitron text-lg mb-4">Settings</h2>
+    <div className="h-full">
+      <h2 className="font-orbitron text-xl mb-4 text-orange-400">Settings</h2>
       
       <div className="space-y-6">
         {/* Game Settings */}
-        <div>
-          <h3 className="font-orbitron text-base mb-3">Game Settings</h3>
+        <div className="glass-panel p-4 rounded-lg">
+          <h3 className="font-orbitron text-lg mb-3 text-orange-400">Game Settings</h3>
           <div className="space-y-3">
-            <button className="glass-button w-full p-3 rounded-lg" onClick={onSave}>
-              💾 Save Game
-            </button>
-            <button className="glass-button w-full p-3 rounded-lg" onClick={onLoad}>
-              📁 Load Game
-            </button>
-            <button className="glass-button w-full p-3 rounded-lg" onClick={onNewGame}>
-              🆕 New Game
-            </button>
-          </div>
-        </div>
-
-        {/* Character Settings */}
-        <div>
-          <h3 className="font-orbitron text-base mb-3">Character</h3>
-          <div className="space-y-3">
-            <div>
-              <label className="block text-sm mb-1">Character Name:</label>
-              <input 
-                type="text" 
-                className="w-full p-2 rounded-lg bg-black bg-opacity-40 border border-gray-600 text-white"
-                value={playerName}
-                onChange={(e) => onNameChange(e.target.value)}
-              />
+            <div className="flex justify-between items-center">
+              <span className="text-gray-300">Auto-save</span>
+              <button className="glass-button px-3 py-1 rounded-md text-sm">
+                Enabled
+              </button>
             </div>
-            <button className="glass-button w-full p-3 rounded-lg" onClick={onResetCharacter}>
-              🔄 Reset Character
-            </button>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-300">Combat speed</span>
+              <select className="glass-button px-3 py-1 rounded-md text-sm">
+                <option>Normal</option>
+                <option>Fast</option>
+                <option>Instant</option>
+              </select>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-300">Notifications</span>
+              <button className="glass-button px-3 py-1 rounded-md text-sm">
+                On
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Display Settings */}
-        <div>
-          <h3 className="font-orbitron text-base mb-3">Display</h3>
+        <div className="glass-panel p-4 rounded-lg">
+          <h3 className="font-orbitron text-lg mb-3 text-orange-400">Display</h3>
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span>Animations:</span>
-              <button className="glass-button px-4 py-2 rounded-lg" onClick={onToggleAnimations}>
-                {settings.animations ? 'ON' : 'OFF'}
+            <div className="flex justify-between items-center">
+              <span className="text-gray-300">Animation effects</span>
+              <button className="glass-button px-3 py-1 rounded-md text-sm">
+                Enhanced
               </button>
             </div>
-            <div className="flex items-center justify-between">
-              <span>Sound Effects:</span>
-              <button className="glass-button px-4 py-2 rounded-lg" onClick={onToggleSounds}>
-                {settings.sounds ? 'ON' : 'OFF'}
-              </button>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-300">UI scale</span>
+              <select className="glass-button px-3 py-1 rounded-md text-sm">
+                <option>Small</option>
+                <option>Normal</option>
+                <option>Large</option>
+              </select>
             </div>
+          </div>
+        </div>
+
+        {/* Account Settings */}
+        <div className="glass-panel p-4 rounded-lg">
+          <h3 className="font-orbitron text-lg mb-3 text-orange-400">Account</h3>
+          <div className="space-y-3">
+            <button className="glass-button w-full py-2 rounded-md">
+              Export Save Data
+            </button>
+            <button className="glass-button w-full py-2 rounded-md">
+              Import Save Data
+            </button>
+            <button className="glass-button w-full py-2 rounded-md text-red-400">
+              Reset Game
+            </button>
           </div>
         </div>
       </div>
