@@ -1465,27 +1465,168 @@
                 "True-Core's Aim": { effect: "Increase Hit", values: [0.75, 1.5, 2.25, 3, 3.75, 4.5, 5.25, 6.25, 7.5] },
             }
         },
-        Monsters: {
-            // MOUNTAIN BIOME MONSTERS - For Crystal Caves, Echo Mountain, Cloud Peak, Gravefrost Peaks, Primal Chasm, Heavenly Spires
-            mountain: [
-                // Regular Monsters (E01-E10)
-                { id: 'mt_e01', name: 'StartZone Monster 1', baseHp: 25, baseAttack: 10, baseAC: 13, baseXP: 15, baseGold: 3 },
-                { id: 'mt_e02', name: 'StartZone Monster 2', baseHp: 28, baseAttack: 11, baseAC: 14, baseXP: 16, baseGold: 3 },
-                { id: 'mt_e03', name: 'StartZone Monster 3', baseHp: 31, baseAttack: 12, baseAC: 15, baseXP: 18, baseGold: 4 },
-                { id: 'mt_e04', name: 'StartZone Monster 4', baseHp: 34, baseAttack: 13, baseAC: 16, baseXP: 20, baseGold: 4 },
-                { id: 'mt_e05', name: 'StartZone Monster 5', baseHp: 37, baseAttack: 14, baseAC: 17, baseXP: 22, baseGold: 5 },
-                { id: 'mt_e06', name: 'StartZone Monster 6', baseHp: 41, baseAttack: 15, baseAC: 18, baseXP: 25, baseGold: 5 },
-                { id: 'mt_e07', name: 'StartZone Monster 7', baseHp: 45, baseAttack: 16, baseAC: 20, baseXP: 28, baseGold: 6 },
-                { id: 'mt_e08', name: 'StartZone Monster 8', baseHp: 49, baseAttack: 17, baseAC: 21, baseXP: 31, baseGold: 6 },
-                { id: 'mt_e09', name: 'StartZone Monster 9', baseHp: 54, baseAttack: 18, baseAC: 23, baseXP: 35, baseGold: 7 },
-                { id: 'mt_e10', name: 'StartZone Monster 10', baseHp: 59, baseAttack: 19, baseAC: 25, baseXP: 39, baseGold: 8 },
-                // Boss Monster (E10*)
-                { id: 'mt_boss', name: 'StartZone Boss (24h Bonus)', baseHp: 60, baseAttack: 20, baseAC: 25, baseXP: 100, baseGold: 20, isBoss: true }
+        // ZONE-SPECIFIC MONSTER SYSTEM: Each zone has unique monsters from the GDD
+        ZoneMonsters: {
+            // STARTER ZONES (1-24) - Generic monsters for racial starter zones
+            // Generate starter zone monsters for all 24 zones using the same base monsters
+            ...Array.from({length: 24}, (_, i) => {
+                const zoneId = i + 1;
+                return [zoneId, [
+                    { id: `z${zoneId}_e01`, name: 'StartZone Monster 1', baseHp: 25, baseAttack: 10, baseAC: 13, baseXP: 15, baseGold: 3 },
+                    { id: `z${zoneId}_e02`, name: 'StartZone Monster 2', baseHp: 28, baseAttack: 11, baseAC: 14, baseXP: 16, baseGold: 3 },
+                    { id: `z${zoneId}_e03`, name: 'StartZone Monster 3', baseHp: 31, baseAttack: 12, baseAC: 15, baseXP: 18, baseGold: 4 },
+                    { id: `z${zoneId}_e04`, name: 'StartZone Monster 4', baseHp: 34, baseAttack: 13, baseAC: 16, baseXP: 20, baseGold: 4 },
+                    { id: `z${zoneId}_e05`, name: 'StartZone Monster 5', baseHp: 37, baseAttack: 14, baseAC: 17, baseXP: 22, baseGold: 5 },
+                    { id: `z${zoneId}_e06`, name: 'StartZone Monster 6', baseHp: 41, baseAttack: 15, baseAC: 18, baseXP: 25, baseGold: 5 },
+                    { id: `z${zoneId}_e07`, name: 'StartZone Monster 7', baseHp: 45, baseAttack: 16, baseAC: 20, baseXP: 28, baseGold: 6 },
+                    { id: `z${zoneId}_e08`, name: 'StartZone Monster 8', baseHp: 49, baseAttack: 17, baseAC: 21, baseXP: 31, baseGold: 6 },
+                    { id: `z${zoneId}_e09`, name: 'StartZone Monster 9', baseHp: 54, baseAttack: 18, baseAC: 23, baseXP: 35, baseGold: 7 },
+                    { id: `z${zoneId}_e10`, name: 'StartZone Monster 10', baseHp: 59, baseAttack: 19, baseAC: 25, baseXP: 39, baseGold: 8 },
+                    { id: `z${zoneId}_boss`, name: 'StartZone Boss (24h Bonus)', baseHp: 60, baseAttack: 20, baseAC: 25, baseXP: 100, baseGold: 20, isBoss: true }
+                ]];
+            }).reduce((obj, [key, value]) => ({ ...obj, [key]: value }), {}),
+            
+            // ADVANCED ZONES (25-101) - Unique monsters from formatted zone data
+            25: [
+                { id: 'z25_e01', name: 'Shrieker', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
+                { id: 'z25_e02', name: 'Rocklurker', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
+                { id: 'z25_e03', name: 'Deep Crawler', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
+                { id: 'z25_e04', name: 'Echo Bat', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
+                { id: 'z25_e05', name: 'Chasm Worm', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
+                { id: 'z25_e06', name: 'Gloom Elemental', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
+                { id: 'z25_e07', name: 'Pit Spider', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
+                { id: 'z25_e08', name: 'Stone Sentinel', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
+                { id: 'z25_e09', name: 'Whisper Wraith', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
+                { id: 'z25_e10', name: 'Abyss Stalker', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
+                { id: 'z25_boss', name: 'Abyss Stalker (Boss)', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
             ],
-            // FOREST BIOME MONSTERS - For Elvenwood, Glimmering Springs, Moss-Covered Forest, Emberfall, Glimmering Glade, Gloomwood
-            forest: [
-                // Regular Monsters (E01-E10)
-                { id: 'fr_e01', name: 'StartZone Monster 1', baseHp: 25, baseAttack: 10, baseAC: 13, baseXP: 15, baseGold: 3 },
+            26: [
+                { id: 'z26_e01', name: 'Sand Serpent', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
+                { id: 'z26_e02', name: 'Dune Strider', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
+                { id: 'z26_e03', name: 'Ember Scorpion', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
+                { id: 'z26_e04', name: 'Sun Golem', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
+                { id: 'z26_e05', name: 'Desert Drifter', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
+                { id: 'z26_e06', name: 'Dust Devil', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
+                { id: 'z26_e07', name: 'Meteorite Beetle', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
+                { id: 'z26_e08', name: 'Oasis Bandit', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
+                { id: 'z26_e09', name: 'Starfall Sprite', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
+                { id: 'z26_e10', name: 'Nomad Hunter', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
+                { id: 'z26_boss', name: 'Nomad Hunter (Boss)', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
+            ],
+            27: [
+                { id: 'z27_e01', name: 'Bog Lurker', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
+                { id: 'z27_e02', name: 'Mire Slime', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
+                { id: 'z27_e03', name: 'Fen Strangler', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
+                { id: 'z27_e04', name: 'Murk Creeper', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
+                { id: 'z27_e05', name: 'Gloom Toad', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
+                { id: 'z27_e06', name: 'Moss Golem', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
+                { id: 'z27_e07', name: 'Swamp Serpent', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
+                { id: 'z27_e08', name: 'Water Hag', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
+                { id: 'z27_e09', name: 'Spore Cloud', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
+                { id: 'z27_e10', name: 'Reed Ambusher', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
+                { id: 'z27_boss', name: 'Reed Ambusher (Boss)', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
+            ],
+            28: [
+                { id: 'z28_e01', name: 'Ice Drake', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
+                { id: 'z28_e02', name: 'Frost Elemental', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
+                { id: 'z28_e03', name: 'Glacier Yeti', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
+                { id: 'z28_e04', name: 'Snow Harpy', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
+                { id: 'z28_e05', name: 'Crystal Golem', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
+                { id: 'z28_e06', name: 'Blizzard Wight', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
+                { id: 'z28_e07', name: 'Rime Wolf', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
+                { id: 'z28_e08', name: 'Spire Guard', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
+                { id: 'z28_e09', name: 'Avalanche Beast', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
+                { id: 'z28_e10', name: 'Ice Construct', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
+                { id: 'z28_boss', name: 'Ice Construct (Boss)', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
+            ],
+            29: [
+                { id: 'z29_e01', name: 'Stone Giant', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
+                { id: 'z29_e02', name: 'Earth Elemental', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
+                { id: 'z29_e03', name: 'Grotto Spider', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
+                { id: 'z29_e04', name: 'Mountain Ape', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
+                { id: 'z29_e05', name: 'Crystal Shardling', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
+                { id: 'z29_e06', name: 'Geomancer', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
+                { id: 'z29_e07', name: 'Deep Burrower', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
+                { id: 'z29_e08', name: 'Peak Harpy', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
+                { id: 'z29_e09', name: 'Basalt Ogre', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
+                { id: 'z29_e10', name: 'Vine Strangler', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
+                { id: 'z29_boss', name: 'Vine Strangler (Boss)', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
+            ],
+            30: [
+                { id: 'z30_e01', name: 'Time Aberration', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
+                { id: 'z30_e02', name: 'Chrono Beetle', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
+                { id: 'z30_e03', name: 'Echo Spirit', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
+                { id: 'z30_e04', name: 'Temporal Worm', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
+                { id: 'z30_e05', name: 'Paradox Hound', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
+                { id: 'z30_e06', name: 'Rewind Wraith', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
+                { id: 'z30_e07', name: 'Flicker Drone', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
+                { id: 'z30_e08', name: 'Quantum Serpent', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
+                { id: 'z30_e09', name: 'Future Scavenger', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
+                { id: 'z30_e10', name: 'Past Echo', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
+                { id: 'z30_boss', name: 'Past Echo (Boss)', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
+            ],
+            
+            // Continue with more zones from the formatted data...
+            31: [
+                { id: 'z31_e01', name: 'Gale Elemental', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
+                { id: 'z31_e02', name: 'Cloud Serpent', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
+                { id: 'z31_e03', name: 'Wind Harpy', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
+                { id: 'z31_e04', name: 'Peak Lynx', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
+                { id: 'z31_e05', name: 'Echo Hawk', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
+                { id: 'z31_e06', name: 'Air Sprite', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
+                { id: 'z31_e07', name: 'Cliff Guardian', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
+                { id: 'z31_e08', name: 'Howling Beast', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
+                { id: 'z31_e09', name: 'Summit Yeti', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
+                { id: 'z31_e10', name: 'Gust Weaver', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
+                { id: 'z31_boss', name: 'Gust Weaver (Boss)', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
+            ],
+            
+            50: [
+                { id: 'z50_e01', name: 'Coral Serpent', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
+                { id: 'z50_e02', name: 'Abyssal Guardian', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
+                { id: 'z50_e03', name: 'Drowned Citizen', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
+                { id: 'z50_e04', name: 'Spire Fish', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
+                { id: 'z50_e05', name: 'Kelp Lurker', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
+                { id: 'z50_e06', name: 'Tide Elemental', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
+                { id: 'z50_e07', name: 'Ruin Scavenger', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
+                { id: 'z50_e08', name: 'Pressure Horror', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
+                { id: 'z50_e09', name: 'Deep Crab', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
+                { id: 'z50_e10', name: 'Manta Ray', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
+                { id: 'z50_boss', name: 'Manta Ray (Boss)', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
+            ],
+            
+            75: [
+                { id: 'z75_e01', name: 'Void Abomination', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
+                { id: 'z75_e02', name: 'Shadow Spawn', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
+                { id: 'z75_e03', name: 'Null Elemental', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
+                { id: 'z75_e04', name: 'Rift Horror', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
+                { id: 'z75_e05', name: 'Gravity Anomaly', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
+                { id: 'z75_e06', name: 'Echo of Nothing', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
+                { id: 'z75_e07', name: 'Devouring Swarm', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
+                { id: 'z75_e08', name: 'Dark Matter Beast', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
+                { id: 'z75_e09', name: 'Dimension Shifter', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
+                { id: 'z75_e10', name: 'Soul Eater', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
+                { id: 'z75_boss', name: 'Soul Eater (Boss)', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
+            ],
+            
+            101: [
+                { id: 'z101_e01', name: 'Echo Titan', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
+                { id: 'z101_e02', name: 'Soul Shepherd', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
+                { id: 'z101_e03', name: 'Gorge Specter', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
+                { id: 'z101_e04', name: 'Void Wraith', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
+                { id: 'z101_e05', name: 'Lost Memoria', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
+                { id: 'z101_e06', name: 'Chasm Phantom', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
+                { id: 'z101_e07', name: 'Soul Devourer', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
+                { id: 'z101_e08', name: 'Echo Guardian', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
+                { id: 'z101_e09', name: 'Dimensional Rift', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
+                { id: 'z101_e10', name: 'Terminus Beast', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
+                { id: 'z101_boss', name: 'Terminus Beast (Boss)', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
+            ]
+        },
+        
+        // Legacy biome system maintained for backward compatibility with starter zones
+        Monsters: {
+            mountain: [
                 { id: 'fr_e02', name: 'StartZone Monster 2', baseHp: 28, baseAttack: 11, baseAC: 14, baseXP: 16, baseGold: 3 },
                 { id: 'fr_e03', name: 'StartZone Monster 3', baseHp: 31, baseAttack: 12, baseAC: 15, baseXP: 18, baseGold: 4 },
                 { id: 'fr_e04', name: 'StartZone Monster 4', baseHp: 34, baseAttack: 13, baseAC: 16, baseXP: 20, baseGold: 4 },
@@ -2725,17 +2866,27 @@ const EquipmentManager = {
     populateMonsterList(zoneId) { 
         const zoneData = AllZones[zoneId]; 
         if (!zoneData) return this.clearMonsterList(); 
-        const biome = zoneData.biome; 
-        const monsterTemplates = GameData.Monsters[biome]; 
+        
+        // Use zone-specific monsters for advanced zones (25+), fallback to biome system for starter zones
+        let monsterTemplates;
+        if (GameData.ZoneMonsters[zoneId]) {
+            monsterTemplates = GameData.ZoneMonsters[zoneId];
+        } else {
+            // Fallback to biome system for starter zones
+            const biome = zoneData.biome;
+            monsterTemplates = GameData.Monsters[biome];
+        }
+        
         const monsterSelect = ui.tabContentCombat.querySelector('#monsterSelect'); 
         if (!monsterTemplates || monsterTemplates.length === 0) { 
-            monsterSelect.innerHTML = `<option value="">No monsters in this biome...</option>`; 
+            monsterSelect.innerHTML = `<option value="">No monsters in this zone...</option>`; 
             this.resetCombatSelection(); 
             return; 
         } 
         let optionsHTML = '<option value="">Select a monster...</option>'; 
         monsterTemplates.forEach(monster => { 
-            optionsHTML += `<option value="${monster.id}">${monster.name} (T${zoneData.gearTier})</option>`; 
+            const displayName = monster.isBoss ? `👑 ${monster.name}` : monster.name;
+            optionsHTML += `<option value="${monster.id}">${displayName} (T${zoneData.gearTier})</option>`; 
         }); 
         monsterSelect.innerHTML = optionsHTML; 
         this.resetCombatSelection(); 
@@ -2748,8 +2899,16 @@ const EquipmentManager = {
         const zoneTier = state.game.currentZoneTier;
         const zoneData = AllZones[zoneTier];
         const gearTier = zoneData.gearTier;
-        const biome = zoneData.biome; 
-        const monsterTemplate = GameData.Monsters[biome].find(m => m.id === monsterId); 
+        
+        // Find monster template from zone-specific or biome system
+        let monsterTemplate;
+        if (GameData.ZoneMonsters[zoneTier]) {
+            monsterTemplate = GameData.ZoneMonsters[zoneTier].find(m => m.id === monsterId);
+        } else {
+            // Fallback to biome system for starter zones
+            const biome = zoneData.biome;
+            monsterTemplate = GameData.Monsters[biome].find(m => m.id === monsterId);
+        }
         if (!monsterTemplate) return; 
 
         let finalHp = monsterTemplate.baseHp * Math.pow(1.20, gearTier - 1);
