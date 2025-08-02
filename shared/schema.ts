@@ -1,147 +1,222 @@
-import { z } from "zod";
+import { pgTable, serial, text, integer, boolean, timestamp, jsonb } from 'drizzle-orm/pg-core';
+import { relations } from 'drizzle-orm';
+import { createInsertSchema } from 'drizzle-zod';
+import { z } from 'zod';
 
-// Core Player Types
-export const PlayerSchema = z.object({
-  name: z.string().default("Player"),
-  level: z.number().default(1),
-  health: z.number().default(100),
-  maxHealth: z.number().default(100),
-  experience: z.number().default(0),
-  gold: z.number().default(0),
-  currentZone: z.string().default("1"),
-  activeQuests: z.array(z.any()).default([]),
-  questStreak: z.number().default(0),
-  questPool: z.object({
-    xp: z.number().default(0),
-    gold: z.number().default(0),
-    items: z.array(z.any()).default([])
-  }).default({ xp: 0, gold: 0, items: [] }),
+// Users table for authentication and basic account data
+export const users = pgTable('users', {
+  id: serial('id').primaryKey(),
+  username: text('username').notNull().unique(),
+  passwordHash: text('password_hash').notNull(),
+  email: text('email'),
+  createdAt: timestamp('created_at').defaultNow(),
+  lastLogin: timestamp('last_login'),
 });
 
-// Equipment and Items
-export const GemSchema = z.object({
-  name: z.string(),
-  abbreviation: z.string(),
-  imageUrl: z.string(),
-  effect: z.string(),
-  values: z.union([z.array(z.number()), z.record(z.array(z.number()))]),
-  tier: z.number().optional()
+// Characters table - core player data following GDD specifications
+export const characters = pgTable('characters', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  name: text('name').notNull(),
+  race: text('race').notNull(), // One of 24 racial starting zones
+  level: integer('level').notNull().default(1),
+  experience: integer('experience').notNull().default(0),
+  currentZone: integer('current_zone').notNull().default(1), // Zone 1-101
+  
+  // Core stats from GDD
+  health: integer('health').notNull().default(100),
+  maxHealth: integer('max_health').notNull().default(100),
+  attack: integer('attack').notNull().default(10),
+  defense: integer('defense').notNull().default(10),
+  
+  // Resources
+  gold: integer('gold').notNull().default(100),
+  bankGold: integer('bank_gold').notNull().default(0),
+  
+  // Equipment slots (item IDs)
+  equippedWeapon: integer('equipped_weapon'),
+  equippedArmor: integer('equipped_armor'),
+  equippedShield: integer('equipped_shield'),
+  equippedHelmet: integer('equipped_helmet'),
+  equippedBoots: integer('equipped_boots'),
+  equippedGloves: integer('equipped_gloves'),
+  equippedRing: integer('equipped_ring'),
+  equippedAmulet: integer('equipped_amulet'),
+  
+  // Combat and progression
+  combatTarget: text('combat_target'),
+  lastCombatAction: timestamp('last_combat_action'),
+  autoFightEnabled: boolean('auto_fight_enabled').default(false),
+  
+  // Character creation and updates
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
 });
 
-export const ItemSchema = z.object({
-  instanceId: z.string(),
-  baseItemId: z.string(),
-  type: z.enum(["Normal", "Shadow", "Echo"]),
-  tier: z.number(),
-  socketedGems: z.array(GemSchema).default([]),
-  special: z.record(z.number()).nullable().default(null),
-  quality: z.number().optional(),
-  kills: z.number().optional(),
-  classValue: z.number()
+// Items table - comprehensive equipment system with 20 gear tiers
+export const items = pgTable('items', {
+  id: serial('id').primaryKey(),
+  characterId: integer('character_id').notNull().references(() => characters.id, { onDelete: 'cascade' }),
+  
+  // Item identification
+  name: text('name').notNull(),
+  type: text('type').notNull(), // weapon, armor, shield, helmet, boots, gloves, ring, amulet
+  gearTier: integer('gear_tier').notNull(), // 1-20 (Crude to Ascended)
+  quality: text('quality').notNull().default('normal'), // normal, enhanced, superior, legendary
+  
+  // Stats - following GDD mathematical progression
+  attackBonus: integer('attack_bonus').default(0),
+  defenseBonus: integer('defense_bonus').default(0),
+  healthBonus: integer('health_bonus').default(0),
+  
+  // Special properties
+  enchantments: jsonb('enchantments'), // Special effects and bonuses
+  durability: integer('durability').default(100),
+  maxDurability: integer('max_durability').default(100),
+  
+  // Trading and economy
+  value: integer('value').notNull(),
+  isEquipped: boolean('is_equipped').default(false),
+  inBank: boolean('in_bank').default(false),
+  
+  createdAt: timestamp('created_at').defaultNow(),
 });
 
-export const BaseItemSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  type: z.string(),
-  subType: z.string().optional(),
-  imageUrl: z.string(),
-  proportion: z.number(),
-  sockets: z.number(),
-  special: z.record(z.number()).optional()
+// Combat logs for tracking battles and rewards
+export const combatLogs = pgTable('combat_logs', {
+  id: serial('id').primaryKey(),
+  characterId: integer('character_id').notNull().references(() => characters.id, { onDelete: 'cascade' }),
+  
+  // Combat details
+  zoneId: integer('zone_id').notNull(),
+  monsterName: text('monster_name').notNull(),
+  monsterLevel: integer('monster_level').notNull(),
+  isBoss: boolean('is_boss').default(false),
+  
+  // Results
+  victory: boolean('victory').notNull(),
+  experienceGained: integer('experience_gained').default(0),
+  goldGained: integer('gold_gained').default(0),
+  itemsDropped: jsonb('items_dropped'), // Array of dropped items
+  
+  // Combat metrics
+  damageDealt: integer('damage_dealt').default(0),
+  damageTaken: integer('damage_taken').default(0),
+  combatDuration: integer('combat_duration'), // in seconds
+  criticalHits: integer('critical_hits').default(0),
+  
+  timestamp: timestamp('timestamp').defaultNow(),
 });
 
-export const EquipmentSlotsSchema = z.object({
-  helmet: ItemSchema.nullable().default(null),
-  armor: ItemSchema.nullable().default(null),
-  leggings: ItemSchema.nullable().default(null),
-  boots: ItemSchema.nullable().default(null),
-  gauntlets: ItemSchema.nullable().default(null),
-  amulet: ItemSchema.nullable().default(null),
-  ring: ItemSchema.nullable().default(null),
-  weapon: ItemSchema.nullable().default(null),
-  offhand: ItemSchema.nullable().default(null),
-  spellbook: ItemSchema.nullable().default(null)
+// Zone progression tracking
+export const zoneProgress = pgTable('zone_progress', {
+  id: serial('id').primaryKey(),
+  characterId: integer('character_id').notNull().references(() => characters.id, { onDelete: 'cascade' }),
+  zoneId: integer('zone_id').notNull(),
+  
+  // Progress metrics
+  monstersDefeated: integer('monsters_defeated').default(0),
+  bossesDefeated: integer('bosses_defeated').default(0),
+  totalExperience: integer('total_experience').default(0),
+  totalGold: integer('total_gold').default(0),
+  
+  // Zone mastery
+  firstClear: timestamp('first_clear'),
+  fastestClear: integer('fastest_clear'), // in seconds
+  highestDamage: integer('highest_damage'),
+  
+  unlocked: boolean('unlocked').default(false),
+  lastVisit: timestamp('last_visit'),
 });
 
-// Zone Types
-export const ZoneSchema = z.object({
-  name: z.string(),
-  levelReq: z.number(),
-  biome: z.string(),
-  gearTier: z.number()
+// Game configuration and balancing data
+export const gameConfig = pgTable('game_config', {
+  id: serial('id').primaryKey(),
+  key: text('key').notNull().unique(),
+  value: jsonb('value').notNull(),
+  description: text('description'),
+  updatedAt: timestamp('updated_at').defaultNow(),
 });
 
-// Legacy Zone type for backwards compatibility
-export const LegacyZoneSchema = z.object({
-  id: z.string(),
-  levelRequirement: z.number(),
-  description: z.string().optional()
+// Relations for data integrity and efficient queries
+export const usersRelations = relations(users, ({ many }) => ({
+  characters: many(characters),
+}));
+
+export const charactersRelations = relations(characters, ({ one, many }) => ({
+  user: one(users, {
+    fields: [characters.userId],
+    references: [users.id],
+  }),
+  items: many(items),
+  combatLogs: many(combatLogs),
+  zoneProgress: many(zoneProgress),
+}));
+
+export const itemsRelations = relations(items, ({ one }) => ({
+  character: one(characters, {
+    fields: [items.characterId],
+    references: [characters.id],
+  }),
+}));
+
+export const combatLogsRelations = relations(combatLogs, ({ one }) => ({
+  character: one(characters, {
+    fields: [combatLogs.characterId],
+    references: [characters.id],
+  }),
+}));
+
+export const zoneProgressRelations = relations(zoneProgress, ({ one }) => ({
+  character: one(characters, {
+    fields: [zoneProgress.characterId],
+    references: [characters.id],
+  }),
+}));
+
+// Zod schemas for validation
+export const insertUserSchema = createInsertSchema(users).omit({
+  id: true,
+  createdAt: true,
+  lastLogin: true,
 });
 
-// Game State
-export const GameStateSchema = z.object({
-  player: PlayerSchema,
-  equipment: EquipmentSlotsSchema.default({}),
-  inventory: z.array(ItemSchema).default([]),
-  gemPouch: z.array(GemSchema).default([]),
-  zones: z.record(ZoneSchema).default({}),
-  currentTab: z.string().default("equipment"),
-  focusMode: z.boolean().default(false)
+export const insertCharacterSchema = createInsertSchema(characters).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
 });
 
-// Chat System
-export const ChatMessageSchema = z.object({
-  id: z.string(),
-  username: z.string(),
-  content: z.string(),
-  timestamp: z.number(),
-  channel: z.string(),
-  replyTo: z.string().optional()
+export const insertItemSchema = createInsertSchema(items).omit({
+  id: true,
+  createdAt: true,
 });
 
-export const ChatStateSchema = z.object({
-  channels: z.object({
-    main: z.array(ChatMessageSchema).default([]),
-    sales: z.array(ChatMessageSchema).default([]),
-    clan: z.array(ChatMessageSchema).default([])
-  }).default({ main: [], sales: [], clan: [] }),
-  activeChannel: z.string().default("main"),
-  isModalOpen: z.boolean().default(false)
+export const insertCombatLogSchema = createInsertSchema(combatLogs).omit({
+  id: true,
+  timestamp: true,
 });
 
-// Export Types
-export type Player = z.infer<typeof PlayerSchema>;
-export type Gem = z.infer<typeof GemSchema>;
-export type Item = z.infer<typeof ItemSchema>;
-export type BaseItem = z.infer<typeof BaseItemSchema>;
-export type EquipmentSlots = z.infer<typeof EquipmentSlotsSchema>;
-export type Zone = z.infer<typeof ZoneSchema>;
-export type LegacyZone = z.infer<typeof LegacyZoneSchema>;
-export type GameState = z.infer<typeof GameStateSchema>;
-export type ChatMessage = z.infer<typeof ChatMessageSchema>;
-export type ChatState = z.infer<typeof ChatStateSchema>;
+export const insertZoneProgressSchema = createInsertSchema(zoneProgress).omit({
+  id: true,
+  lastVisit: true,
+});
 
-// Game Constants
-export const EQUIPMENT_SLOTS = [
-  { id: 'helmet', name: 'Helmet', icon: '⛑️' },
-  { id: 'armor', name: 'Armor', icon: '🛡️' },
-  { id: 'leggings', name: 'Leggings', icon: '👖' },
-  { id: 'boots', name: 'Boots', icon: '👢' },
-  { id: 'gauntlets', name: 'Gauntlets', icon: '🧤' },
-  { id: 'amulet', name: 'Amulet', icon: '📿' },
-  { id: 'ring', name: 'Ring', icon: '💍' },
-  { id: 'weapon', name: 'Weapon', icon: '⚔️' },
-  { id: 'offhand', name: 'Off-Hand', icon: '🛡️' },
-  { id: 'spellbook', name: 'Spellbook', icon: '📚' }
-];
+export const insertGameConfigSchema = createInsertSchema(gameConfig).omit({
+  id: true,
+  updatedAt: true,
+});
 
-export const TABS = [
-  { id: 'equipment', label: 'Equipment' },
-  { id: 'infusion', label: 'Infusion' },
-  { id: 'inventory', label: 'Inventory' },
-  { id: 'stats', label: 'Stats' },
-  { id: 'combat', label: 'Combat' },
-  { id: 'quest', label: 'Quest' },
-  { id: 'settings', label: 'Settings' }
-];
+// Type exports
+export type User = typeof users.$inferSelect;
+export type InsertUser = z.infer<typeof insertUserSchema>;
+export type Character = typeof characters.$inferSelect;
+export type InsertCharacter = z.infer<typeof insertCharacterSchema>;
+export type Item = typeof items.$inferSelect;
+export type InsertItem = z.infer<typeof insertItemSchema>;
+export type CombatLog = typeof combatLogs.$inferSelect;
+export type InsertCombatLog = z.infer<typeof insertCombatLogSchema>;
+export type ZoneProgress = typeof zoneProgress.$inferSelect;
+export type InsertZoneProgress = z.infer<typeof insertZoneProgressSchema>;
+export type GameConfig = typeof gameConfig.$inferSelect;
+export type InsertGameConfig = z.infer<typeof insertGameConfigSchema>;
