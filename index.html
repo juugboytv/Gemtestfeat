@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Geminus - Dark Fantasy RPG (GDD Integrated)</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Background smoke canvas -->
+  <canvas id="smoke-canvas"></canvas>
+  
+  <!-- Toast notification -->
+  <div id="toast-notification"></div>
+  
+  <!-- Stat info modal -->
+  <div id="stat-info-modal">
+    <div id="stat-info-backdrop"></div>
+    <div class="stat-info-content">
+      <h3 class="font-orbitron text-lg mb-2" id="stat-info-title"></h3>
+      <p id="stat-info-description"></p>
+    </div>
+  </div>
+  
+  <!-- Zone teleport modal -->
+  <div id="zone-popup-modal" class="hidden">
+    <div class="glass-panel p-6 rounded-lg max-w-md w-full max-h-[80vh] overflow-hidden flex flex-col">
+      <h2 class="font-orbitron text-xl mb-4 text-center">Select Zone</h2>
+      <ul id="zone-list-container" class="space-y-2 overflow-y-auto custom-scrollbar flex-grow">
+        <!-- Zone options will be populated here -->
+      </ul>
+      <button id="close-zone-popup" class="glass-button mt-4 py-2 px-4 rounded">Close</button>
+    </div>
+  </div>
+
+  <!-- Main content container -->
+  <div id="main-content" class="glass-panel p-4 mx-auto max-w-md min-h-screen flex flex-col">
+    <!-- Main tab navigation -->
+    <div class="flex-shrink-0 flex overflow-x-auto border-b border-orange-500/30 mb-4 custom-scrollbar-x">
+      <button class="main-tab-button active" data-tab="adventure">Adventure</button>
+      <button class="main-tab-button" data-tab="character">Character</button>
+      <button class="main-tab-button" data-tab="inventory">Inventory</button>
+      <button class="main-tab-button" data-tab="equipment">Equipment</button>
+      <button class="main-tab-button" data-tab="spells">Spells</button>
+      <button class="main-tab-button" data-tab="settings">Settings</button>
+    </div>
+
+    <!-- Adventure Tab -->
+    <div id="adventure-tab" class="main-tab-panel active flex-grow flex flex-col">
+      <!-- Player status -->
+      <div id="player-status-container" class="glass-panel p-3 mb-4 rounded-lg">
+        <div class="flex justify-between items-center mb-2">
+          <div class="flex items-center gap-2">
+            <span class="level-label text-sm">Lv.</span>
+            <span id="player-level" class="level-value font-orbitron text-lg">1</span>
+            <span id="player-name" class="name-value font-orbitron text-sm ml-2">Hero</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="player-gold" class="text-yellow-400 font-orbitron text-sm">0</span>
+            <span class="text-yellow-400">👑</span>
+            <button class="teleport-trigger-btn" id="teleport-btn">🌀</button>
+          </div>
+        </div>
+        
+        <!-- Health bar -->
+        <div class="mb-2">
+          <div class="progress-bar-track h-4 relative">
+            <div id="player-health-bar" class="progress-bar-fill h-full" style="width: 100%; background: linear-gradient(90deg, #dc2626, #ef4444);"></div>
+            <span id="player-health-numeric" class="absolute inset-0 flex items-center justify-center text-xs">100/100</span>
+          </div>
+        </div>
+        
+        <!-- Experience bar -->
+        <div>
+          <div class="progress-bar-track h-2">
+            <div id="player-exp-bar" class="progress-bar-fill h-full bg-gradient-to-r from-green-600 to-green-400" style="width: 0%;"></div>
+          </div>
+          <div class="flex justify-between text-xs mt-1">
+            <span id="player-exp" class="text-green-400">0</span>
+            <span id="player-exp-next" class="text-purple-400">100</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Current location -->
+      <div class="glass-panel p-3 mb-4 rounded-lg">
+        <div class="text-center">
+          <div class="text-sm text-gray-400 mb-1">Current Location</div>
+          <div id="current-location" class="font-orbitron text-orange-400">World Map</div>
+        </div>
+      </div>
+
+      <!-- Mini map -->
+      <div class="glass-panel p-3 mb-4 rounded-lg flex-grow min-h-[200px]">
+        <div class="text-center text-sm text-gray-400 mb-2">Mini Map</div>
+        <div id="minimap-container" class="w-full h-full min-h-[150px] relative">
+          <canvas id="minimap-canvas" class="w-full h-full"></canvas>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="flex-shrink-0 flex justify-between items-center gap-4">
+        <!-- D-pad controls -->
+        <div id="d-pad-controls">
+          <div id="key-up" class="game-key move-key">
+            <svg viewBox="0 0 24 24"><path d="M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14l-6-6z"/></svg>
+          </div>
+          <div id="key-left" class="game-key move-key">
+            <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12l4.58-4.59z"/></svg>
+          </div>
+          <div id="key-down" class="game-key move-key">
+            <svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+          </div>
+          <div id="key-right" class="game-key move-key">
+            <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+          </div>
+        </div>
+        
+        <!-- Interact button -->
+        <div id="key-interact" class="game-key">Interact</div>
+      </div>
+
+      <!-- Combat section -->
+      <div id="combat-section" class="mt-4">
+        <!-- Monster list -->
+        <div id="monster-list-container" class="glass-panel p-3 rounded-lg mb-4" style="display: none;">
+          <div class="text-center text-sm text-gray-400 mb-2">Available Monsters</div>
+          <div id="monster-list" class="space-y-2">
+            <!-- Monsters will be populated here -->
+          </div>
+        </div>
+
+        <!-- Combat interface -->
+        <div id="combat-interface" class="glass-panel p-3 rounded-lg" style="display: none;">
+          <div class="text-center mb-4">
+            <div id="selected-monster-name" class="font-orbitron text-lg text-orange-400 mb-2"></div>
+            <div id="selected-monster-image" class="flex justify-center mb-2">
+              <!-- Monster image will go here -->
+            </div>
+            <div class="text-sm text-gray-400">
+              <div>Level: <span id="selected-monster-level"></span></div>
+              <div>Health: <span id="selected-monster-health"></span></div>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-2">
+            <button id="attack-btn" class="glass-button py-2 rounded">Attack</button>
+            <button id="cast-btn" class="glass-button py-2 rounded">Cast</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Character Tab -->
+    <div id="character-tab" class="main-tab-panel flex-grow">
+      <div class="space-y-4">
+        <!-- Character info -->
+        <div class="glass-panel p-4 rounded-lg">
+          <div class="text-center mb-4">
+            <div class="font-orbitron text-lg" id="char-name">Hero</div>
+            <div class="text-sm text-gray-400">
+              <span id="char-race">Human</span> <span id="char-class">Fighter</span>
+            </div>
+          </div>
+          
+          <!-- Attribute points -->
+          <div class="text-center mb-4">
+            <div class="text-sm text-gray-400">Attribute Points</div>
+            <div id="attribute-points" class="font-orbitron text-xl text-orange-400">0</div>
+          </div>
+        </div>
+
+        <!-- Stats accordion -->
+        <div id="stats-container">
+          <!-- Stats will be populated here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Inventory Tab -->
+    <div id="inventory-tab" class="main-tab-panel flex-grow">
+      <!-- Inventory bags -->
+      <div class="space-y-4">
+        <div class="glass-panel p-4 rounded-lg">
+          <h3 class="font-orbitron text-lg mb-3 text-center">Inventory</h3>
+          
+          <!-- Bag tabs -->
+          <div class="flex overflow-x-auto mb-4 custom-scrollbar-x">
+            <button class="inventory-bag-tab active" data-bag="all">All</button>
+            <button class="inventory-bag-tab" data-bag="Weapon Chest">Weapons</button>
+            <button class="inventory-bag-tab" data-bag="Bag of Gear">Gear</button>
+            <button class="inventory-bag-tab" data-bag="Jewelry Box">Jewelry</button>
+            <button class="inventory-bag-tab" data-bag="Spell Satchel">Spells</button>
+          </div>
+          
+          <!-- Inventory grid -->
+          <div id="inventory-grid" class="inventory-grid">
+            <!-- Inventory items will be populated here -->
+          </div>
+        </div>
+
+        <!-- Gem pouch -->
+        <div class="glass-panel p-4 rounded-lg">
+          <h3 class="font-orbitron text-lg mb-3 text-center">Gem Pouch</h3>
+          <div id="gem-pouch-grid" class="gem-pouch-grid">
+            <!-- Gems will be populated here -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Equipment Tab -->
+    <div id="equipment-tab" class="main-tab-panel flex-grow">
+      <div class="glass-panel p-4 rounded-lg">
+        <h3 class="font-orbitron text-lg mb-4 text-center">Equipment</h3>
+        <div id="equipment-grid" class="equipment-grid">
+          <!-- Equipment slots will be populated here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Spells Tab -->
+    <div id="spells-tab" class="main-tab-panel flex-grow">
+      <div class="glass-panel p-4 rounded-lg">
+        <h3 class="font-orbitron text-lg mb-4 text-center">Spells & Magic</h3>
+        <div class="text-center text-gray-400">
+          Spell system coming soon...
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Tab -->
+    <div id="settings-tab" class="main-tab-panel flex-grow">
+      <div class="space-y-4">
+        <div class="glass-panel p-4 rounded-lg">
+          <h3 class="font-orbitron text-lg mb-4 text-center">Settings</h3>
+          
+          <!-- Save/Load -->
+          <div class="space-y-2 mb-4">
+            <button id="save-game-btn" class="glass-button w-full py-2 rounded">Save Game</button>
+            <button id="load-game-btn" class="glass-button w-full py-2 rounded">Load Game</button>
+            <button id="reset-game-btn" class="glass-button w-full py-2 rounded">Reset Game</button>
+          </div>
+
+          <!-- Chat -->
+          <div class="mb-4">
+            <div class="text-sm text-gray-400 mb-2">Game Chat</div>
+            <div id="chat-log" class="bg-black/30 p-2 rounded h-32 overflow-y-auto custom-scrollbar text-xs">
+              <div class="text-green-400">[System] Welcome to Geminus!</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal container -->
+  <div id="modal-container"></div>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>
