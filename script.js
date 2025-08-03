@@ -1910,17 +1910,8 @@ const EquipmentManager = {
                 const blueprint = WorldMapManager.getZoneBlueprint(zone.id);
                 let displayName = zone.name;  // Default to original name
                 
-                // For zones 1-5, force use of blueprint names
-                if (parseInt(zone.id) <= 5) {
-                    const blueprintNames = {
-                        '1': 'Crystal Caves',
-                        '2': 'Whispering Woods', 
-                        '3': 'Ember Peaks',
-                        '4': 'Frost Hollow',
-                        '5': 'Shadowmere Swamp'
-                    };
-                    displayName = blueprintNames[zone.id] || zone.name;
-                } else if (blueprint) {
+                // Use blueprint names when available
+                if (blueprint) {
                     displayName = blueprint.name;
                 }
                 
@@ -1956,16 +1947,7 @@ const EquipmentManager = {
             // Force use blueprint names for first 5 zones
             let zoneName = zone.name;  // Default to original name
             
-            if (parseInt(zoneId) <= 5) {
-                const blueprintNames = {
-                    '1': 'Crystal Caves',
-                    '2': 'Whispering Woods', 
-                    '3': 'Ember Peaks',
-                    '4': 'Frost Hollow',
-                    '5': 'Shadowmere Swamp'
-                };
-                zoneName = blueprintNames[zoneId] || zone.name;
-            } else if (blueprint) {
+            if (blueprint) {
                 zoneName = blueprint.name;
             }
             
