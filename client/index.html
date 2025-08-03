@@ -3737,7 +3737,7 @@ const EquipmentManager = {
                     '--border-color-main': 'rgba(34, 211, 238, 0.4)',
                     '--border-color-pulse': 'rgba(103, 232, 249, 0.7)'
                 },
-                backgroundColor: '#121212'
+                backgroundColor: 'linear-gradient(135deg, #0f2027 0%, #203a43 25%, #2c5364 50%, #0f4c75 75%, #3282b8 100%)'
             },
             'frostbite': {
                 name: 'Frostbite',
@@ -3829,11 +3829,12 @@ const EquipmentManager = {
                 root.style.setProperty(property, value);
             });
             
-            // Change background color
-            document.body.style.backgroundColor = theme.backgroundColor;
-            
-            // Update glass panel animations based on theme
+            // Apply background based on theme
             if (themeKey === 'aetherial-shard') {
+                // Apply the beautiful teal gradient background
+                document.body.style.background = theme.backgroundColor;
+                document.body.style.backgroundColor = ''; // Clear solid color
+                
                 // Apply cyan-specific animation and glass effects
                 const glassPanels = document.querySelectorAll('.glass-panel');
                 glassPanels.forEach(panel => {
@@ -3844,6 +3845,10 @@ const EquipmentManager = {
                     `;
                 });
             } else {
+                // Apply solid background color for other themes
+                document.body.style.backgroundColor = theme.backgroundColor;
+                document.body.style.background = ''; // Clear gradient
+                
                 // Reset to default animation for other themes
                 const glassPanels = document.querySelectorAll('.glass-panel');
                 glassPanels.forEach(panel => {
