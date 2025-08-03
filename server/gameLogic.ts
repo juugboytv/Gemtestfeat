@@ -128,16 +128,141 @@ export class GameLogicManager {
   }
 
   // Get available zones for teleportation
-  getAvailableZones(playerId: string): Array<{ id: number; name: string; levelReq: number; unlocked: boolean }> {
+  getAvailableZones(playerId: string): Array<{ id: string; name: string; levelReq: number; unlocked: boolean }> {
     const gameState = this.gameStates.get(playerId);
     if (!gameState) return [];
 
-    return Object.entries(gameState.zones).map(([zoneId, zone]) => ({
-      id: zone.id,
-      name: zone.name,
-      levelReq: 1, // All zones are level 1 for now
-      unlocked: true // All zones unlocked for testing
-    }));
+    // Generate all 101 zones with proper level requirements
+    const allZones = [];
+    
+    // Starter zones 1-24 (Level 1)
+    for (let i = 1; i <= 24; i++) {
+      const raceNames = [
+        "Crystal Caves (Dwarf)", "Elvenwood (Elf)", "Shifting Maze (Halfling)", "Arid Badlands (Human)",
+        "Glimmering Springs (Gnome)", "Blazefire Wastes (Tiefling)", "Abyssal Fen (Swampfolk)", 
+        "Moss-Covered Forest (Human/Fey)", "Cinder Barrens (Orc)", "Echo Mountain (Dwarf/Giant)",
+        "Labyrinth (Minotaur)", "Steppe (Centaur)", "Cloud Peak (Griffin/Angel)", "Emberfall Cliffs (Phoenix)",
+        "Tidal Pools (Merfolk)", "Shadowmere (Dark Elf)", "Ironhold (Dwarf Clan)", "Moongrove (Night Elf)",
+        "Thornwood (Wild Elf)", "Mistral Heights (Air Genasi)", "Crimson Peaks (Fire Genasi)", 
+        "Frostholm (Frost Giant)", "Verdant Vale (Earth Genasi)", "Starlight Sanctuary (Celestial)"
+      ];
+      allZones.push({
+        id: i.toString(),
+        name: raceNames[i-1] || `Starter Zone ${i}`,
+        levelReq: 1,
+        unlocked: true
+      });
+    }
+
+    // Advanced zones 25-101 with proper level requirements
+    const zoneData = [
+      // Level 100 zones (25-33)
+      { name: "Echoing Chasms", level: 100 },
+      { name: "Starfall Deserts", level: 100 },
+      { name: "The Weeping Mire", level: 100 },
+      { name: "Frozen Spirelands", level: 100 },
+      { name: "Living Mountain", level: 100 },
+      { name: "Chrono-Distorted Fields", level: 100 },
+      { name: "Whisperwind Peaks", level: 100 },
+      { name: "Corrupted Jungles", level: 100 },
+      { name: "Acidic Fens", level: 100 },
+      
+      // Level 253 zones (34-50)
+      { name: "Bone Deserts", level: 253 },
+      { name: "The Maw", level: 253 },
+      { name: "Poisonbloom Meadows", level: 253 },
+      { name: "Storm-Wrenched Coast", level: 253 },
+      { name: "The Rusting Wastes", level: 253 },
+      { name: "Webbed Caverns", level: 253 },
+      { name: "The Scarred Peaks", level: 253 },
+      { name: "Fungal Undergrowth", level: 253 },
+      { name: "Obsidian Flats", level: 253 },
+      { name: "Quicksand Dunes", level: 253 },
+      { name: "Floating Islands", level: 253 },
+      { name: "Glass Sea", level: 253 },
+      { name: "Upside-Down Forest", level: 253 },
+      { name: "Singing Sands", level: 253 },
+      { name: "Aurora Borealis Caverns", level: 253 },
+      { name: "Gloom-Shrouded Peaks", level: 253 },
+      { name: "Sunken Spire City", level: 253 },
+      
+      // Level 1000 zones (51-58)
+      { name: "Giant Mushroom Forests", level: 1000 },
+      { name: "Living Stone Gardens", level: 1000 },
+      { name: "The Whispering Wastes", level: 1000 },
+      { name: "Mirage Deserts", level: 1000 },
+      { name: "Gravity Wells", level: 1000 },
+      { name: "Chromatic Reefs", level: 1000 },
+      { name: "The Endless Bridge", level: 1000 },
+      { name: "Sky-Whale Graveyard", level: 1000 },
+      
+      // Level 6143 zones (59-66)
+      { name: "The Weaving Caves", level: 6143 },
+      { name: "Echoing Valley of the Giants", level: 6143 },
+      { name: "The Glimmering Shore", level: 6143 },
+      { name: "The Whispering Canyon", level: 6143 },
+      { name: "Floating River", level: 6143 },
+      { name: "The Cloud Sea", level: 6143 },
+      { name: "Obsidian Monolith Plains", level: 6143 },
+      { name: "The Bloodfang Jungle", level: 6143 },
+      
+      // Level 13636 zones (67-73)
+      { name: "Sunstone Deserts", level: 13636 },
+      { name: "The Whispering Gardens", level: 13636 },
+      { name: "Glass Peaks", level: 13636 },
+      { name: "Phantom Forests", level: 13636 },
+      { name: "Elemental Crossroads", level: 13636 },
+      { name: "The Shimmering Void", level: 13636 },
+      { name: "Crimson Wastelands", level: 13636 },
+      
+      // Level 35452 zones (74-78)
+      { name: "Temporal Anomaly Fields", level: 35452 },
+      { name: "The Fractured Realms", level: 35452 },
+      { name: "Gravity-Defying Rapids", level: 35452 },
+      { name: "Crystal Mind Caves", level: 35452 },
+      { name: "The Howling Expanse", level: 35452 },
+      
+      // Level 83333 zones (79-81)
+      { name: "Nexus of Shadows", level: 83333 },
+      { name: "The Glittering Grottos", level: 83333 },
+      { name: "Abyssal Throne Room", level: 83333 },
+      
+      // Level 172222 zones (82-100)
+      { name: "The Infinite Library", level: 172222 },
+      { name: "Gelatinous Jungles", level: 172222 },
+      { name: "The Screaming Peaks", level: 172222 },
+      { name: "Molten Core Chambers", level: 172222 },
+      { name: "The Weeping Void", level: 172222 },
+      { name: "Crystalline Maze", level: 172222 },
+      { name: "The Forgotten Realm", level: 172222 },
+      { name: "Nightmare Landscapes", level: 172222 },
+      { name: "The Eternal Storm", level: 172222 },
+      { name: "Shattered Reality", level: 172222 },
+      { name: "The Consuming Dark", level: 172222 },
+      { name: "Prismatic Dimensions", level: 172222 },
+      { name: "The Howling Abyss", level: 172222 },
+      { name: "Spectral Battlegrounds", level: 172222 },
+      { name: "The Twisted Sanctum", level: 172222 },
+      { name: "Elemental Chaos", level: 172222 },
+      { name: "The Final Threshold", level: 172222 },
+      { name: "Apocalyptic Wasteland", level: 172222 },
+      { name: "The Last Haven", level: 172222 },
+      
+      // Level 400000 zone (101)
+      { name: "The Echoing Gorge of Lost Souls", level: 400000 }
+    ];
+
+    // Add advanced zones
+    zoneData.forEach((zone, index) => {
+      allZones.push({
+        id: (25 + index).toString(),
+        name: zone.name,
+        levelReq: zone.level,
+        unlocked: gameState.player.level >= zone.level
+      });
+    });
+
+    return allZones;
   }
 
   // Get current zone data
