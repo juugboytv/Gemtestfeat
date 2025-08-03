@@ -2124,37 +2124,40 @@ const EquipmentManager = {
                 // Handle both server data format (feature.type) and legacy format (feature.name/feature.icon)
                 const featureType = feature.type || feature.name || 'Unknown';
                 
-                // Use working emojis directly instead of text fallbacks
+                // Feature mapping with both emoji and text fallbacks
                 let displayChar = '?';
                 let displayColor = '#F44336';
                 
+                // Debug log what feature type we're processing
+                console.log(`Processing feature type: "${featureType}"`);
+                
                 switch (featureType) {
                     case 'Bank':
-                        displayChar = '🏧';
+                        displayChar = '$';  // Simple text for reliability
                         displayColor = '#FFC107';
                         break;
                     case 'Armory':
-                        displayChar = '⚔️';
+                        displayChar = 'W';  // Simple text for reliability
                         displayColor = '#F44336';
                         break;
                     case 'Arcanum':
-                        displayChar = '🔮';
+                        displayChar = 'M';  // Simple text for reliability
                         displayColor = '#9C27B0';
                         break;
                     case 'Revive Station':
-                        displayChar = '🆘';
+                        displayChar = '+';  // Simple text for reliability
                         displayColor = '#4CAF50';
                         break;
                     case 'Gem Crucible':
-                        displayChar = 'G';  // Keep as text since 💎 is problematic
+                        displayChar = 'G';  // Simple text for reliability
                         displayColor = '#00BCD4';
                         break;
                     case 'Teleporter':
-                        displayChar = '🌀';
+                        displayChar = 'T';  // Simple text for reliability
                         displayColor = '#2196F3';
                         break;
                     case 'Sanctuary':
-                        displayChar = 'H';  // Keep as text since sanctuary emoji is problematic
+                        displayChar = 'H';  // Simple text for reliability
                         displayColor = '#FFEB3B';
                         break;
                     case 'Monster Zone':
@@ -2165,6 +2168,8 @@ const EquipmentManager = {
                         console.log(`Unknown feature type: "${featureType}" - using fallback`);
                         break;
                 }
+                
+                console.log(`Mapped to: "${displayChar}" with color ${displayColor}`);
                 
                 // Use emoji-supporting font for reliable display
                 this.ctx.font = `bold ${Math.max(10, size * 1.0)}px "Noto Color Emoji", "Apple Color Emoji", "Segoe UI Emoji", Arial, sans-serif`;
