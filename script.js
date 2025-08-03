@@ -2073,7 +2073,43 @@ const EquipmentManager = {
             this.grid.get('2,0').feature = { name: 'Bank', icon: '🏧' }; 
             this.grid.get('-2,0').feature = { name: 'Sanctuary', icon: '🆘' }; 
             this.grid.get('0,2').feature = { name: 'Teleport Zone', icon: '🌀' }; 
-        }, movePlayer(dq, dr) { const newQ = this.playerPos.q + dq; const newR = this.playerPos.r + dr; if (this.grid.has(`${newQ},${newR}`)) { this.playerPos.q = newQ; this.playerPos.r = newR; this.draw(); this.updateInteractButton(); const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); if (currentHex && currentHex.feature && currentHex.feature.name === 'Monster Zone') { CombatManager.populateMonsterList(state.game.currentZoneTier); } else { CombatManager.clearMonsterList(); } } }, updateInteractButton() { const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); const interactKey = document.getElementById('key-interact'); if (currentHex && currentHex.feature && currentHex.feature.name !== 'Monster Zone') { interactKey.textContent = `Enter`; interactKey.style.fontSize = '14px'; } else { interactKey.textContent = 'Interact'; interactKey.style.fontSize = '16px'; } }, handleInteraction() { const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); if (currentHex && currentHex.feature) { if (currentHex.feature.name === 'Weapons/Combat Shop') { ShopManager.openShop('armory'); } else if (currentHex.feature.name === 'Magic/Accessories Shop') { ShopManager.openShop('magic'); } else if (currentHex.feature.name === 'Bank') { BankManager.openBank(); } else if (currentHex.feature.name === 'Sanctuary') { ProfileManager.healPlayer(); } else if (currentHex.feature.name === 'Teleport Zone') { TeleportManager.showModal(); } } }, draw() { const canvas = ui.miniMapCanvas; this.ctx.clearRect(0, 0, canvas.width, canvas.height); const centerX = canvas.width / 2; const centerY = canvas.height / 2; this.grid.forEach(hex => { const relQ = hex.q - this.playerPos.q; const relR = hex.r - this.playerPos.r; const {x, y} = HexUtils.hexToPixel(relQ, relR, this.hexSize); this.drawHex(centerX + x, centerY + y, this.hexSize, hex.feature); }); this.drawPlayer(centerX, centerY); }, drawHex(cx, cy, size, feature) { 
+        }, movePlayer(dq, dr) { const newQ = this.playerPos.q + dq; const newR = this.playerPos.r + dr; if (this.grid.has(`${newQ},${newR}`)) { this.playerPos.q = newQ; this.playerPos.r = newR; this.draw(); this.updateInteractButton(); const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); if (currentHex && currentHex.feature && currentHex.feature.name === 'Monster Zone') { CombatManager.populateMonsterList(state.game.currentZoneTier); } else { CombatManager.clearMonsterList(); } } }, updateInteractButton() { const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); const interactKey = document.getElementById('key-interact'); if (currentHex && currentHex.feature && currentHex.feature.name !== 'Monster Zone') { interactKey.textContent = `Enter`; interactKey.style.fontSize = '14px'; } else { interactKey.textContent = 'Interact'; interactKey.style.fontSize = '16px'; } }, handleInteraction() { 
+            const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); 
+            if (currentHex && currentHex.feature) { 
+                // Handle both server-side feature types and legacy feature names
+                const featureType = currentHex.feature.type || currentHex.feature.name;
+                
+                console.log(`Interacting with feature: "${featureType}"`);
+                
+                // Handle server-side feature types (new system)
+                if (featureType === 'Armory') {
+                    ShopManager.openShop('armory');
+                } else if (featureType === 'Arcanum') {
+                    ShopManager.openShop('magic');
+                } else if (featureType === 'Bank') {
+                    BankManager.openBank();
+                } else if (featureType === 'Revive Station') {
+                    ProfileManager.healPlayer();
+                    showToast('🆘 Revived! Health restored to full.', false);
+                } else if (featureType === 'Teleporter') {
+                    TeleportManager.showModal();
+                }
+                // Legacy feature names (old system - for compatibility)
+                else if (featureType === 'Weapons/Combat Shop') {
+                    ShopManager.openShop('armory');
+                } else if (featureType === 'Magic/Accessories Shop') {
+                    ShopManager.openShop('magic');
+                } else if (featureType === 'Sanctuary') {
+                    ProfileManager.healPlayer();
+                } else if (featureType === 'Teleport Zone') {
+                    TeleportManager.showModal();
+                }
+                else {
+                    console.log(`Unknown feature type: "${featureType}"`);
+                    showToast(`Feature "${featureType}" not yet implemented.`, true);
+                }
+            } 
+        }, draw() { const canvas = ui.miniMapCanvas; this.ctx.clearRect(0, 0, canvas.width, canvas.height); const centerX = canvas.width / 2; const centerY = canvas.height / 2; this.grid.forEach(hex => { const relQ = hex.q - this.playerPos.q; const relR = hex.r - this.playerPos.r; const {x, y} = HexUtils.hexToPixel(relQ, relR, this.hexSize); this.drawHex(centerX + x, centerY + y, this.hexSize, hex.feature); }); this.drawPlayer(centerX, centerY); }, drawHex(cx, cy, size, feature) { 
             this.ctx.beginPath(); 
             for (let i = 0; i < 6; i++) { 
                 const angle = 2 * Math.PI / 6 * (i + 0.5); 
