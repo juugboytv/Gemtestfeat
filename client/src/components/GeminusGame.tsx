@@ -743,16 +743,118 @@ export default function GeminusGame() {
                     </div>
                   )}
 
-                  {/* Other tabs - placeholder content for now */}
+                  {/* Inventory Tab */}
                   {gameState.currentTab === 'inventory' && (
                     <div className="h-full">
                       <h2 className="font-orbitron text-xl mb-4 text-orange-400">Inventory</h2>
-                      <div className="inventory-grid">
+                      
+                      {/* Main Inventory Grid */}
+                      <div className="inventory-grid mb-6">
                         {Array.from({length: 25}).map((_, i) => (
                           <div key={i} className="inventory-slot">
                             <span className="text-gray-500 text-xs absolute inset-0 flex items-center justify-center">{i + 1}</span>
                           </div>
                         ))}
+                      </div>
+
+                      {/* Sort & Filter Gems */}
+                      <div className="stat-accordion-item open mb-2">
+                        <button className="stat-accordion-header">
+                          <h3 className="flex items-center">
+                            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4h13M3 8h9M3 12h9m-9 4h6"></path>
+                            </svg>
+                            Sort & Filter Gems
+                          </h3>
+                          <svg className="accordion-arrow w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                          </svg>
+                        </button>
+                        <div className="stat-accordion-content !p-2">
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                            <div>
+                              <label className="text-xs text-gray-400">Category</label>
+                              <select className="editor-input !w-full !text-xs">
+                                <option value="All">All</option>
+                                <option value="Gem Pouch">Gem Pouch</option>
+                                <option value="Spell">Spell</option>
+                                <option value="Melee">Melee</option>
+                                <option value="Ranged">Ranged</option>
+                                <option value="Defense">Defense</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="text-xs text-gray-400">Element</label>
+                              <select className="editor-input !w-full !text-xs">
+                                <option value="All">All</option>
+                                <option value="Fire">Fire</option>
+                                <option value="Air">Air</option>
+                                <option value="Earth">Earth</option>
+                                <option value="Cold">Cold</option>
+                                <option value="Death">Death</option>
+                                <option value="Arcane">Arcane</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="text-xs text-gray-400">Grade</label>
+                              <select className="editor-input !w-full !text-xs">
+                                <option value="All">All Grades</option>
+                                <option value="1">Grade 1</option>
+                                <option value="2">Grade 2</option>
+                                <option value="3">Grade 3</option>
+                                <option value="4">Grade 4</option>
+                                <option value="5">Grade 5</option>
+                              </select>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 mt-2 border-t border-gray-700 pt-2">
+                            <div>
+                              <label className="text-xs text-gray-400">Sort By</label>
+                              <select className="editor-input !w-full !text-xs">
+                                <option value="grade">Grade</option>
+                                <option value="name">Name</option>
+                                <option value="category">Category</option>
+                                <option value="element">Element</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="text-xs text-gray-400">Order</label>
+                              <select className="editor-input !w-full !text-xs">
+                                <option value="desc">Descending</option>
+                                <option value="asc">Ascending</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Gem Pouch */}
+                      <div className="stat-accordion-item open">
+                        <button className="stat-accordion-header">
+                          <h3>Gem Pouch <span className="text-xs text-gray-500 font-sans">({gameState.gemPouch.length})</span></h3>
+                          <svg className="accordion-arrow w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                          </svg>
+                        </button>
+                        <div className="stat-accordion-content !p-2">
+                          <div className="gem-pouch-grid">
+                            {gameState.gemPouch.map((gemInfo, index) => (
+                              <div 
+                                key={`${gemInfo.id}-${index}`}
+                                className={`gem-item ${selectedGemId === `${gemInfo.id}-${index}` ? 'selected' : ''}`}
+                                data-gem-id={`${gemInfo.id}-${index}`}
+                                onClick={() => setSelectedGemId(selectedGemId === `${gemInfo.id}-${index}` ? null : `${gemInfo.id}-${index}`)}
+                              >
+                                <img 
+                                  src={`https://placehold.co/40x40/1f2937/f97316?text=${gemInfo.abbreviation}`} 
+                                  className="w-10 h-10" 
+                                  alt={`${gemInfo.abbreviation} Grade ${gemInfo.grade}`}
+                                />
+                                <span className="item-label">{gemInfo.abbreviation}{gemInfo.grade}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )}
