@@ -5,8 +5,24 @@
 
 import { Router } from 'express';
 import { gameLogic } from './gameLogic.js';
+import { seedZoneData } from './zoneSeeder.js';
 
 const router = Router();
+
+// Seed zone data endpoint (development only)
+router.post('/api/game/seed-zones', async (req, res) => {
+  if (process.env.NODE_ENV !== 'development') {
+    return res.status(403).json({ success: false, message: 'Only available in development' });
+  }
+  
+  try {
+    await seedZoneData();
+    res.json({ success: true, message: 'Zone data seeded successfully' });
+  } catch (error) {
+    console.error('Zone seeding error:', error);
+    res.status(500).json({ success: false, message: 'Failed to seed zone data' });
+  }
+});
 
 // Initialize player session
 router.post('/api/game/init', (req, res) => {
@@ -42,14 +58,21 @@ router.get('/api/game/state', (req, res) => {
 });
 
 // Get available zones for teleportation
-router.get('/api/game/zones', (req, res) => {
+router.get('/api/game/zones', async (req, res) => {
   const playerId = (req.session as any)?.id || req.ip || 'default_player';
-  const zones = gameLogic.getAvailableZones(playerId);
-  
-  res.json({
-    success: true,
-    zones
-  });
+  try {
+    const zones = await gameLogic.getAvailableZones(playerId);
+    res.json({
+      success: true,
+      zones
+    });
+  } catch (error) {
+    console.error('Error fetching zones:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch zones'
+    });
+  }
 });
 
 // Teleport to a zone

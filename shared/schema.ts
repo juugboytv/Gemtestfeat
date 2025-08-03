@@ -235,7 +235,10 @@ export const charactersRelations = relations(characters, ({ one, many }) => ({
     fields: [characters.userId],
     references: [users.id],
   }),
-  items: many(items),
+  dropperItems: many(dropperItems),
+  echoItems: many(echoItems),
+  shadowItems: many(shadowItems),
+  gems: many(gems),
   combatLogs: many(combatLogs),
   zoneProgress: many(zoneProgress),
 }));
