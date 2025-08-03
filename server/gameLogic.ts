@@ -133,14 +133,12 @@ export class GameLogicManager {
     const features: Array<{ q: number; r: number; type: string; name?: string }> = [];
     
     // Core feature types with consistent positions across ALL zones
+    // Using only features that have actual interactive logic in the frontend
     const coreFeatures = [
-      { type: 'Sanctuary', position: { q: 0, r: 0 } }, // Always center
-      { type: 'Bank', position: { q: 0, r: -Math.min(2, gridSize - 1) } }, // North
-      { type: 'Armory', position: { q: Math.min(2, gridSize - 1), r: 0 } }, // East
-      { type: 'Arcanum', position: { q: -Math.min(2, gridSize - 1), r: 0 } }, // West
-      { type: 'Revive Station', position: { q: 0, r: Math.min(2, gridSize - 1) } }, // South
-      { type: 'Gem Crucible', position: { q: Math.min(1, gridSize - 2), r: -Math.min(1, gridSize - 2) } }, // Northeast
-      { type: 'Teleporter', position: { q: -Math.min(1, gridSize - 2), r: Math.min(1, gridSize - 2) } } // Southwest
+      { type: 'Armory', position: { q: Math.min(2, gridSize - 1), r: 0 } }, // East - Has shop logic
+      { type: 'Arcanum', position: { q: -Math.min(2, gridSize - 1), r: 0 } }, // West - Has spell shop logic  
+      { type: 'Revive Station', position: { q: 0, r: Math.min(2, gridSize - 1) } }, // South - Has SOS logic
+      { type: 'Teleporter', position: { q: -Math.min(1, gridSize - 2), r: Math.min(1, gridSize - 2) } } // Southwest - Has teleport logic
     ];
 
     // Add all core features to the zone with proper bounds checking

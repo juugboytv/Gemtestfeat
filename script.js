@@ -2132,33 +2132,21 @@ const EquipmentManager = {
                 console.log(`Processing feature type: "${featureType}"`);
                 
                 switch (featureType) {
-                    case 'Bank':
-                        displayChar = '$';  // Dollar symbol for Bank
-                        displayColor = '#FFC107';
-                        break;
                     case 'Armory':
-                        displayChar = 'A';  // A for Armory
+                        displayChar = 'A';  // A for Armory (Weapon/Armor Shop)
                         displayColor = '#F44336';
                         break;
                     case 'Arcanum':
-                        displayChar = 'M';  // M for Magic/Arcanum
+                        displayChar = 'M';  // M for Magic/Arcanum (Spell Shop)
                         displayColor = '#9C27B0';
                         break;
                     case 'Revive Station':
-                        displayChar = '+';  // Plus symbol for Revive Station
+                        displayChar = '+';  // Plus symbol for Revive Station (SOS)
                         displayColor = '#4CAF50';
-                        break;
-                    case 'Gem Crucible':
-                        displayChar = 'G';  // G for Gem Crucible
-                        displayColor = '#00BCD4';
                         break;
                     case 'Teleporter':
                         displayChar = 'T';  // T for Teleporter
                         displayColor = '#2196F3';
-                        break;
-                    case 'Sanctuary':
-                        displayChar = 'S';  // S for Sanctuary
-                        displayColor = '#FFEB3B';
                         break;
                     case 'Monster Zone':
                         displayChar = '•';
