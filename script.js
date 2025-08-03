@@ -1697,11 +1697,11 @@ const EquipmentManager = {
         }, 
         
         // Load zone blueprint dynamically
-        loadZoneBlueprint(zoneId) {
+        async loadZoneBlueprint(zoneId) {
             this.currentZoneId = zoneId;
-            const blueprint = this.getZoneBlueprint(zoneId);
+            const blueprint = await this.getZoneBlueprint(zoneId);
             
-            console.log(`Loading zone ${zoneId}:`, blueprint ? blueprint.name : 'No blueprint found');
+            console.log(`Loading zone ${zoneId}:`, blueprint ? (blueprint.name || `Zone ${zoneId}`) : 'No blueprint found');
             
             if (!blueprint) {
                 console.log('Falling back to static grid for zone', zoneId);
@@ -1804,14 +1804,25 @@ const EquipmentManager = {
             return this.generateBasicBlueprint(zoneId);
         },
 
-        // Get zone blueprint data
-        getZoneBlueprint(zoneId) {
-            // Use the global zoneBlueprints loaded from shared/zoneBlueprints.ts
-            const zoneKey = String(zoneId);
+        // Get zone blueprint data - prioritize server data
+        async getZoneBlueprint(zoneId) {
             console.log(`Looking for blueprint for zone ${zoneId}...`);
             
+            // First try to get server data if we're connected
+            try {
+                const serverData = await this.getZoneBlueprintFromServer(zoneId);
+                if (serverData && serverData.features) {
+                    console.log(`Using server blueprint for zone ${zoneId}:`, serverData.name || `Zone ${zoneId}`);
+                    return serverData;
+                }
+            } catch (error) {
+                console.log(`Server data not available for zone ${zoneId}, trying static blueprints`);
+            }
+            
+            // Fallback to static blueprints
+            const zoneKey = String(zoneId);
             if (window.zoneBlueprints && window.zoneBlueprints[zoneKey]) {
-                console.log(`Found blueprint for zone ${zoneId}:`, window.zoneBlueprints[zoneKey].name);
+                console.log(`Found static blueprint for zone ${zoneId}:`, window.zoneBlueprints[zoneKey].name);
                 return window.zoneBlueprints[zoneKey];
             }
             
@@ -1846,14 +1857,23 @@ const EquipmentManager = {
         // Map feature types to display information
         getFeatureInfo(featureType) {
             const featureMap = {
-                'Sanctuary': { name: 'Sanctuary', icon: '🆘' },
-                'Armory': { name: 'Weapons/Combat Shop', icon: '⚔️' },
-                'Arcanum': { name: 'Magic/Accessories Shop', icon: '🔮' },
-                'AetheriumConduit': { name: 'Bank', icon: '🏧' },
-                'Teleporter': { name: 'Teleport Zone', icon: '🌀' },
+                // Core 6 features - must match server-side generation exactly
+                'Bank': { name: 'Bank', icon: '🏧' },                        // 🏧 ATM
+                'Armory': { name: 'Weapons/Combat Shop', icon: '⚔️' },       // ⚔️ Weapon shop  
+                'Arcanum': { name: 'Magic/Accessories Shop', icon: '🔮' },   // 🔮 Spell shop
+                'Revive Station': { name: 'Revive Station', icon: '🆘' },    // 🆘 SOS revive station
+                'Gem Crucible': { name: 'Gem Crucible', icon: '💎' },        // 💎 Gem shop
+                'Teleporter': { name: 'Teleport Zone', icon: '🌀' },         // 🌀 Zone teleporter
+                
+                // Additional features
+                'Sanctuary': { name: 'Sanctuary', icon: '🏠' },              // Home base
                 'Monster Zone': { name: 'Monster Zone', icon: '◻️' },
                 'Resource Node': { name: 'Resource Node', icon: '⛏️' },
-                'Boss Arena': { name: 'Boss Arena', icon: '👑' }
+                'Boss Arena': { name: 'Boss Arena', icon: '👑' },
+                
+                // Legacy mappings for backward compatibility
+                'AetheriumConduit': { name: 'Bank', icon: '🏧' },
+                'Gem Node': { name: 'Gem Crucible', icon: '💎' }
             };
             return featureMap[featureType] || { name: featureType, icon: '❓' };
         },
