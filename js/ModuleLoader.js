@@ -41,6 +41,7 @@ class ModuleLoader {
             { id: 'demoSystem', path: 'js/demo/DemoSystem.js', dependencies: ['quickStart', 'databaseHelper', 'apiPatterns'] },
             { id: 'zoneDataProcessor', path: 'js/tools/ZoneDataProcessor.js', dependencies: [] },
             { id: 'completeZoneGenerator', path: 'js/tools/CompleteZoneGenerator.js', dependencies: [] },
+            { id: 'zoneMonsterData', path: 'js/data/ZoneMonsterData.js', dependencies: [] },
 
             // Additional modules will be added here as we extract them
         ];
