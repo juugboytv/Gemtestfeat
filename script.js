@@ -1613,11 +1613,8 @@ const EquipmentManager = {
             logToGame(`${enemy.name} strikes you for ${enemyDamage.toFixed(0)} damage!`, 'enemy'); 
             if (player.hp <= 0) { 
                 player.hp = 0; 
-                logToGame("You have been defeated! You are returned to the sanctuary.", 'system'); 
-                ProfileManager.healPlayer(); 
-                WorldMapManager.playerPos = { q: 0, r: 0 }; 
-                WorldMapManager.draw(); 
-                WorldMapManager.updateInteractButton(); 
+                logToGame("You have been defeated!", 'system'); 
+                RevivalManager.triggerDefeat();
                 this.endCombat(); 
             }
             this.updateEnemyUI(); 
@@ -2069,6 +2066,10 @@ const EquipmentManager = {
                 'Gem Crucible': { name: 'Gem Crucible', icon: '💎', fallback: 'G', color: '#00BCD4' },        
                 'Teleporter': { name: 'Teleport Zone', icon: '🌀', fallback: 'T', color: '#2196F3' },         
                 
+                // NEW: Rebuilt banking and revival systems
+                'Bank': { name: 'The Grand Vault', icon: '🏦', fallback: '$', color: '#FFC107' },
+                'Revive Station': { name: 'Sanctuary', icon: '⛑️', fallback: '+', color: '#4CAF50' },
+                
                 // Additional features
                 'Sanctuary': { name: 'Sanctuary', icon: '🏠', fallback: 'H', color: '#FFEB3B' },              
                 'Monster Zone': { name: 'Monster Zone', icon: '◻️', fallback: '•', color: '#757575' },
@@ -2112,6 +2113,10 @@ const EquipmentManager = {
                     ShopManager.openShop('magic');
                 } else if (featureType === 'Teleporter') {
                     TeleportManager.showModal();
+                } else if (featureType === 'Bank') {
+                    GildedVaultManager.openBank();
+                } else if (featureType === 'Revive Station') {
+                    RevivalManager.interactWithSanctuary();
                 }
                 // Legacy feature names (old system - for compatibility)
                 else if (featureType === 'Weapons/Combat Shop') {
@@ -2196,6 +2201,14 @@ const EquipmentManager = {
                     case 'Teleporter':
                         displayChar = '🌀';  // Cyclone emoji for Teleporter
                         displayColor = '#2196F3';
+                        break;
+                    case 'Bank':
+                        displayChar = '🏦';  // Bank building emoji for The Grand Vault
+                        displayColor = '#FFC107';
+                        break;
+                    case 'Revive Station':
+                        displayChar = '⛑️';  // Rescue helmet emoji for Sanctuary
+                        displayColor = '#4CAF50';
                         break;
                     case 'Monster Zone':
                         displayChar = '•';
@@ -3464,6 +3477,307 @@ const InfusionManager = {
         }
     };
 
+    // ======================
+    // GILDED VAULT MANAGER (Banking System)
+    // ======================
+    const GildedVaultManager = {
+        init() {
+            // Initialize banking system data
+            if (!ProfileManager.gameData.banking) {
+                ProfileManager.gameData.banking = {
+                    vaultGold: 0,
+                    hasVaultSigil: false,
+                    creditLimit: 0,
+                    currentDebt: 0,
+                    lastInterestUpdate: Date.now(),
+                    merchantWritUnlocked: false
+                };
+                ProfileManager.saveGame();
+            }
+        },
+
+        openBank() {
+            const modal = document.getElementById('banking-modal');
+            if (!modal) {
+                this.createBankModal();
+            }
+            this.updateBankDisplay();
+            document.getElementById('banking-modal').style.display = 'block';
+        },
+
+        createBankModal() {
+            const modalHTML = `
+                <div id="banking-modal" class="modal-overlay" style="display: none;">
+                    <div class="modal-content" style="max-width: 500px;">
+                        <h2 style="color: #FFD700; text-align: center; margin-bottom: 20px;">🏦 The Grand Vault</h2>
+                        
+                        <div id="vault-status" style="background: rgba(255,215,0,0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                <span>Carried Gold:</span>
+                                <span id="carried-gold">0</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                <span>Vault Balance:</span>
+                                <span id="vault-balance">0</span>
+                            </div>
+                            <div id="debt-info" style="display: none;">
+                                <div style="display: flex; justify-content: space-between; color: #FF6B6B;">
+                                    <span>Outstanding Debt:</span>
+                                    <span id="current-debt">0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="banking-actions">
+                            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                                <input type="number" id="bank-amount" placeholder="Amount" style="flex: 1; padding: 8px; border-radius: 4px; border: 1px solid #666; background: #333; color: white;">
+                                <button onclick="GildedVaultManager.deposit()" class="action-btn" style="background: #4CAF50;">Deposit</button>
+                                <button onclick="GildedVaultManager.withdraw()" class="action-btn" style="background: #FF9800;">Withdraw</button>
+                            </div>
+                            
+                            <div id="credit-section" style="display: none; border-top: 1px solid #666; padding-top: 15px;">
+                                <h3 style="color: #FF6B6B; margin-bottom: 10px;">📜 Merchant's Writ (Credit)</h3>
+                                <div style="margin-bottom: 10px;">
+                                    <span>Credit Limit: </span><span id="credit-limit">0</span>
+                                </div>
+                                <button onclick="GildedVaultManager.requestCredit()" class="action-btn" style="background: #FF6B6B;">Request Credit</button>
+                                <button onclick="GildedVaultManager.repayDebt()" class="action-btn" style="background: #9C27B0;">Repay Debt</button>
+                            </div>
+                        </div>
+
+                        <button onclick="GildedVaultManager.closeBank()" class="close-btn">Close</button>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+        },
+
+        updateBankDisplay() {
+            const banking = ProfileManager.gameData.banking;
+            document.getElementById('carried-gold').textContent = ProfileManager.gameData.player.gold.toLocaleString();
+            document.getElementById('vault-balance').textContent = banking.vaultGold.toLocaleString();
+            
+            if (banking.currentDebt > 0) {
+                document.getElementById('debt-info').style.display = 'block';
+                document.getElementById('current-debt').textContent = banking.currentDebt.toLocaleString();
+            } else {
+                document.getElementById('debt-info').style.display = 'none';
+            }
+
+            if (banking.merchantWritUnlocked) {
+                document.getElementById('credit-section').style.display = 'block';
+                document.getElementById('credit-limit').textContent = banking.creditLimit.toLocaleString();
+            }
+        },
+
+        deposit() {
+            const amount = parseInt(document.getElementById('bank-amount').value);
+            if (!amount || amount <= 0) return;
+            
+            if (amount > ProfileManager.gameData.player.gold) {
+                showToast('Insufficient gold to deposit!', true);
+                return;
+            }
+
+            ProfileManager.gameData.player.gold -= amount;
+            ProfileManager.gameData.banking.vaultGold += amount;
+            ProfileManager.saveGame();
+            this.updateBankDisplay();
+            ProfileManager.updateUI();
+            showToast(`Deposited ${amount.toLocaleString()} gold to vault`, false);
+            document.getElementById('bank-amount').value = '';
+        },
+
+        withdraw() {
+            const amount = parseInt(document.getElementById('bank-amount').value);
+            if (!amount || amount <= 0) return;
+            
+            if (amount > ProfileManager.gameData.banking.vaultGold) {
+                showToast('Insufficient vault balance!', true);
+                return;
+            }
+
+            ProfileManager.gameData.banking.vaultGold -= amount;
+            ProfileManager.gameData.player.gold += amount;
+            ProfileManager.saveGame();
+            this.updateBankDisplay();
+            ProfileManager.updateUI();
+            showToast(`Withdrew ${amount.toLocaleString()} gold from vault`, false);
+            document.getElementById('bank-amount').value = '';
+        },
+
+        requestCredit() {
+            const banking = ProfileManager.gameData.banking;
+            if (banking.currentDebt >= banking.creditLimit) {
+                showToast('Credit limit reached!', true);
+                return;
+            }
+
+            const availableCredit = banking.creditLimit - banking.currentDebt;
+            const amount = Math.min(availableCredit, 1000); // Request up to 1000 or available credit
+            
+            banking.currentDebt += amount;
+            ProfileManager.gameData.player.gold += amount;
+            ProfileManager.saveGame();
+            this.updateBankDisplay();
+            ProfileManager.updateUI();
+            showToast(`Borrowed ${amount.toLocaleString()} gold on credit`, false);
+        },
+
+        repayDebt() {
+            const amount = parseInt(document.getElementById('bank-amount').value);
+            const banking = ProfileManager.gameData.banking;
+            
+            if (!amount || amount <= 0) return;
+            if (amount > ProfileManager.gameData.player.gold) {
+                showToast('Insufficient gold to repay debt!', true);
+                return;
+            }
+            if (amount > banking.currentDebt) {
+                showToast('Cannot repay more than current debt!', true);
+                return;
+            }
+
+            ProfileManager.gameData.player.gold -= amount;
+            banking.currentDebt -= amount;
+            ProfileManager.saveGame();
+            this.updateBankDisplay();
+            ProfileManager.updateUI();
+            showToast(`Repaid ${amount.toLocaleString()} gold debt`, false);
+            document.getElementById('bank-amount').value = '';
+        },
+
+        closeBank() {
+            document.getElementById('banking-modal').style.display = 'none';
+        }
+    };
+
+    // ======================
+    // REVIVAL MANAGER (Death/Revival System)
+    // ======================
+    const RevivalManager = {
+        init() {
+            // Initialize revival system data
+            if (!ProfileManager.gameData.deathSystem) {
+                ProfileManager.gameData.deathSystem = {
+                    isDefeated: false,
+                    deathCount: 0
+                };
+                ProfileManager.saveGame();
+            }
+        },
+
+        checkForDeath() {
+            const player = ProfileManager.gameData.player;
+            if (player.health <= 0 && !ProfileManager.gameData.deathSystem.isDefeated) {
+                this.triggerDefeat();
+            }
+        },
+
+        triggerDefeat() {
+            const player = ProfileManager.gameData.player;
+            const deathSystem = ProfileManager.gameData.deathSystem;
+            
+            // Set defeated state
+            deathSystem.isDefeated = true;
+            deathSystem.deathCount++;
+            
+            // Apply death penalties
+            const lostGold = player.gold;
+            const lostXP = player.experience;
+            
+            // Keep banked gold safe, lose carried gold
+            player.gold = 0;
+            player.experience = 0; // Reset XP progress but keep level
+            player.health = 0; // Keep at 0 until revived
+            
+            // Apply visual effects
+            this.applyDefeatedEffects();
+            
+            ProfileManager.saveGame();
+            ProfileManager.updateUI();
+            
+            showToast(`DEFEATED! Lost ${lostGold.toLocaleString()} gold and ${lostXP.toLocaleString()} XP. Seek revival at a Sanctuary!`, true);
+            showToast('You are now in ghost form. Find a Sanctuary to revive!', false);
+        },
+
+        applyDefeatedEffects() {
+            // Add visual effect to indicate defeated state
+            const gameContainer = document.getElementById('game-container');
+            if (gameContainer) {
+                gameContainer.style.filter = 'grayscale(50%) brightness(0.7)';
+                gameContainer.style.border = '2px solid #FF6B6B';
+            }
+            
+            // Add defeated indicator to UI
+            const defeatedIndicator = document.createElement('div');
+            defeatedIndicator.id = 'defeated-indicator';
+            defeatedIndicator.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: rgba(255, 107, 107, 0.9);
+                color: white;
+                padding: 10px;
+                border-radius: 8px;
+                font-weight: bold;
+                z-index: 1000;
+                animation: pulse 2s infinite;
+            `;
+            defeatedIndicator.innerHTML = 'DEFEATED - Seek Revival';
+            document.body.appendChild(defeatedIndicator);
+        },
+
+        removeDefeatedEffects() {
+            // Remove visual effects
+            const gameContainer = document.getElementById('game-container');
+            if (gameContainer) {
+                gameContainer.style.filter = '';
+                gameContainer.style.border = '';
+            }
+            
+            // Remove defeated indicator
+            const defeatedIndicator = document.getElementById('defeated-indicator');
+            if (defeatedIndicator) {
+                defeatedIndicator.remove();
+            }
+        },
+
+        interactWithSanctuary() {
+            const deathSystem = ProfileManager.gameData.deathSystem;
+            
+            if (!deathSystem.isDefeated) {
+                showToast('Sanctuary: A place of peace and healing. Return here if you fall in battle.', false);
+                return;
+            }
+            
+            // Revive the player
+            this.revivePlayer();
+        },
+
+        revivePlayer() {
+            const player = ProfileManager.gameData.player;
+            const deathSystem = ProfileManager.gameData.deathSystem;
+            
+            // Restore health and clear defeated state
+            player.health = player.maxHealth;
+            deathSystem.isDefeated = false;
+            
+            // Remove visual effects
+            this.removeDefeatedEffects();
+            
+            ProfileManager.saveGame();
+            ProfileManager.updateUI();
+            
+            showToast('REVIVED! You have been restored to full health at the Sanctuary!', false);
+            showToast('Remember: Your lost gold and XP cannot be recovered.', false);
+        },
+
+        canInteractWithWorld() {
+            return !ProfileManager.gameData.deathSystem.isDefeated;
+        }
+    };
+
     // --- NEW: DATA LOADING ---
     /**
      * Asynchronously fetches and loads all necessary game data from external JSON files.
@@ -3513,6 +3827,11 @@ const InfusionManager = {
      */
     async function main() {
         await loadGameData(); // Ensure data is loaded before the game starts
+        
+        // Initialize new systems
+        GildedVaultManager.init();
+        RevivalManager.init();
+        
         CreationManager.init();
     }
 
