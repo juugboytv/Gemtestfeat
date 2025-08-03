@@ -12,6 +12,7 @@ export default function InventoryTab({ gameState, updateGameState }: InventoryTa
   const [selectedGem, setSelectedGem] = useState<number | null>(null);
   const [showItemActions, setShowItemActions] = useState(false);
   const [showGemActions, setShowGemActions] = useState(false);
+  const [showGemFilters, setShowGemFilters] = useState(false);
 
   // Create grid of 25 slots (5x5)
   const inventorySlots = Array.from({ length: 25 }, (_, index) => {
@@ -107,6 +108,79 @@ export default function InventoryTab({ gameState, updateGameState }: InventoryTa
             </div>
           );
         })}
+      </div>
+
+      {/* Sort & Filter Gems */}
+      <div className="glass-panel p-4 rounded-lg mb-4">
+        <button className="w-full flex items-center justify-between mb-3" onClick={() => setShowGemFilters(!showGemFilters)}>
+          <h3 className="font-orbitron text-lg text-orange-400 flex items-center">
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4h13M3 8h9M3 12h9m-9 4h6"></path>
+            </svg>
+            Sort & Filter Gems
+          </h3>
+          <svg className={`w-6 h-6 transition-transform ${showGemFilters ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+        
+        {showGemFilters && (
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+              <div>
+                <label className="text-xs text-gray-400 block mb-1">Category</label>
+                <select className="w-full px-2 py-1 text-xs bg-gray-800 border border-gray-600 rounded text-white">
+                  <option value="All">All</option>
+                  <option value="Spell">Spell</option>
+                  <option value="Melee">Melee</option>
+                  <option value="Ranged">Ranged</option>
+                  <option value="Defense">Defense</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-xs text-gray-400 block mb-1">Element</label>
+                <select className="w-full px-2 py-1 text-xs bg-gray-800 border border-gray-600 rounded text-white">
+                  <option value="All">All</option>
+                  <option value="Fire">Fire</option>
+                  <option value="Air">Air</option>
+                  <option value="Earth">Earth</option>
+                  <option value="Cold">Cold</option>
+                  <option value="Death">Death</option>
+                  <option value="Arcane">Arcane</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-xs text-gray-400 block mb-1">Grade</label>
+                <select className="w-full px-2 py-1 text-xs bg-gray-800 border border-gray-600 rounded text-white">
+                  <option value="All">All Grades</option>
+                  <option value="1">Grade 1</option>
+                  <option value="2">Grade 2</option>
+                  <option value="3">Grade 3</option>
+                  <option value="4">Grade 4</option>
+                  <option value="5">Grade 5</option>
+                </select>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-2 border-t border-gray-700 pt-2">
+              <div>
+                <label className="text-xs text-gray-400 block mb-1">Sort By</label>
+                <select className="w-full px-2 py-1 text-xs bg-gray-800 border border-gray-600 rounded text-white">
+                  <option value="grade">Grade</option>
+                  <option value="name">Name</option>
+                  <option value="category">Category</option>
+                  <option value="element">Element</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-xs text-gray-400 block mb-1">Order</label>
+                <select className="w-full px-2 py-1 text-xs bg-gray-800 border border-gray-600 rounded text-white">
+                  <option value="desc">Descending</option>
+                  <option value="asc">Ascending</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Gem Pouch */}
