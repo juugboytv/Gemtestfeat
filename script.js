@@ -2054,10 +2054,10 @@ const EquipmentManager = {
         getFeatureInfo(featureType) {
             const featureMap = {
                 // Core 6 features - must match server-side generation exactly
-                'Bank': { name: 'Bank', icon: '🏧', fallback: '$', color: '#FFC107' },                        
+                'Bank': { name: 'Bank', icon: '🏦', fallback: '$', color: '#FFC107' },                        
                 'Armory': { name: 'Weapons/Combat Shop', icon: '⚔️', fallback: 'W', color: '#F44336' },       
                 'Arcanum': { name: 'Magic/Accessories Shop', icon: '🔮', fallback: 'M', color: '#9C27B0' },   
-                'Revive Station': { name: 'Revive Station', icon: '🆘', fallback: '+', color: '#4CAF50' },    
+                'Revive Station': { name: 'Revive Station', icon: '⛑️', fallback: '+', color: '#4CAF50' },    
                 'Gem Crucible': { name: 'Gem Crucible', icon: '💎', fallback: 'G', color: '#00BCD4' },        
                 'Teleporter': { name: 'Teleport Zone', icon: '🌀', fallback: 'T', color: '#2196F3' },         
                 
@@ -2068,7 +2068,7 @@ const EquipmentManager = {
                 'Boss Arena': { name: 'Boss Arena', icon: '👑', fallback: 'B', color: '#FF9800' },
                 
                 // Legacy mappings for backward compatibility
-                'AetheriumConduit': { name: 'Bank', icon: '🏧', fallback: '$', color: '#FFC107' },
+                'AetheriumConduit': { name: 'Bank', icon: '🏦', fallback: '$', color: '#FFC107' },
                 'Gem Node': { name: 'Gem Crucible', icon: '💎', fallback: 'G', color: '#00BCD4' }
             };
             return featureMap[featureType] || { name: featureType, icon: '❓', fallback: '?', color: '#F44336' };
@@ -2194,7 +2194,7 @@ const EquipmentManager = {
                         displayColor = '#9C27B0';
                         break;
                     case 'Revive Station':
-                        displayChar = '🆘';  // SOS emoji for Revive Station
+                        displayChar = '⛑️';  // Rescue helmet emoji for Revive Station
                         displayColor = '#4CAF50';
                         break;
                     case 'Teleporter':
@@ -2202,7 +2202,7 @@ const EquipmentManager = {
                         displayColor = '#2196F3';
                         break;
                     case 'Bank':
-                        displayChar = '🏧';  // ATM emoji for Bank
+                        displayChar = '🏦';  // Bank building emoji for Bank
                         displayColor = '#FFC107';
                         break;
                     case 'Monster Zone':
@@ -2211,7 +2211,7 @@ const EquipmentManager = {
                         break;
                     // Add legacy compatibility for any remaining old format features
                     case 'Sanctuary':
-                        displayChar = '🆘';  // SOS emoji for Sanctuary (alias for Revive Station)
+                        displayChar = '⛑️';  // Rescue helmet emoji for Sanctuary (alias for Revive Station)
                         displayColor = '#4CAF50';
                         break;
                     case 'Weapons/Combat Shop':
@@ -2235,9 +2235,10 @@ const EquipmentManager = {
                 
                 // Set font - different handling for emojis vs text
                 // Simplified emoji detection with explicit checks for our specific emojis
-                const isEmoji = displayChar === '🏧' || displayChar === '🆘' || displayChar === '⚔️' || 
+                const isEmoji = displayChar === '🏦' || displayChar === '⛑️' || displayChar === '⚔️' || 
                                displayChar === '🔮' || displayChar === '🌀' || displayChar === '💎' ||
                                displayChar === '🏠' || displayChar === '👑' || displayChar === '⛏️' ||
+                               displayChar === '🏧' || displayChar === '🆘' || // Keep old emojis for compatibility
                                /[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/u.test(displayChar);
                 
                 console.log(`Is emoji: ${isEmoji} for character: "${displayChar}"`)
