@@ -140,13 +140,14 @@ export class GameLogicManager {
     features.push({ type: "Sanctuary", q: 0, r: 0 });
     usedCoordinates.add("0,0");
 
-    // Core features (🆘,💎,🏧,🔮,🌀,⚔️) - place these in unique positions for each zone
+    // Core features (🆘,💎,🏧,🔮,🌀,⚔️) - ALL zones must have these 6 features
     const coreFeatureTypes = [
-      { type: "Bank", icon: "🏧" },
-      { type: "Arcanum", icon: "🔮" }, 
-      { type: "Armory", icon: "⚔️" },
-      { type: "AetheriumConduit", icon: "🌀" },
-      { type: "Gem Node", icon: "💎" }
+      { type: "Bank", icon: "🏧" },           // ATM
+      { type: "Arcanum", icon: "🔮" },       // Spell shop
+      { type: "Armory", icon: "⚔️" },        // Weapon shop
+      { type: "AetheriumConduit", icon: "🌀" }, // Teleporter functionality
+      { type: "Gem Node", icon: "💎" },      // Gem crucible
+      { type: "Revive Station", icon: "🆘" } // SOS revive station
     ];
 
     // Use zone ID to seed different patterns for consistent but unique layouts
@@ -158,7 +159,7 @@ export class GameLogicManager {
       features.push({ type: feature.type, q: coords.q, r: coords.r });
     }
 
-    // Add teleporter
+    // Add main teleporter (separate from AetheriumConduit)
     const teleporterCoords = this.generateUniqueCoordinates(gridSize, usedCoordinates, baseSeed + seedCounter++);
     features.push({ type: "Teleporter", q: teleporterCoords.q, r: teleporterCoords.r });
 
@@ -224,19 +225,17 @@ export class GameLogicManager {
       };
     });
 
-    // Generate unique layouts for all remaining zones
+    // Generate unique layouts for ALL zones to ensure they have all 6 core features
     for (let i = 1; i <= 101; i++) {
       const zoneId = i.toString();
-      if (!zones[zoneId]) {
-        const layout = this.generateUniqueZoneLayout(i);
-        zones[zoneId] = {
-          id: i,
-          name: `Zone ${i}`, // This will be overridden by getAvailableZones with proper names
-          gridSize: layout.gridSize,
-          features: layout.features,
-          currentMonsters: []
-        };
-      }
+      const layout = this.generateUniqueZoneLayout(i);
+      zones[zoneId] = {
+        id: i,
+        name: `Zone ${i}`, // This will be overridden by getAvailableZones with proper names
+        gridSize: layout.gridSize,
+        features: layout.features,
+        currentMonsters: []
+      };
     }
 
     return zones;
@@ -324,101 +323,98 @@ export class GameLogicManager {
       });
     }
 
-    // Advanced zones 25-101 with proper level requirements
+    // Advanced zones 25-101 with correct level requirements from provided data
     const zoneData = [
-      // Level 100 zones (25-33)
+      // Z25-Z34
       { name: "Echoing Chasms", level: 100 },
-      { name: "Starfall Deserts", level: 100 },
-      { name: "The Weeping Mire", level: 100 },
-      { name: "Frozen Spirelands", level: 100 },
-      { name: "Living Mountain", level: 100 },
-      { name: "Chrono-Distorted Fields", level: 100 },
-      { name: "Whisperwind Peaks", level: 100 },
-      { name: "Corrupted Jungles", level: 100 },
-      { name: "Acidic Fens", level: 100 },
-      
-      // Level 253 zones (34-50)
+      { name: "Starfall Deserts", level: 110 },
+      { name: "The Weeping Mire", level: 121 },
+      { name: "Frozen Spirelands", level: 135 },
+      { name: "Living Mountain", level: 149 },
+      { name: "Chrono-Distorted Fields", level: 166 },
+      { name: "Whisperwind Peaks", level: 184 },
+      { name: "Corrupted Jungles", level: 205 },
+      { name: "Acidic Fens", level: 227 },
       { name: "Bone Deserts", level: 253 },
-      { name: "The Maw", level: 253 },
-      { name: "Poisonbloom Meadows", level: 253 },
-      { name: "Storm-Wrenched Coast", level: 253 },
-      { name: "The Rusting Wastes", level: 253 },
-      { name: "Webbed Caverns", level: 253 },
-      { name: "The Scarred Peaks", level: 253 },
-      { name: "Fungal Undergrowth", level: 253 },
-      { name: "Obsidian Flats", level: 253 },
-      { name: "Quicksand Dunes", level: 253 },
-      { name: "Floating Islands", level: 253 },
-      { name: "Glass Sea", level: 253 },
-      { name: "Upside-Down Forest", level: 253 },
-      { name: "Singing Sands", level: 253 },
-      { name: "Aurora Borealis Caverns", level: 253 },
-      { name: "Gloom-Shrouded Peaks", level: 253 },
-      { name: "Sunken Spire City", level: 253 },
       
-      // Level 1000 zones (51-58)
+      // Z35-Z44
+      { name: "The Maw", level: 281 },
+      { name: "Poisonbloom Meadows", level: 312 },
+      { name: "Storm-Wrenched Coast", level: 347 },
+      { name: "The Rusting Wastes", level: 386 },
+      { name: "Webbed Caverns", level: 429 },
+      { name: "The Scarred Peaks", level: 477 },
+      { name: "Fungal Undergrowth", level: 530 },
+      { name: "Obsidian Flats", level: 589 },
+      { name: "Quicksand Dunes", level: 655 },
+      { name: "Floating Islands", level: 728 },
+      
+      // Z45-Z51
+      { name: "Glass Sea", level: 809 },
+      { name: "Upside-Down Forest", level: 899 },
+      { name: "Singing Sands", level: 1000 },
+      { name: "Aurora Borealis Caverns", level: 1000 },
+      { name: "Gloom-Shrouded Peaks", level: 1000 },
+      { name: "Sunken Spire City", level: 1000 },
       { name: "Giant Mushroom Forests", level: 1000 },
-      { name: "Living Stone Gardens", level: 1000 },
-      { name: "The Whispering Wastes", level: 1000 },
-      { name: "Mirage Deserts", level: 1000 },
-      { name: "Gravity Wells", level: 1000 },
-      { name: "Chromatic Reefs", level: 1000 },
-      { name: "The Endless Bridge", level: 1000 },
-      { name: "Sky-Whale Graveyard", level: 1000 },
       
-      // Level 6143 zones (59-66)
+      // Z52-Z58
+      { name: "Living Stone Gardens", level: 1643 },
+      { name: "The Whispering Wastes", level: 2286 },
+      { name: "Mirage Deserts", level: 2929 },
+      { name: "Gravity Wells", level: 3571 },
+      { name: "Chromatic Reefs", level: 4214 },
+      { name: "The Endless Bridge", level: 4857 },
+      { name: "Sky-Whale Graveyard", level: 5500 },
+      
+      // Z59-Z65
       { name: "The Weaving Caves", level: 6143 },
-      { name: "Echoing Valley of the Giants", level: 6143 },
-      { name: "The Glimmering Shore", level: 6143 },
-      { name: "The Whispering Canyon", level: 6143 },
-      { name: "Floating River", level: 6143 },
-      { name: "The Cloud Sea", level: 6143 },
-      { name: "Obsidian Monolith Plains", level: 6143 },
-      { name: "The Bloodfang Jungle", level: 6143 },
+      { name: "Echoing Valley of the Giants", level: 6786 },
+      { name: "The Glimmering Shore", level: 7429 },
+      { name: "The Whispering Canyon", level: 8071 },
+      { name: "Floating River", level: 8714 },
+      { name: "The Cloud Sea", level: 9357 },
       
-      // Level 13636 zones (67-73)
-      { name: "Sunstone Deserts", level: 13636 },
-      { name: "The Whispering Gardens", level: 13636 },
-      { name: "Glass Peaks", level: 13636 },
-      { name: "Phantom Forests", level: 13636 },
-      { name: "Elemental Crossroads", level: 13636 },
-      { name: "The Shimmering Void", level: 13636 },
-      { name: "Crimson Wastelands", level: 13636 },
-      
-      // Level 35452 zones (74-78)
-      { name: "Temporal Anomaly Fields", level: 35452 },
-      { name: "The Fractured Realms", level: 35452 },
+      // Z66-Z76
+      { name: "The Bloodfang Jungle", level: 13636 },
+      { name: "Sunstone Deserts", level: 17272 },
+      { name: "The Whispering Gardens", level: 20908 },
+      { name: "Glass Peaks", level: 24544 },
+      { name: "Phantom Forests", level: 28180 },
+      { name: "The Shrouded Isles", level: 31816 },
       { name: "Gravity-Defying Rapids", level: 35452 },
-      { name: "Crystal Mind Caves", level: 35452 },
-      { name: "The Howling Expanse", level: 35452 },
+      { name: "The Azure Depths", level: 39088 },
+      { name: "Crystalline Spires", level: 42724 },
+      { name: "The Void Scar", level: 46360 },
+      { name: "Living Labyrinth", level: 50000 },
       
-      // Level 83333 zones (79-81)
-      { name: "Nexus of Shadows", level: 83333 },
+      // Z77-Z81
+      { name: "The Silent Sands", level: 61111 },
+      { name: "Acoustic Caves", level: 72222 },
       { name: "The Glittering Grottos", level: 83333 },
-      { name: "Abyssal Throne Room", level: 83333 },
+      { name: "Timeworn Badlands", level: 94444 },
+      { name: "The Canopy Kingdom", level: 105555 },
       
-      // Level 172222 zones (82-100)
-      { name: "The Infinite Library", level: 172222 },
+      // Z82-Z101
+      { name: "The Sunken Library", level: 116666 },
+      { name: "Chromatic Geysers", level: 127777 },
+      { name: "The Whispering City", level: 138888 },
+      { name: "The Labyrinthine Mangroves", level: 150000 },
+      { name: "The Frozen Heart of the World", level: 161111 },
       { name: "Gelatinous Jungles", level: 172222 },
-      { name: "The Screaming Peaks", level: 172222 },
-      { name: "Molten Core Chambers", level: 172222 },
-      { name: "The Weeping Void", level: 172222 },
-      { name: "Crystalline Maze", level: 172222 },
-      { name: "The Forgotten Realm", level: 172222 },
-      { name: "Nightmare Landscapes", level: 172222 },
-      { name: "The Eternal Storm", level: 172222 },
-      { name: "Shattered Reality", level: 172222 },
-      { name: "The Consuming Dark", level: 172222 },
-      { name: "Prismatic Dimensions", level: 172222 },
-      { name: "The Howling Abyss", level: 172222 },
-      { name: "Spectral Battlegrounds", level: 172222 },
-      { name: "The Twisted Sanctum", level: 172222 },
-      { name: "Elemental Chaos", level: 172222 },
-      { name: "The Final Threshold", level: 172222 },
-      { name: "Apocalyptic Wasteland", level: 172222 },
-      { name: "The Last Haven", level: 172222 },
-      
-      // Level 400000 zone (101)
+      { name: "The Petrified Ocean", level: 183333 },
+      { name: "The Symphony Springs", level: 194444 },
+      { name: "The Whispering Cliffs", level: 205555 },
+      { name: "The Bioluminescent Bog", level: 216666 },
+      { name: "The Stone Giant's Graveyard", level: 227777 },
+      { name: "The Maze of Roots", level: 238888 },
+      { name: "The Endless Plains of Glass", level: 250000 },
+      { name: "The Whispering Temple Ruins", level: 267857 },
+      { name: "The Crystal Ocean", level: 285714 },
+      { name: "The Sunken Palace of the Sea King", level: 303571 },
+      { name: "The Land of Shifting Colors", level: 321428 },
+      { name: "The Cloud Forest of the Sky Serpents", level: 339285 },
+      { name: "The Singing Rivers", level: 357142 },
       { name: "The Echoing Gorge of Lost Souls", level: 400000 }
     ];
 
