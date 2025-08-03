@@ -25,7 +25,7 @@ export interface EchoTier {
   };
 }
 
-// Echo item types with object storage image paths
+// Echo item types with GitHub image URLs
 export const ECHO_ITEM_TYPES: Record<string, EchoItemType> = {
   // Fighter Weapons
   'echo_axe': {
@@ -34,7 +34,7 @@ export const ECHO_ITEM_TYPES: Record<string, EchoItemType> = {
     archetype: 'Fighter',
     equipSlot: 'weapon',
     primaryStat: 'WC',
-    imagePath: '/public-objects/echo-items/echo-axe.png',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Echo%20axe.PNG',
     baseResonance: 15,
   },
   'echo_dagger': {
@@ -43,7 +43,7 @@ export const ECHO_ITEM_TYPES: Record<string, EchoItemType> = {
     archetype: 'Fighter',
     equipSlot: 'weapon',
     primaryStat: 'WC',
-    imagePath: '/public-objects/echo-items/echo-dagger.png',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Echo%20dagger.PNG',
     baseResonance: 12,
   },
   'echo_bow': {
@@ -52,7 +52,7 @@ export const ECHO_ITEM_TYPES: Record<string, EchoItemType> = {
     archetype: 'Fighter',
     equipSlot: 'weapon1',
     primaryStat: 'WC',
-    imagePath: '/public-objects/echo-items/echo-bow.png',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Echo%20bow%20.PNG',
     baseResonance: 18,
   },
   'echo_arrow': {
@@ -61,7 +61,7 @@ export const ECHO_ITEM_TYPES: Record<string, EchoItemType> = {
     archetype: 'Fighter',
     equipSlot: 'weapon2',
     primaryStat: 'WC',
-    imagePath: '/public-objects/echo-items/echo-arrow.png',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Echo%20arrow.PNG',
     baseResonance: 8,
   },
   'echo_mace': {
@@ -70,7 +70,7 @@ export const ECHO_ITEM_TYPES: Record<string, EchoItemType> = {
     archetype: 'Fighter',
     equipSlot: 'weapon',
     primaryStat: 'WC',
-    imagePath: '/public-objects/echo-items/echo-mace.png',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Echo%20mace.PNG',
     baseResonance: 16,
   },
   'echo_claws': {
@@ -79,7 +79,7 @@ export const ECHO_ITEM_TYPES: Record<string, EchoItemType> = {
     archetype: 'Fighter',
     equipSlot: 'weapon',
     primaryStat: 'WC',
-    imagePath: '/public-objects/echo-items/echo-claws.png',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Echo%20claws.PNG',
     baseResonance: 14,
   },
 
@@ -90,7 +90,7 @@ export const ECHO_ITEM_TYPES: Record<string, EchoItemType> = {
     archetype: 'Caster',
     equipSlot: 'weapon',
     primaryStat: 'SC',
-    imagePath: '/public-objects/echo-items/echo-staff.png',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Echo%20staff.PNG',
     baseResonance: 20,
   },
   'echo_caster_offhand': {
@@ -99,7 +99,7 @@ export const ECHO_ITEM_TYPES: Record<string, EchoItemType> = {
     archetype: 'Caster',
     equipSlot: 'weapon2',
     primaryStat: 'SC',
-    imagePath: '/public-objects/echo-items/echo-caster-offhand.png',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Echo%20caster%20off%20hand%20weapon.PNG',
     baseResonance: 12,
   },
 
@@ -110,7 +110,7 @@ export const ECHO_ITEM_TYPES: Record<string, EchoItemType> = {
     archetype: 'Caster',
     equipSlot: 'spell',
     primaryStat: 'SC',
-    imagePath: '/public-objects/echo-items/echo-air-spell.png',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Echo%20air%20spell.PNG',
     baseResonance: 10,
   },
   'echo_arcane_spell': {
@@ -119,7 +119,7 @@ export const ECHO_ITEM_TYPES: Record<string, EchoItemType> = {
     archetype: 'Caster',
     equipSlot: 'spell',
     primaryStat: 'SC',
-    imagePath: '/public-objects/echo-items/echo-arcane-spell.png',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Echo%20Arcane%20Spell.PNG',
     baseResonance: 15,
   },
   'echo_cold_spell': {
@@ -128,7 +128,7 @@ export const ECHO_ITEM_TYPES: Record<string, EchoItemType> = {
     archetype: 'Caster',
     equipSlot: 'spell',
     primaryStat: 'SC',
-    imagePath: '/public-objects/echo-items/echo-cold-spell.png',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Echo%20cold%20spell.PNG',
     baseResonance: 11,
   },
   'echo_death_spell': {
@@ -137,7 +137,7 @@ export const ECHO_ITEM_TYPES: Record<string, EchoItemType> = {
     archetype: 'Caster',
     equipSlot: 'spell',
     primaryStat: 'SC',
-    imagePath: '/public-objects/echo-items/echo-death-spell.png',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Echo%20Death%20spell.PNG',
     baseResonance: 18,
   },
   'echo_drain_spell': {
@@ -146,7 +146,7 @@ export const ECHO_ITEM_TYPES: Record<string, EchoItemType> = {
     archetype: 'Caster',
     equipSlot: 'spell',
     primaryStat: 'SC',
-    imagePath: '/public-objects/echo-items/echo-drain-spell.png',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Echo%20Drain%20Spell.PNG',
     baseResonance: 13,
   },
   'echo_earth_spell': {
@@ -155,7 +155,7 @@ export const ECHO_ITEM_TYPES: Record<string, EchoItemType> = {
     archetype: 'Caster',
     equipSlot: 'spell',
     primaryStat: 'SC',
-    imagePath: '/public-objects/echo-items/echo-earth-spell.png',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Echo%20earth%20spell.PNG',
     baseResonance: 14,
   },
   'echo_fire_spell': {
@@ -164,7 +164,7 @@ export const ECHO_ITEM_TYPES: Record<string, EchoItemType> = {
     archetype: 'Caster',
     equipSlot: 'spell',
     primaryStat: 'SC',
-    imagePath: '/public-objects/echo-items/echo-fire-spell.png',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Echo%20Fire%20Spell.PNG',
     baseResonance: 16,
   },
   'echo_fighter_buff_spell': {
@@ -173,7 +173,7 @@ export const ECHO_ITEM_TYPES: Record<string, EchoItemType> = {
     archetype: 'Both',
     equipSlot: 'spell',
     primaryStat: 'SC',
-    imagePath: '/public-objects/echo-items/echo-fighter-buff-spell.png',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Echo%20Fighter%20spell%20buff.PNG',
     baseResonance: 12,
   },
 
@@ -184,7 +184,7 @@ export const ECHO_ITEM_TYPES: Record<string, EchoItemType> = {
     archetype: 'Both',
     equipSlot: 'boots',
     primaryStat: 'AC',
-    imagePath: '/public-objects/echo-items/echo-boots.png',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Echo%20boots.PNG',
     baseResonance: 8,
   },
   'echo_gloves': {
@@ -193,8 +193,35 @@ export const ECHO_ITEM_TYPES: Record<string, EchoItemType> = {
     archetype: 'Both',
     equipSlot: 'gauntlets',
     primaryStat: 'AC',
-    imagePath: '/public-objects/echo-items/echo-gloves.png',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Echo%20gloves.PNG',
     baseResonance: 10,
+  },
+  'echo_helmet': {
+    id: 'echo_helmet',
+    name: 'Echo Helmet',
+    archetype: 'Both',
+    equipSlot: 'helmet',
+    primaryStat: 'AC',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Echo%20helmet.PNG',
+    baseResonance: 12,
+  },
+  'echo_leggings': {
+    id: 'echo_leggings',
+    name: 'Echo Leggings',
+    archetype: 'Both',
+    equipSlot: 'leggings',
+    primaryStat: 'AC',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Echo%20leggings.PNG',
+    baseResonance: 11,
+  },
+  'echo_chest_armor': {
+    id: 'echo_chest_armor',
+    name: 'Echo Chest Armor',
+    archetype: 'Both',
+    equipSlot: 'armor',
+    primaryStat: 'AC',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Echo%20chest%20armor.PNG',
+    baseResonance: 14,
   },
 
   // Shields (Fighter only)
@@ -204,7 +231,7 @@ export const ECHO_ITEM_TYPES: Record<string, EchoItemType> = {
     archetype: 'Fighter',
     equipSlot: 'shield',
     primaryStat: 'AC',
-    imagePath: '/public-objects/echo-items/echo-shield.png',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Echo%20shield.PNG',
     baseResonance: 15,
   },
 
@@ -215,7 +242,7 @@ export const ECHO_ITEM_TYPES: Record<string, EchoItemType> = {
     archetype: 'Both',
     equipSlot: 'amulet',
     primaryStat: 'WC',
-    imagePath: '/public-objects/echo-items/echo-necklace.png',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Echo%20necklace.PNG',
     baseResonance: 20,
   },
   'echo_ring': {
@@ -224,7 +251,7 @@ export const ECHO_ITEM_TYPES: Record<string, EchoItemType> = {
     archetype: 'Both',
     equipSlot: 'ring',
     primaryStat: 'WC',
-    imagePath: '/public-objects/echo-items/echo-ring.png',
+    imagePath: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Echo%20ring.PNG',
     baseResonance: 15,
   },
 };

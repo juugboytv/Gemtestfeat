@@ -53,6 +53,13 @@ The game uses minimal external dependencies to maintain the original architectur
 
 ## Recent Changes
 
+**January 2025 - Echo Items GitHub Integration**
+- Updated all Echo Items to use GitHub image URLs instead of object storage paths
+- Integrated complete set of Echo item images: weapons, armor, spells, jewelry, shields
+- Added new Echo armor pieces: helmet, leggings, chest armor to complete the equipment set
+- Enhanced Echo Items system with proper GitHub asset management for consistent visual presentation
+- Updated Arrow item in starting inventory to use correct dropper item image URL
+
 **January 2025 - UI Customization System Implementation**
 - Implemented complete UI customization system with five professional themes
 - Added drag-and-drop tab reordering functionality using HTML5 Drag and Drop API
@@ -74,7 +81,7 @@ The game uses minimal external dependencies to maintain the original architectur
 - Implemented comprehensive PostgreSQL database schema with separate tables for all three item types
 - Created complete **Dropper Items** system: 20 gear tiers (Crude to Ascended) for store-bought equipment including Steel Arrow weapon
 - Built **Shadow Items** system: T1-T20 tiers with GitHub image integration and equipment-based drop logic
-- Developed **Echo Items** system: Unique resonance-based progression with 10 tiers and object storage integration
+- Developed **Echo Items** system: Unique resonance-based progression with 10 tiers and GitHub image integration
 - Added **Gem System**: T1-T9 grades with Fighter/Caster/Utility/Farming categories and zone-based drops
 - Implemented **Dual-Weapon Support**: Bow+Arrow system with weapon1/weapon2 slots
 - Created **Smart Drop Logic**: Shadow items drop based on equipped gear tiers, Echo items require resonance
