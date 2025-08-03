@@ -80,7 +80,7 @@ export default function InventoryTab({ gameState, updateGameState }: InventoryTa
 
   return (
     <div className="h-full">
-      <h2 className="font-orbitron text-xl mb-4 text-orange-400">Inventory</h2>
+      <h2 className="font-orbitron text-xl mb-4 text-orange-400">Inventory - UPDATED</h2>
       
       {/* Main Inventory Grid */}
       <div className="inventory-grid mb-6">
