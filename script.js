@@ -2244,7 +2244,7 @@ const EquipmentManager = {
                 console.log(`Is emoji: ${isEmoji} for character: "${displayChar}"`)
                 
                 // IMMEDIATE DEBUG - Log every render call to console
-                console.log(`RENDERING: "${displayChar}" (emoji: ${isEmoji}) at canvas position (${cx}, ${cy})`);
+                console.log(`RENDERING: "${displayChar}" (emoji: ${isEmoji}) at canvas position (${cx}, ${cy}) - Cache Refresh`);
                 
                 if (isEmoji) {
                     // For emojis, use larger size and comprehensive emoji font fallback
