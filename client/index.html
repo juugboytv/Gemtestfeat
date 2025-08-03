@@ -4906,7 +4906,17 @@ const WorldMapManager = {
             StatsManager.init();
             CombatManager.init();
             EquipmentManager.init();
-            WorldMapManager.init();
+            
+            // Initialize WorldMapManager with proper DOM readiness check
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => {
+                    WorldMapManager.init();
+                });
+            } else {
+                // DOM is already loaded
+                WorldMapManager.init();
+            }
+            
             ShopManager.init();
             BankManager.init();
             TeleportManager.init();
