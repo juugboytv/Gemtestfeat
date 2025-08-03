@@ -1314,6 +1314,8 @@
         }));
     };
     const animateSmoke = () => {
+        // Add null check as suggested by user to prevent canvas errors
+        if (!smokeCtx) return;
         smokeCtx.clearRect(0, 0, smokeCanvas.width, smokeCanvas.height);
         smokeParticles.forEach(p => {
             p.x += p.speedX; p.y += p.speedY;
@@ -3657,6 +3659,8 @@ const WorldMapManager = {
     
     draw() {
         const canvas = ui.miniMapCanvas;
+        // Add null check as suggested by user to prevent canvas errors
+        if (!this.ctx) return;
         this.ctx.clearRect(0, 0, canvas.width, canvas.height);
         const centerX = canvas.width / 2;
         const centerY = canvas.height / 2;
@@ -3670,6 +3674,8 @@ const WorldMapManager = {
     },
     
     drawHex(cx, cy, size, feature) {
+        // Add null check as suggested by user to prevent canvas errors
+        if (!this.ctx) return;
         this.ctx.beginPath();
         for (let i = 0; i < 6; i++) {
             const angle = 2 * Math.PI / 6 * (i + 0.5);
@@ -3693,6 +3699,8 @@ const WorldMapManager = {
     },
     
     drawPlayer(cx, cy) {
+        // Add null check as suggested by user to prevent canvas errors
+        if (!this.ctx) return;
         this.ctx.font = `${this.hexSize * 1.5}px sans-serif`;
         this.ctx.textAlign = 'center';
         this.ctx.textBaseline = 'middle';
