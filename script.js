@@ -1651,12 +1651,70 @@ const EquipmentManager = {
                 console.log('WARNING: Zone blueprints not loaded yet');
             }
             
-            this.loadZoneBlueprint(startingZone);
+            // NOTE: Grid generation is now handled externally with server data
+            // this.generateGrid(); - REMOVED: Now called from main() with server zone data
             this.updateInteractButton(); 
-            this.draw(); 
+            // Drawing is also handled externally after grid generation
         }, 
         
-        // Load zone blueprint dynamically
+        // Generate grid from server zone data (NEW PRIORITIZED METHOD)
+        generateGrid(serverZoneData = null) {
+            console.log('🔥 GRID GENERATION STARTING - generateGrid called with server data:', serverZoneData);
+            
+            // Use server zone data if available
+            if (serverZoneData && serverZoneData.features) {
+                console.log('Using server zone data for map generation:', serverZoneData);
+                
+                // Clear existing grid
+                this.grid.clear();
+                
+                // Generate hexagonal grid based on server data
+                const gridSize = serverZoneData.gridSize || 4;
+                for (let q = -gridSize; q <= gridSize; q++) {
+                    for (let r = -gridSize; r <= gridSize; r++) {
+                        const s = -q - r;
+                        if (s >= -gridSize && s <= gridSize) {
+                            // Default all hexes to Monster Zones
+                            this.grid.set(`${q},${r}`, { 
+                                q, r, s, 
+                                feature: { name: 'Monster Zone', icon: '◻️' } 
+                            });
+                        }
+                    }
+                }
+                
+                // Apply features from server data
+                console.log('Applying server features:', serverZoneData.features.length, 'features to apply');
+                console.log('Grid size after generation:', this.grid.size, 'hexes');
+                
+                serverZoneData.features.forEach(feature => {
+                    const key = `${feature.q},${feature.r}`;
+                    console.log(`Trying to apply feature ${feature.type} at key "${key}"`);
+                    console.log('Grid has this key:', this.grid.has(key));
+                    
+                    if (this.grid.has(key)) {
+                        const featureInfo = this.getFeatureInfo(feature.type);
+                        this.grid.get(key).feature = {
+                            name: feature.name || featureInfo.name,
+                            icon: featureInfo.icon,
+                            type: feature.type
+                        };
+                        console.log(`✓ Applied server feature at (${feature.q},${feature.r}): ${featureInfo.name} ${featureInfo.icon}`);
+                    } else {
+                        console.log(`✗ Grid key "${key}" not found. Available keys:`, Array.from(this.grid.keys()).slice(0, 5));
+                    }
+                });
+                
+                console.log(`Generated server-based grid: ${serverZoneData.name} (${gridSize}x${gridSize})`, serverZoneData.features);
+                showToast(`Zone Layout: ${serverZoneData.name} (${gridSize}x${gridSize} grid)`, false);
+                return;
+            }
+            
+            // Fallback to blueprint system if no server data
+            this.loadZoneBlueprint(this.currentZoneId);
+        },
+
+        // Load zone blueprint dynamically (FALLBACK METHOD)
         loadZoneBlueprint(zoneId) {
             this.currentZoneId = zoneId;
             const blueprint = this.getZoneBlueprint(zoneId);
