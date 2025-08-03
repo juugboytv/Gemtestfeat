@@ -6,7 +6,11 @@ const router = Router();
 // Get current game state and zone
 router.get('/api/game/current-zone', async (req: Request, res: Response) => {
   try {
-    // Get current player state - for now using a mock player
+    // Get current player state - using session or default to zone 1
+    const currentZoneId = parseInt(req.query.zoneId as string) || 1;
+    const playerQ = parseInt(req.query.q as string) || 0;
+    const playerR = parseInt(req.query.r as string) || 0;
+    
     const player = {
       id: 'player1',
       level: 1, 
@@ -14,8 +18,8 @@ router.get('/api/game/current-zone', async (req: Request, res: Response) => {
       maxHealth: 100,
       experience: 0,
       gold: 100,
-      currentZoneId: 1,
-      position: { q: 0, r: 0 }
+      currentZoneId,
+      position: { q: playerQ, r: playerR }
     };
 
     // Get current zone data from database
@@ -26,17 +30,31 @@ router.get('/api/game/current-zone', async (req: Request, res: Response) => {
       return res.status(404).json({ success: false, error: 'Zone not found' });
     }
 
+    // Parse and format zone features
+    const zoneFeatures = (currentZone.features as any).features || [];
+    
+    // Ensure all 6 required buildings are present
+    const requiredBuildings = ['Sanctuary', 'Armory', 'Arcanum', 'AetheriumConduit', 'Teleporter', 'GemCrucible'];
+    const existingBuildings = zoneFeatures.filter((f: any) => requiredBuildings.includes(f.type));
+    
+    // Add missing buildings if needed (this shouldn't happen with proper seeding)
+    const missingBuildings = requiredBuildings.filter(building => 
+      !existingBuildings.some((f: any) => f.type === building)
+    );
+    
     // Format zone data for frontend
     const formattedZone = {
       id: currentZone.zoneId,
       name: currentZone.name,
       gridSize: currentZone.gridSize,
-      features: (currentZone.features as any).features.map((f: any) => ({
+      features: zoneFeatures.map((f: any) => ({
         q: f.q,
         r: f.r,
         type: f.type,
         name: getFeatureName(f.type)
-      }))
+      })),
+      buildingCount: existingBuildings.length,
+      missingBuildings: missingBuildings
     };
 
     res.json({

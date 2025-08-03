@@ -1696,19 +1696,61 @@ const EquipmentManager = {
             // Drawing is also handled externally after grid generation
         }, 
         
-        // Generate grid from server zone data (NEW PRIORITIZED METHOD)
-        generateGrid(serverZoneData = null) {
-            console.log('🔥 GRID GENERATION STARTING - generateGrid called with server data:', serverZoneData);
+        // Enhanced server zone data loader
+        async loadServerZoneData(zoneId = null) {
+            zoneId = zoneId || this.currentZoneId || 1;
             
-            // Use server zone data if available
-            if (serverZoneData && serverZoneData.features) {
-                console.log('🚀 CONFIRMED: Using server zone data for map generation:', serverZoneData);
+            try {
+                console.log(`🌐 Loading server zone data for zone ${zoneId}...`);
+                const response = await fetch(`/api/game/current-zone?zoneId=${zoneId}&q=${this.playerPos.q}&r=${this.playerPos.r}`);
+                
+                if (!response.ok) {
+                    throw new Error(`Server response not ok: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                if (data.success && data.gameState && data.gameState.currentZone) {
+                    console.log('✅ Server zone data loaded successfully:', data.gameState.currentZone.name);
+                    this.serverZoneData = data.gameState.currentZone;
+                    this.currentZoneId = zoneId;
+                    
+                    // Generate grid with server data
+                    this.generateGrid(data.gameState.currentZone);
+                    return data.gameState.currentZone;
+                } else {
+                    throw new Error('Invalid server response structure');
+                }
+            } catch (error) {
+                console.log('Server zone loading failed, using fallback:', error.message);
+                // Fallback to blueprint system
+                return this.loadFallbackZone(zoneId);
+            }
+        },
+        
+        // Fallback zone loading using blueprint system
+        loadFallbackZone(zoneId) {
+            console.log(`Loading fallback zone data for zone ${zoneId}`);
+            const blueprint = this.getZoneBlueprint(zoneId);
+            if (blueprint) {
+                this.generateGrid(blueprint);
+                return blueprint;
+            }
+            return null;
+        },
+
+        // Generate grid from server zone data (ENHANCED WITH SERVER INTEGRATION)
+        generateGrid(zoneData = null) {
+            console.log('🔥 GRID GENERATION STARTING - generateGrid called with zone data:', zoneData);
+            
+            // Use provided zone data (server or fallback)
+            if (zoneData && zoneData.features) {
+                console.log('🚀 CONFIRMED: Using zone data for map generation:', zoneData);
                 
                 // Clear existing grid
                 this.grid.clear();
                 
-                // Generate hexagonal grid based on server data
-                const gridSize = serverZoneData.gridSize || 4;
+                // Generate hexagonal grid based on zone data
+                const gridSize = zoneData.gridSize || 4;
                 for (let q = -gridSize; q <= gridSize; q++) {
                     for (let r = -gridSize; r <= gridSize; r++) {
                         const s = -q - r;
@@ -1722,18 +1764,17 @@ const EquipmentManager = {
                     }
                 }
                 
-                // Apply features from server data
-                console.log('🔧 FEATURE APPLICATION: Applying server features:', serverZoneData.features.length, 'features to apply');
+                // Apply features from zone data
+                console.log('🔧 FEATURE APPLICATION: Applying zone features:', zoneData.features.length, 'features');
                 console.log('🔧 GRID INFO: Grid size after generation:', this.grid.size, 'hexes');
                 
-                serverZoneData.features.forEach(feature => {
+                zoneData.features.forEach(feature => {
                     const key = `${feature.q},${feature.r}`;
-                    console.log(`Trying to apply feature ${feature.type} at key "${key}"`);
-                    console.log('Grid has this key:', this.grid.has(key));
+                    console.log(`Applying feature ${feature.type} at key "${key}"`);
                     
                     if (this.grid.has(key)) {
                         const featureInfo = this.getFeatureInfo(feature.type);
-                        console.log(`🔍 FEATURE DEBUG: ${feature.type} -> ${featureInfo.name} (${featureInfo.icon})`);
+                        console.log(`🔍 FEATURE: ${feature.type} -> ${featureInfo.name} (${featureInfo.icon})`);
                         this.grid.get(key).feature = {
                             name: feature.name || featureInfo.name,
                             icon: featureInfo.icon,
@@ -1741,12 +1782,15 @@ const EquipmentManager = {
                         };
                         console.log(`✅ APPLIED: ${feature.type} at (${feature.q},${feature.r}) = ${featureInfo.icon}`);
                     } else {
-                        console.log(`❌ MISSING KEY: "${key}" not in grid. Available:`, Array.from(this.grid.keys()).slice(0, 3));
+                        console.log(`❌ COORDINATE OUT OF BOUNDS: "${key}" not in ${gridSize}x${gridSize} grid`);
                     }
                 });
                 
-                console.log(`Generated server-based grid: ${serverZoneData.name} (${gridSize}x${gridSize})`, serverZoneData.features);
-                showToast(`Zone Layout: ${serverZoneData.name} (${gridSize}x${gridSize} grid)`, false);
+                console.log(`Generated zone grid: ${zoneData.name} (${gridSize}x${gridSize})`, zoneData.features);
+                showToast(`Zone Layout: ${zoneData.name} (${gridSize}x${gridSize} grid)`, false);
+                
+                // Update zone info display
+                this.updateZoneInfoDisplay(zoneData);
                 
                 // Attempt to draw only if context and initialization are ready
                 if (this.isInitialized && this.canvasReady && this.ctx && ui.miniMapCanvas) {
@@ -3309,21 +3353,174 @@ const InfusionManager = {
             }
         });
         
-        // Update location display
-        const updateLocationDisplay = () => {
-            const locationDiv = document.getElementById('current-location');
-            if (locationDiv && WorldMapManager.grid) {
-                const pos = WorldMapManager.playerPos;
-                const currentHex = WorldMapManager.grid.get(`${pos.q},${pos.r}`);
-                if (currentHex && currentHex.feature) {
-                    locationDiv.textContent = `${currentHex.feature.icon} ${currentHex.feature.name}`;
-                } else {
-                    locationDiv.textContent = `Monster Zone (${pos.q}, ${pos.r})`;
+        // Enhanced zone and location management
+        const updateZoneDisplay = async () => {
+            try {
+                // Get current zone data from server
+                const response = await fetch('/api/game/current-zone');
+                if (!response.ok) throw new Error('Failed to fetch zone data');
+                
+                const data = await response.json();
+                if (data.success && data.gameState) {
+                    const { player, currentZone } = data.gameState;
+                    
+                    // Update location display
+                    const locationDiv = document.getElementById('current-location');
+                    if (locationDiv) {
+                        const currentFeature = currentZone.features.find(f => 
+                            f.q === player.position.q && f.r === player.position.r
+                        );
+                        
+                        if (currentFeature) {
+                            locationDiv.textContent = `${getFeatureIcon(currentFeature.type)} ${currentFeature.name}`;
+                        } else {
+                            locationDiv.textContent = `Monster Zone (${player.position.q}, ${player.position.r})`;
+                        }
+                    }
+                    
+                    // Update zone display in mini-map area
+                    updateMiniMapZoneInfo(currentZone);
+                }
+            } catch (error) {
+                console.log('Zone display update using client fallback');
+                // Fallback to existing client logic
+                const locationDiv = document.getElementById('current-location');
+                if (locationDiv && WorldMapManager.grid) {
+                    const pos = WorldMapManager.playerPos;
+                    const currentHex = WorldMapManager.grid.get(`${pos.q},${pos.r}`);
+                    if (currentHex && currentHex.feature) {
+                        locationDiv.textContent = `${currentHex.feature.icon} ${currentHex.feature.name}`;
+                    } else {
+                        locationDiv.textContent = `Monster Zone (${pos.q}, ${pos.r})`;
+                    }
                 }
             }
         };
         
-        // Update location every 2 seconds
-        setInterval(updateLocationDisplay, 2000);
+        // Helper function for feature icons
+        const getFeatureIcon = (featureType) => {
+            const icons = {
+                'Sanctuary': '🆘',
+                'Armory': '⚔️', 
+                'Arcanum': '🔮',
+                'AetheriumConduit': '🏧',
+                'Teleporter': '🌀',
+                'GemCrucible': '💎',
+                'Monster Zone': '👹'
+            };
+            return icons[featureType] || '◻️';
+        };
+        
+        // Update mini-map area with zone info
+        const updateMiniMapZoneInfo = (zoneData) => {
+            const miniMapContainer = document.getElementById('mini-map-container');
+            if (miniMapContainer) {
+                // Add zone info display
+                let zoneInfoDiv = document.getElementById('zone-info-display');
+                if (!zoneInfoDiv) {
+                    zoneInfoDiv = document.createElement('div');
+                    zoneInfoDiv.id = 'zone-info-display';
+                    zoneInfoDiv.className = 'absolute -bottom-8 left-0 right-0 text-xs text-center text-orange-400';
+                    miniMapContainer.appendChild(zoneInfoDiv);
+                }
+                zoneInfoDiv.textContent = zoneData.name;
+            }
+        };
+        
+        // Enhanced navigation with server sync
+        const enhancedNavButtons = {
+            'nav-north': async () => {
+                try {
+                    const response = await fetch('/api/game/move', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ dq: 0, dr: -1 })
+                    });
+                    if (response.ok) {
+                        if (WorldMapManager && WorldMapManager.movePlayer) {
+                            WorldMapManager.movePlayer(0, -1);
+                        }
+                        updateZoneDisplay();
+                    }
+                } catch (error) {
+                    // Fallback to client-side movement
+                    if (WorldMapManager && WorldMapManager.movePlayer) {
+                        WorldMapManager.movePlayer(0, -1);
+                    }
+                }
+            },
+            'nav-south': async () => {
+                try {
+                    const response = await fetch('/api/game/move', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ dq: 0, dr: 1 })
+                    });
+                    if (response.ok) {
+                        if (WorldMapManager && WorldMapManager.movePlayer) {
+                            WorldMapManager.movePlayer(0, 1);
+                        }
+                        updateZoneDisplay();
+                    }
+                } catch (error) {
+                    if (WorldMapManager && WorldMapManager.movePlayer) {
+                        WorldMapManager.movePlayer(0, 1);
+                    }
+                }
+            },
+            'nav-west': async () => {
+                try {
+                    const response = await fetch('/api/game/move', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ dq: -1, dr: 0 })
+                    });
+                    if (response.ok) {
+                        if (WorldMapManager && WorldMapManager.movePlayer) {
+                            WorldMapManager.movePlayer(-1, 0);
+                        }
+                        updateZoneDisplay();
+                    }
+                } catch (error) {
+                    if (WorldMapManager && WorldMapManager.movePlayer) {
+                        WorldMapManager.movePlayer(-1, 0);
+                    }
+                }
+            },
+            'nav-east': async () => {
+                try {
+                    const response = await fetch('/api/game/move', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ dq: 1, dr: 0 })
+                    });
+                    if (response.ok) {
+                        if (WorldMapManager && WorldMapManager.movePlayer) {
+                            WorldMapManager.movePlayer(1, 0);
+                        }
+                        updateZoneDisplay();
+                    }
+                } catch (error) {
+                    if (WorldMapManager && WorldMapManager.movePlayer) {
+                        WorldMapManager.movePlayer(1, 0);
+                    }
+                }
+            }
+        };
+        
+        // Replace original nav buttons with enhanced versions
+        Object.entries(enhancedNavButtons).forEach(([id, action]) => {
+            const button = document.getElementById(id);
+            if (button) {
+                // Remove old listeners
+                button.replaceWith(button.cloneNode(true));
+                // Add new enhanced listener
+                document.getElementById(id).addEventListener('click', action);
+            }
+        });
+        
+        // Update zone display every 3 seconds and on load
+        updateZoneDisplay();
+        setInterval(updateZoneDisplay, 3000);
     });
 
