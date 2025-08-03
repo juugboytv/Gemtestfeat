@@ -1938,40 +1938,50 @@ const EquipmentManager = {
             } 
             this.ctx.closePath(); 
             
-            // Generate zone colors based on 5-zone repeating pattern
-            const generateZoneColor = (zoneId) => {
-                if (!zoneId) return 'rgba(10, 10, 10, 0.5)'; // Default
-                
-                const patternIndex = ((zoneId - 1) % 5) + 1; // Gets 1-5 pattern that repeats
-                
-                switch (patternIndex) {
-                    case 1: // Red zones (1, 6, 11, 16... etc)
-                        return 'rgba(200, 50, 50, 0.7)'; // Red 4x4
-                    case 2: // Blue zones (2, 7, 12, 17... etc)
-                        return 'rgba(50, 100, 200, 0.7)'; // Blue 5x5
-                    case 3: // Green zones (3, 8, 13, 18... etc)
-                        return 'rgba(50, 150, 50, 0.7)'; // Green 6x6
-                    case 4: // Yellow zones (4, 9, 14, 19... etc)
-                        return 'rgba(200, 200, 50, 0.7)'; // Yellow 7x7
-                    case 5: // Purple zones (5, 10, 15, 20... etc)
-                        return 'rgba(150, 50, 200, 0.7)'; // Purple 8x8
-                    default:
-                        return 'rgba(200, 50, 50, 0.7)'; // Default to red
-                }
-            };
+            // Generate zone colors based on 5-zone repeating pattern using current zone
+            const currentZoneId = state.game.currentZoneTier || this.currentZoneId || 1;
+            const patternIndex = ((currentZoneId - 1) % 5) + 1; // Gets 1-5 pattern that repeats
             
-            this.ctx.fillStyle = generateZoneColor(this.currentZoneId);
+            let zoneColor;
+            switch (patternIndex) {
+                case 1: // Red zones (1, 6, 11, 16... etc)
+                    zoneColor = 'rgba(200, 50, 50, 0.7)'; // Red 4x4
+                    break;
+                case 2: // Blue zones (2, 7, 12, 17... etc)
+                    zoneColor = 'rgba(50, 100, 200, 0.7)'; // Blue 5x5
+                    break;
+                case 3: // Green zones (3, 8, 13, 18... etc)
+                    zoneColor = 'rgba(50, 150, 50, 0.7)'; // Green 6x6
+                    break;
+                case 4: // Yellow zones (4, 9, 14, 19... etc)
+                    zoneColor = 'rgba(200, 200, 50, 0.7)'; // Yellow 7x7
+                    break;
+                case 5: // Purple zones (5, 10, 15, 20... etc)
+                    zoneColor = 'rgba(150, 50, 200, 0.7)'; // Purple 8x8
+                    break;
+                default:
+                    zoneColor = 'rgba(200, 50, 50, 0.7)'; // Default to red
+            }
+            
+            this.ctx.fillStyle = zoneColor;
             this.ctx.fill(); 
             this.ctx.strokeStyle = 'rgba(249, 115, 22, 0.3)'; 
             this.ctx.lineWidth = 1.5; 
             this.ctx.stroke(); 
             
             if (feature) { 
-                this.ctx.font = `${size * 1.5}px sans-serif`; 
+                // Use a better font for emoji support
+                this.ctx.font = `${size * 1.2}px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif`; 
                 this.ctx.textAlign = 'center'; 
                 this.ctx.textBaseline = 'middle'; 
                 this.ctx.fillStyle = 'white';
-                this.ctx.fillText(feature.icon, cx, cy); 
+                
+                // Debug log the feature being drawn
+                if (feature.icon === '❓') {
+                    console.log(`Drawing unknown feature:`, feature);
+                }
+                
+                this.ctx.fillText(feature.icon || '❓', cx, cy); 
             } 
         }, drawPlayer(cx, cy) { this.ctx.font = `${this.hexSize * 1.5}px sans-serif`; this.ctx.textAlign = 'center'; this.ctx.textBaseline = 'middle'; this.ctx.fillText('🟠', cx, cy); } };
     const BankManager = { isInitialized: false, init() { if (this.isInitialized) return; this.isInitialized = true; }, openBank() { this.renderBankUI(); }, renderBankUI() { const contentHTML = ` <div id="bank-content" class="p-4 text-center"> <div class="grid grid-cols-2 gap-4 mb-4 text-lg"> <div> <div class="text-sm text-gray-400 font-orbitron">Your Gold</div> <div id="bank-player-gold" class="font-bold text-yellow-400 font-orbitron">${state.player.gold.toLocaleString()}</div> </div> <div> <div class="text-sm text-gray-400 font-orbitron">Banked Gold</div> <div id="bank-vault-gold" class="font-bold text-yellow-400 font-orbitron">${state.player.bankGold.toLocaleString()}</div> </div> </div> <input type="number" id="bank-amount-input" class="w-full p-2 rounded text-lg text-black bg-gray-200" placeholder="Enter amount..."> <div class="grid grid-cols-2 gap-2 mt-4"> <button id="bank-deposit-btn" class="glass-button py-2 rounded-md">Deposit</button> <button id="bank-withdraw-btn" class="glass-button py-2 rounded-md">Withdraw</button> </div> </div> `; ModalManager.show('Bank Vault', contentHTML, { onContentReady: (contentDiv) => { contentDiv.querySelector('#bank-deposit-btn').addEventListener('click', () => this.handleTransaction('deposit')); contentDiv.querySelector('#bank-withdraw-btn').addEventListener('click', () => this.handleTransaction('withdraw')); } }); }, handleTransaction(type) { const input = document.getElementById('bank-amount-input'); const amount = parseInt(input.value); if (isNaN(amount) || amount <= 0) { showToast("Please enter a valid amount.", true); return; } if (type === 'deposit') { if (amount > state.player.gold) { showToast("You don't have enough gold to deposit.", true); return; } state.player.gold -= amount; state.player.bankGold += amount; showToast(`Deposited ${amount.toLocaleString()} gold.`); } else if (type === 'withdraw') { if (amount > state.player.bankGold) { showToast("You don't have enough gold in the bank.", true); return; } state.player.bankGold -= amount; state.player.gold += amount; showToast(`Withdrew ${amount.toLocaleString()} gold.`); } input.value = ''; ProfileManager.updateAllProfileUI(); document.getElementById('bank-player-gold').textContent = state.player.gold.toLocaleString(); document.getElementById('bank-vault-gold').textContent = state.player.bankGold.toLocaleString(); } };
