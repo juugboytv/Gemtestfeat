@@ -50,11 +50,165 @@ export class GameLogicManager {
     return gameState;
   }
 
+  // Simple seeded random number generator for consistent zone layouts
+  private seededRandom(seed: number): number {
+    const x = Math.sin(seed) * 10000;
+    return x - Math.floor(x);
+  }
+
+  // Generate unique hexagonal coordinates for a feature type within grid bounds using seeded randomness
+  private generateUniqueCoordinates(gridSize: number, usedCoordinates: Set<string>, seed: number, attempts: number = 50): { q: number; r: number } {
+    for (let attempt = 0; attempt < attempts; attempt++) {
+      const randomSeed1 = seed + attempt * 17;
+      const randomSeed2 = seed + attempt * 23;
+      
+      const q = Math.floor(this.seededRandom(randomSeed1) * (2 * gridSize + 1)) - gridSize;
+      const r = Math.floor(this.seededRandom(randomSeed2) * (2 * gridSize + 1)) - gridSize;
+      const s = -q - r;
+      
+      // Check if coordinates are within hexagonal bounds
+      if (Math.abs(q) <= gridSize && Math.abs(r) <= gridSize && Math.abs(s) <= gridSize) {
+        const coordKey = `${q},${r}`;
+        if (!usedCoordinates.has(coordKey)) {
+          usedCoordinates.add(coordKey);
+          return { q, r };
+        }
+      }
+    }
+    
+    // Fallback - find any available coordinate
+    for (let q = -gridSize; q <= gridSize; q++) {
+      for (let r = -gridSize; r <= gridSize; r++) {
+        const s = -q - r;
+        if (Math.abs(s) <= gridSize) {
+          const coordKey = `${q},${r}`;
+          if (!usedCoordinates.has(coordKey)) {
+            usedCoordinates.add(coordKey);
+            return { q, r };
+          }
+        }
+      }
+    }
+    
+    return { q: 0, r: 0 };
+  }
+
+  // Generate unique layout for each zone
+  private generateUniqueZoneLayout(zoneId: number): { gridSize: number; features: Array<{ q: number; r: number; type: string; name?: string }> } {
+    // Determine grid size with more variety
+    let gridSize: number;
+    
+    if (zoneId <= 24) {
+      // Starter zones: Mix of 3x3 to 5x5
+      const starterSizes = [3, 4, 4, 5, 3, 4, 5, 4, 3, 5, 4, 3, 5, 4, 3, 4, 5, 3, 4, 5, 3, 4, 4, 5];
+      gridSize = starterSizes[zoneId - 1] || 4;
+    } else if (zoneId <= 33) {
+      // Level 100 zones: 5x5 to 6x6
+      gridSize = 5 + (zoneId % 2);
+    } else if (zoneId <= 50) {
+      // Level 253 zones: 6x6 to 7x7
+      gridSize = 6 + (zoneId % 2);
+    } else if (zoneId <= 58) {
+      // Level 1000 zones: 7x7 to 8x8
+      gridSize = 7 + (zoneId % 2);
+    } else if (zoneId <= 66) {
+      // Level 6143 zones: 8x8 to 9x9
+      gridSize = 8 + (zoneId % 2);
+    } else if (zoneId <= 73) {
+      // Level 13636 zones: 9x9 to 10x10
+      gridSize = 9 + (zoneId % 2);
+    } else if (zoneId <= 78) {
+      // Level 35452 zones: 10x10 to 11x11
+      gridSize = 10 + (zoneId % 2);
+    } else if (zoneId <= 81) {
+      // Level 83333 zones: 11x11 to 12x12
+      gridSize = 11 + (zoneId % 2);
+    } else if (zoneId <= 100) {
+      // Level 172222 zones: Mix of large sizes 10x10 to 13x13
+      const largeSizes = [10, 11, 12, 13];
+      gridSize = largeSizes[zoneId % 4];
+    } else {
+      // Zone 101: Massive 15x15
+      gridSize = 15;
+    }
+
+    // Track used coordinates to ensure no overlaps
+    const usedCoordinates = new Set<string>();
+    const features: Array<{ q: number; r: number; type: string; name?: string }> = [];
+
+    // Always place Sanctuary at center
+    features.push({ type: "Sanctuary", q: 0, r: 0 });
+    usedCoordinates.add("0,0");
+
+    // Core features (🆘,💎,🏧,🔮,🌀,⚔️) - place these in unique positions for each zone
+    const coreFeatureTypes = [
+      { type: "Bank", icon: "🏧" },
+      { type: "Arcanum", icon: "🔮" }, 
+      { type: "Armory", icon: "⚔️" },
+      { type: "AetheriumConduit", icon: "🌀" },
+      { type: "Gem Node", icon: "💎" }
+    ];
+
+    // Use zone ID to seed different patterns for consistent but unique layouts
+    const baseSeed = zoneId * 7 + 13;
+    let seedCounter = 0;
+    
+    for (const feature of coreFeatureTypes) {
+      const coords = this.generateUniqueCoordinates(gridSize, usedCoordinates, baseSeed + seedCounter++);
+      features.push({ type: feature.type, q: coords.q, r: coords.r });
+    }
+
+    // Add teleporter
+    const teleporterCoords = this.generateUniqueCoordinates(gridSize, usedCoordinates, baseSeed + seedCounter++);
+    features.push({ type: "Teleporter", q: teleporterCoords.q, r: teleporterCoords.r });
+
+    // Add monster zones - number varies by zone size
+    let monsterZoneCount = Math.min(3 + Math.floor(gridSize / 2), 8);
+    for (let i = 0; i < monsterZoneCount; i++) {
+      const coords = this.generateUniqueCoordinates(gridSize, usedCoordinates, baseSeed + seedCounter++);
+      features.push({ type: "Monster Zone", q: coords.q, r: coords.r });
+    }
+
+    // Add boss arena for larger zones
+    if (gridSize >= 5) {
+      const bossCoords = this.generateUniqueCoordinates(gridSize, usedCoordinates, baseSeed + seedCounter++);
+      const bossNames = [
+        "Ancient Guardian", "Shadow Lord", "Crystal Titan", "Void Beast", "Elemental Core",
+        "Nightmare King", "Soul Reaper", "Chaos Bringer", "Time Weaver", "Reality Shaper"
+      ];
+      features.push({ 
+        type: "Boss Arena", 
+        q: bossCoords.q, 
+        r: bossCoords.r, 
+        name: bossNames[zoneId % bossNames.length] 
+      });
+    }
+
+    // Add resource nodes for variety
+    let resourceNodeCount = Math.min(1 + Math.floor(gridSize / 3), 4);
+    const resourceNames = [
+      "Mystic Ore", "Ancient Relic", "Power Crystal", "Ethereal Essence", "Void Fragment",
+      "Time Shard", "Reality Stone", "Soul Gem", "Chaos Fragment", "Divine Essence"
+    ];
+    
+    for (let i = 0; i < resourceNodeCount; i++) {
+      const coords = this.generateUniqueCoordinates(gridSize, usedCoordinates, baseSeed + seedCounter++);
+      features.push({ 
+        type: "Resource Node", 
+        q: coords.q, 
+        r: coords.r, 
+        name: resourceNames[(zoneId + i) % resourceNames.length]
+      });
+    }
+
+    return { gridSize, features };
+  }
+
   // Initialize all zones from blueprints and generate missing ones
   private initializeZones(): Record<string, ZoneState> {
     const zones: Record<string, ZoneState> = {};
     
-    // Load zones from blueprints first
+    // Load zones from blueprints first (these have hand-crafted layouts)
     Object.entries(ZONE_BLUEPRINTS).forEach(([zoneId, blueprint]) => {
       zones[zoneId] = {
         id: parseInt(zoneId),
@@ -70,43 +224,16 @@ export class GameLogicManager {
       };
     });
 
-    // Generate missing zones dynamically for complete 101 zone system
-    const standardFeatures = [
-      { type: "Sanctuary", q: 0, r: 0 },
-      { type: "Bank", q: -1, r: -1 },
-      { type: "Arcanum", q: 1, r: -1 },
-      { type: "Armory", q: -1, r: 1 },
-      { type: "AetheriumConduit", q: 1, r: 1 },
-      { type: "Gem Node", q: 0, r: 2 },
-      { type: "Monster Zone", q: -2, r: 0 },
-      { type: "Monster Zone", q: 0, r: -2 },
-      { type: "Monster Zone", q: 2, r: -2 },
-      { type: "Monster Zone", q: -2, r: 2 },
-      { type: "Boss Arena", q: 2, r: 0, name: "Boss Chamber" },
-      { type: "Resource Node", q: -1, r: 2, name: "Rare Resource" }
-    ];
-
-    // Ensure all 101 zones exist
+    // Generate unique layouts for all remaining zones
     for (let i = 1; i <= 101; i++) {
       const zoneId = i.toString();
       if (!zones[zoneId]) {
-        // Determine grid size based on level requirements
-        let gridSize = 4;
-        if (i >= 25 && i <= 33) gridSize = 5; // Level 100 zones
-        else if (i >= 34 && i <= 50) gridSize = 6; // Level 253 zones
-        else if (i >= 51 && i <= 58) gridSize = 7; // Level 1000 zones
-        else if (i >= 59 && i <= 66) gridSize = 8; // Level 6143 zones
-        else if (i >= 67 && i <= 73) gridSize = 9; // Level 13636 zones
-        else if (i >= 74 && i <= 78) gridSize = 10; // Level 35452 zones
-        else if (i >= 79 && i <= 81) gridSize = 11; // Level 83333 zones
-        else if (i >= 82 && i <= 100) gridSize = 11; // Level 172222 zones
-        else if (i === 101) gridSize = 12; // Level 400000 zone
-
+        const layout = this.generateUniqueZoneLayout(i);
         zones[zoneId] = {
           id: i,
-          name: `Zone ${i}`,
-          gridSize,
-          features: standardFeatures,
+          name: `Zone ${i}`, // This will be overridden by getAvailableZones with proper names
+          gridSize: layout.gridSize,
+          features: layout.features,
           currentMonsters: []
         };
       }

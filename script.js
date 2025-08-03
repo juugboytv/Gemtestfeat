@@ -1870,18 +1870,91 @@ const EquipmentManager = {
             } 
             this.ctx.closePath(); 
             
-            // Different hex colors based on current zone for visual variety
-            const zoneColors = [
-                'rgba(10, 10, 10, 0.5)',     // Default
-                'rgba(0, 50, 100, 0.5)',     // Zone 1: Blue (Crystal Caves)
-                'rgba(0, 100, 50, 0.5)',     // Zone 2: Green (Whispering Woods)  
-                'rgba(100, 30, 0, 0.5)',     // Zone 3: Red (Ember Peaks)
-                'rgba(50, 100, 200, 0.5)',   // Zone 4: Light Blue (Frost Hollow)
-                'rgba(50, 50, 100, 0.5)'     // Zone 5: Purple (Shadowmere Swamp)
-            ];
+            // Generate unique hex colors for all 101 zones with thematic variety
+            const generateZoneColor = (zoneId) => {
+                if (!zoneId) return 'rgba(10, 10, 10, 0.5)'; // Default
+                
+                // Starter zones (1-24): Various vibrant colors
+                if (zoneId <= 24) {
+                    const starterColors = [
+                        'rgba(0, 50, 100, 0.5)',     // Zone 1: Blue (Crystal Caves)
+                        'rgba(0, 100, 50, 0.5)',     // Zone 2: Green (Elvenwood)  
+                        'rgba(100, 30, 0, 0.5)',     // Zone 3: Red (Shifting Maze)
+                        'rgba(50, 100, 200, 0.5)',   // Zone 4: Light Blue (Arid Badlands)
+                        'rgba(50, 50, 100, 0.5)',    // Zone 5: Purple (Glimmering Springs)
+                        'rgba(150, 30, 30, 0.5)',    // Zone 6: Dark Red (Blazefire Wastes)
+                        'rgba(20, 80, 20, 0.5)',     // Zone 7: Dark Green (Abyssal Fen)
+                        'rgba(30, 100, 30, 0.5)',    // Zone 8: Forest Green (Moss-Covered Forest)
+                        'rgba(120, 40, 10, 0.5)',    // Zone 9: Orange-Red (Cinder Barrens)
+                        'rgba(80, 80, 80, 0.5)',     // Zone 10: Gray (Echo Mountain)
+                        'rgba(100, 100, 30, 0.5)',   // Zone 11: Yellow-Brown (Labyrinth)
+                        'rgba(90, 70, 40, 0.5)',     // Zone 12: Brown (Steppe)
+                        'rgba(180, 180, 200, 0.5)',  // Zone 13: Light Gray (Cloud Peak)
+                        'rgba(200, 100, 50, 0.5)',   // Zone 14: Orange (Emberfall Cliffs)
+                        'rgba(40, 60, 120, 0.5)',    // Zone 15: Deep Blue (Tidal Pools)
+                        'rgba(40, 20, 60, 0.5)',     // Zone 16: Dark Purple (Shadowmere)
+                        'rgba(100, 80, 60, 0.5)',    // Zone 17: Brown-Gray (Ironhold)
+                        'rgba(60, 80, 100, 0.5)',    // Zone 18: Blue-Gray (Moongrove)
+                        'rgba(80, 60, 40, 0.5)',     // Zone 19: Dark Brown (Thornwood)
+                        'rgba(120, 140, 160, 0.5)',  // Zone 20: Light Blue-Gray (Mistral Heights)
+                        'rgba(150, 50, 30, 0.5)',    // Zone 21: Red-Orange (Crimson Peaks)
+                        'rgba(100, 120, 140, 0.5)',  // Zone 22: Ice Blue (Frostholm)
+                        'rgba(60, 120, 60, 0.5)',    // Zone 23: Earth Green (Verdant Vale)
+                        'rgba(200, 200, 100, 0.5)'   // Zone 24: Golden (Starlight Sanctuary)
+                    ];
+                    return starterColors[zoneId - 1] || starterColors[0];
+                }
+                
+                // Advanced zones: Generate colors based on level tiers
+                else if (zoneId <= 33) {
+                    // Level 100 zones: Deep blues and purples
+                    const hue = 220 + (zoneId - 25) * 15;
+                    return `hsla(${hue}, 60%, 30%, 0.6)`;
+                }
+                else if (zoneId <= 50) {
+                    // Level 253 zones: Reds and oranges
+                    const hue = 0 + (zoneId - 34) * 10;
+                    return `hsla(${hue}, 70%, 35%, 0.6)`;
+                }
+                else if (zoneId <= 58) {
+                    // Level 1000 zones: Greens and teals
+                    const hue = 120 + (zoneId - 51) * 20;
+                    return `hsla(${hue}, 65%, 25%, 0.7)`;
+                }
+                else if (zoneId <= 66) {
+                    // Level 6143 zones: Purples and magentas
+                    const hue = 270 + (zoneId - 59) * 15;
+                    return `hsla(${hue}, 75%, 30%, 0.7)`;
+                }
+                else if (zoneId <= 73) {
+                    // Level 13636 zones: Dark reds and crimsons
+                    const hue = 330 + (zoneId - 67) * 8;
+                    return `hsla(${hue}, 80%, 25%, 0.8)`;
+                }
+                else if (zoneId <= 78) {
+                    // Level 35452 zones: Yellows and golds
+                    const hue = 45 + (zoneId - 74) * 12;
+                    return `hsla(${hue}, 85%, 30%, 0.8)`;
+                }
+                else if (zoneId <= 81) {
+                    // Level 83333 zones: Deep indigos and violets
+                    const hue = 250 + (zoneId - 79) * 20;
+                    return `hsla(${hue}, 90%, 20%, 0.9)`;
+                }
+                else if (zoneId <= 100) {
+                    // Level 172222 zones: Black and dark grays with colored tints
+                    const hue = (zoneId - 82) * 18;
+                    return `hsla(${hue}, 50%, 15%, 0.9)`;
+                }
+                else {
+                    // Zone 101: Final zone - Prismatic/rainbow effect
+                    const time = Date.now() * 0.001;
+                    const hue = (time * 50 + zoneId * 17) % 360;
+                    return `hsla(${hue}, 100%, 10%, 0.95)`;
+                }
+            };
             
-            const colorIndex = Math.min(this.currentZoneId || 0, zoneColors.length - 1);
-            this.ctx.fillStyle = zoneColors[colorIndex];
+            this.ctx.fillStyle = generateZoneColor(this.currentZoneId);
             this.ctx.fill(); 
             this.ctx.strokeStyle = 'rgba(249, 115, 22, 0.3)'; 
             this.ctx.lineWidth = 1.5; 
