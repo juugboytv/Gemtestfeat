@@ -58,38 +58,40 @@ export class GameLogicManager {
 
   // Generate unique hexagonal coordinates for a feature type within grid bounds using seeded randomness
   private generateUniqueCoordinates(gridSize: number, usedCoordinates: Set<string>, seed: number, attempts: number = 50): { q: number; r: number } {
-    for (let attempt = 0; attempt < attempts; attempt++) {
-      const randomSeed1 = seed + attempt * 17;
-      const randomSeed2 = seed + attempt * 23;
-      
-      const q = Math.floor(this.seededRandom(randomSeed1) * (2 * gridSize + 1)) - gridSize;
-      const r = Math.floor(this.seededRandom(randomSeed2) * (2 * gridSize + 1)) - gridSize;
-      const s = -q - r;
-      
-      // Check if coordinates are within hexagonal bounds
-      if (Math.abs(q) <= gridSize && Math.abs(r) <= gridSize && Math.abs(s) <= gridSize) {
-        const coordKey = `${q},${r}`;
-        if (!usedCoordinates.has(coordKey)) {
-          usedCoordinates.add(coordKey);
-          return { q, r };
-        }
-      }
-    }
-    
-    // Fallback - find any available coordinate
+    // First collect all valid hexagonal coordinates within bounds
+    const validCoords: Array<{ q: number; r: number }> = [];
     for (let q = -gridSize; q <= gridSize; q++) {
       for (let r = -gridSize; r <= gridSize; r++) {
         const s = -q - r;
-        if (Math.abs(s) <= gridSize) {
-          const coordKey = `${q},${r}`;
-          if (!usedCoordinates.has(coordKey)) {
-            usedCoordinates.add(coordKey);
-            return { q, r };
-          }
+        // Proper hexagonal bounds check: all three coordinates must be within gridSize
+        if (Math.abs(q) <= gridSize && Math.abs(r) <= gridSize && Math.abs(s) <= gridSize) {
+          validCoords.push({ q, r });
         }
       }
     }
     
+    // Try seeded random selection from valid coordinates
+    for (let attempt = 0; attempt < attempts; attempt++) {
+      const randomIndex = Math.floor(this.seededRandom(seed + attempt * 13) * validCoords.length);
+      const { q, r } = validCoords[randomIndex];
+      const coordKey = `${q},${r}`;
+      
+      if (!usedCoordinates.has(coordKey)) {
+        usedCoordinates.add(coordKey);
+        return { q, r };
+      }
+    }
+    
+    // Final fallback - find first available coordinate
+    for (const { q, r } of validCoords) {
+      const coordKey = `${q},${r}`;
+      if (!usedCoordinates.has(coordKey)) {
+        usedCoordinates.add(coordKey);
+        return { q, r };
+      }
+    }
+    
+    // Absolute fallback
     return { q: 0, r: 0 };
   }
 
