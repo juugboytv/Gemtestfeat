@@ -1692,6 +1692,24 @@ const EquipmentManager = {
             
             console.log(`Loaded zone blueprint: ${blueprint.name} (Zone ${zoneId}) - Grid Size: ${gridSize}`, blueprint.features);
             showToast(`Zone Layout: ${blueprint.name} (${gridSize}x${gridSize} grid)`, false);
+            
+                // Add global test functions for debugging
+            window.testZoneBlueprints = () => {
+                console.log('=== Zone Blueprint Test ===');
+                [1, 2, 3, 25].forEach(zoneId => {
+                    const bp = this.getZoneBlueprint(zoneId);
+                    console.log(`Zone ${zoneId}: ${bp.name}, Grid: ${bp.gridSize}x${bp.gridSize}, Features: ${bp.features.length}`);
+                });
+            };
+            
+            window.forceZoneChange = (zoneId) => {
+                console.log(`Forcing zone change to ${zoneId}`);
+                this.loadZoneBlueprint(zoneId);
+                this.playerPos = { q: 0, r: 0 };
+                this.draw();
+                this.updateInteractButton();
+                showToast(`Force changed to zone ${zoneId}`, false);
+            };
         },
         
         // Get zone blueprint data
@@ -2407,7 +2425,7 @@ const EquipmentManager = {
             TeleportManager.init();
             ChatManager.init();
             initializeGDD(); // Load the GDD structure
-            gddEditor.init(); // Initialize the dev tools listeners
+            // gddEditor disabled - using DevSuite instead
             SettingsManager.init();
             QuestManager.init();
            InfusionManager.init();
