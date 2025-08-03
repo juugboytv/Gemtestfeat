@@ -60,7 +60,7 @@ The game uses minimal external dependencies to maintain the original architectur
 - Implemented dynamic text overlay system for all item types:
   - **Dropper Items**: T1-T20 tier labels using same base images
   - **Shadow Items**: T1-T20 tier labels using same base images  
-  - **Echo Items**: T1-T10 tier labels using same base images
+  - **Echo Items**: T1-T20 tier labels using same base images (10 actual tiers map to T1-T10)
   - **Gem System**: Abbreviation + grade labels (WST1, WST2, etc.) using same base images
 - Created unified `getItemTierText()` function for consistent tier/grade display across all game interfaces
 - Enhanced Echo Items system with proper GitHub asset management for consistent visual presentation
