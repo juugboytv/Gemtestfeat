@@ -815,6 +815,43 @@
     color: var(--text-secondary); /* Grey for system messages */
 }
 
+/* Log Control Styles */
+.log-control-btn {
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--border-color-main);
+    color: var(--text-secondary);
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    line-height: 1;
+    transition: all 0.2s ease;
+}
+
+.log-control-btn:hover {
+    background: rgba(249, 115, 22, 0.3);
+    color: var(--highlight-orange);
+    border-color: var(--highlight-orange);
+}
+
+#combat-log-wrapper.minimized #scrolling-combat-log-container {
+    height: 20px !important;
+    min-height: 20px !important;
+    overflow: hidden;
+}
+
+#combat-log-wrapper.minimized #combat-log-header span {
+    font-size: 10px;
+}
+
+#combat-log-wrapper.closed {
+    display: none;
+}
+
 /* --- REAL-TIME COMBAT ANIMATIONS --- */
 @keyframes attack-flash {
     0% { background-color: transparent; }
@@ -3059,7 +3096,21 @@ const EquipmentManager = {
                 <!-- Main Content Area -->
                 <div class="flex-grow w-full flex flex-col"> 
                     <select id="monsterSelect" class="w-full mb-3"></select> 
-                    <div id="scrolling-combat-log-container" class="flex-grow min-h-[100px]"></div>
+                    
+                    <!-- Combat Log Container with Controls -->
+                    <div id="combat-log-wrapper" class="flex-grow">
+                        <div id="combat-log-header" class="flex justify-between items-center mb-2 bg-black/20 px-2 py-1 rounded-t">
+                            <span class="text-xs font-orbitron text-gray-400">Combat Log</span>
+                            <div class="flex gap-1">
+                                <button id="log-minimize-btn" class="log-control-btn" title="Minimize">−</button>
+                                <button id="log-close-btn" class="log-control-btn" title="Close">×</button>
+                            </div>
+                        </div>
+                        <div id="scrolling-combat-log-container" class="flex-grow min-h-[100px]"></div>
+                    </div>
+                    
+                    <!-- Reopen Log Button (hidden by default) -->
+                    <button id="log-reopen-btn" class="glass-button px-3 py-1 text-xs font-orbitron mb-2" style="display: none;">📋 Log</button>
                 </div>
                 
                 <!-- Compact Combat Actions Bar -->
@@ -5105,9 +5156,81 @@ const InfusionManager = {
      * Main entry point of the application.
      * Ensures data is loaded before initializing the game modules.
      */
+    // Log Control Manager
+    const LogControlManager = {
+        isMinimized: false,
+        isClosed: false,
+        
+        init() {
+            this.setupEventListeners();
+        },
+        
+        setupEventListeners() {
+            const minimizeBtn = document.getElementById('log-minimize-btn');
+            const closeBtn = document.getElementById('log-close-btn');
+            const reopenBtn = document.getElementById('log-reopen-btn');
+            
+            if (minimizeBtn) {
+                minimizeBtn.addEventListener('click', () => this.toggleMinimize());
+            }
+            
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => this.closeLog());
+            }
+            
+            if (reopenBtn) {
+                reopenBtn.addEventListener('click', () => this.openLog());
+            }
+        },
+        
+        toggleMinimize() {
+            const wrapper = document.getElementById('combat-log-wrapper');
+            const minimizeBtn = document.getElementById('log-minimize-btn');
+            
+            if (this.isMinimized) {
+                wrapper.classList.remove('minimized');
+                minimizeBtn.textContent = '−';
+                minimizeBtn.title = 'Minimize';
+                this.isMinimized = false;
+            } else {
+                wrapper.classList.add('minimized');
+                minimizeBtn.textContent = '+';
+                minimizeBtn.title = 'Expand';
+                this.isMinimized = true;
+            }
+        },
+        
+        closeLog() {
+            const wrapper = document.getElementById('combat-log-wrapper');
+            const reopenBtn = document.getElementById('log-reopen-btn');
+            
+            wrapper.classList.add('closed');
+            reopenBtn.style.display = 'block';
+            this.isClosed = true;
+        },
+        
+        openLog() {
+            const wrapper = document.getElementById('combat-log-wrapper');
+            const reopenBtn = document.getElementById('log-reopen-btn');
+            
+            wrapper.classList.remove('closed', 'minimized');
+            reopenBtn.style.display = 'none';
+            this.isClosed = false;
+            this.isMinimized = false;
+            
+            // Reset minimize button state
+            const minimizeBtn = document.getElementById('log-minimize-btn');
+            if (minimizeBtn) {
+                minimizeBtn.textContent = '−';
+                minimizeBtn.title = 'Minimize';
+            }
+        }
+    };
+
     async function main() {
         await loadGameData(); // Ensure data is loaded before the game starts
         CreationManager.init();
+        LogControlManager.init();
     }
 
     document.addEventListener('DOMContentLoaded', main);
