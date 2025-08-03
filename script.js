@@ -2041,13 +2041,11 @@ const EquipmentManager = {
             // Ensure all zones have the 6 core features
             const coreFeatures = [
                 { type: "Sanctuary", q: 0, r: 0 },
-                { type: "Bank", q: 1, r: -1 },
-                { type: "Arcanum", q: -1, r: 1 },
-                { type: "Armory", q: 1, r: 1 },
-                { type: "AetheriumConduit", q: -1, r: -1 },
-                { type: "Gem Node", q: 2, r: 0 },
-                { type: "Revive Station", q: -2, r: 0 },
-                { type: "Teleporter", q: 0, r: 2 }
+                { type: "Bank", q: 0, r: -2 },
+                { type: "Arcanum", q: -2, r: 0 },
+                { type: "Armory", q: 2, r: 0 },
+                { type: "Revive Station", q: 0, r: 2 },
+                { type: "Teleporter", q: -1, r: 1 }
             ];
             
             return {
