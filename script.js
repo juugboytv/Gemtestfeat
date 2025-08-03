@@ -1,6 +1,6 @@
 
     // --- VERSION STAMP FOR CACHE BUSTING ---
-    console.log('🚨 SCRIPT VERSION: 2025-01-03-15:56 - Building Icon Fix');
+    console.log('🚨 SCRIPT VERSION: 2025-01-03-16:10 - Canvas Context & Database Fix');
     
     // --- App State & Config ---
     let state = {
@@ -1637,11 +1637,27 @@ const EquipmentManager = {
         init() { 
             if (this.isInitialized) return; 
             this.isInitialized = true; 
+            
+            // Ensure canvas and container exist
+            if (!ui.miniMapCanvas || !ui.miniMapContainer) {
+                console.error('Canvas or container not found!');
+                return;
+            }
+            
             ui.miniMapCanvas.width = ui.miniMapContainer.clientWidth * 2; 
             ui.miniMapCanvas.height = ui.miniMapContainer.clientHeight * 2; 
             ui.miniMapCanvas.style.width = `${ui.miniMapContainer.clientWidth}px`; 
             ui.miniMapCanvas.style.height = `${ui.miniMapContainer.clientHeight}px`; 
-            this.ctx = ui.miniMapCanvas.getContext('2d'); 
+            
+            // Get context with error handling
+            this.ctx = ui.miniMapCanvas.getContext('2d');
+            if (!this.ctx) {
+                console.error('Failed to get canvas 2d context!');
+                return;
+            }
+            
+            // Set font for emoji support
+            this.ctx.font = '16px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
             
             // Load blueprint for current zone (if any) or default to zone 1
             const startingZone = state.game.currentZoneTier || 1;
@@ -1883,7 +1899,44 @@ const EquipmentManager = {
             this.grid.get('-2,0').feature = { name: 'Sanctuary', icon: '🆘' }; 
             this.grid.get('0,2').feature = { name: 'Teleport Zone', icon: '🌀' };
             this.grid.get('-1,2').feature = { name: 'Gem Crucible', icon: '💎' }; 
-        }, movePlayer(dq, dr) { const newQ = this.playerPos.q + dq; const newR = this.playerPos.r + dr; if (this.grid.has(`${newQ},${newR}`)) { this.playerPos.q = newQ; this.playerPos.r = newR; this.draw(); this.updateInteractButton(); const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); if (currentHex && currentHex.feature && currentHex.feature.name === 'Monster Zone') { CombatManager.populateMonsterList(state.game.currentZoneTier); } else { CombatManager.clearMonsterList(); } } }, updateInteractButton() { const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); const interactKey = document.getElementById('key-interact'); if (currentHex && currentHex.feature && currentHex.feature.name !== 'Monster Zone') { interactKey.textContent = `Enter`; interactKey.style.fontSize = '14px'; } else { interactKey.textContent = 'Interact'; interactKey.style.fontSize = '16px'; } }, handleInteraction() { const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); if (currentHex && currentHex.feature) { if (currentHex.feature.name === 'Weapons/Combat Shop') { ShopManager.openShop('armory'); } else if (currentHex.feature.name === 'Magic/Accessories Shop') { ShopManager.openShop('magic'); } else if (currentHex.feature.name === 'Bank') { BankManager.openBank(); } else if (currentHex.feature.name === 'Sanctuary') { ProfileManager.healPlayer(); } else if (currentHex.feature.name === 'Teleport Zone') { TeleportManager.showModal(); } else if (currentHex.feature.name === 'Gem Crucible') { GemCrucibleManager.openGemCrucible(); } } }, draw() { const canvas = ui.miniMapCanvas; this.ctx.clearRect(0, 0, canvas.width, canvas.height); const centerX = canvas.width / 2; const centerY = canvas.height / 2; this.grid.forEach(hex => { const relQ = hex.q - this.playerPos.q; const relR = hex.r - this.playerPos.r; const {x, y} = HexUtils.hexToPixel(relQ, relR, this.hexSize); this.drawHex(centerX + x, centerY + y, this.hexSize, hex.feature); }); this.drawPlayer(centerX, centerY); }, drawHex(cx, cy, size, feature) { 
+        }, movePlayer(dq, dr) { const newQ = this.playerPos.q + dq; const newR = this.playerPos.r + dr; if (this.grid.has(`${newQ},${newR}`)) { this.playerPos.q = newQ; this.playerPos.r = newR; this.draw(); this.updateInteractButton(); const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); if (currentHex && currentHex.feature && currentHex.feature.name === 'Monster Zone') { CombatManager.populateMonsterList(state.game.currentZoneTier); } else { CombatManager.clearMonsterList(); } } }, updateInteractButton() { const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); const interactKey = document.getElementById('key-interact'); if (currentHex && currentHex.feature && currentHex.feature.name !== 'Monster Zone') { interactKey.textContent = `Enter`; interactKey.style.fontSize = '14px'; } else { interactKey.textContent = 'Interact'; interactKey.style.fontSize = '16px'; } }, handleInteraction() { const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); if (currentHex && currentHex.feature) { if (currentHex.feature.name === 'Weapons/Combat Shop') { ShopManager.openShop('armory'); } else if (currentHex.feature.name === 'Magic/Accessories Shop') { ShopManager.openShop('magic'); } else if (currentHex.feature.name === 'Bank') { BankManager.openBank(); } else if (currentHex.feature.name === 'Sanctuary') { ProfileManager.healPlayer(); } else if (currentHex.feature.name === 'Teleport Zone') { TeleportManager.showModal(); } else if (currentHex.feature.name === 'Gem Crucible') { GemCrucibleManager.openGemCrucible(); } } }, draw() { 
+            // Safety check for canvas context
+            if (!this.ctx || !ui.miniMapCanvas) { 
+                console.error('Canvas context or canvas not ready, deferring draw'); 
+                return; 
+            } 
+            
+            const canvas = ui.miniMapCanvas;
+            
+            // Verify canvas context is valid before using
+            try {
+                this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+            } catch (error) {
+                console.error('Canvas clearRect failed:', error);
+                // Try to reinitialize context
+                this.ctx = ui.miniMapCanvas.getContext('2d');
+                if (!this.ctx) {
+                    console.error('Failed to reinitialize canvas context');
+                    return;
+                }
+                // Set font for emoji support
+                this.ctx.font = '16px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
+                // Retry clear
+                this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+            
+            const centerX = canvas.width / 2; 
+            const centerY = canvas.height / 2; 
+            
+            this.grid.forEach(hex => { 
+                const relQ = hex.q - this.playerPos.q; 
+                const relR = hex.r - this.playerPos.r; 
+                const {x, y} = HexUtils.hexToPixel(relQ, relR, this.hexSize); 
+                this.drawHex(centerX + x, centerY + y, this.hexSize, hex.feature); 
+            }); 
+            
+            this.drawPlayer(centerX, centerY); 
+        }, drawHex(cx, cy, size, feature) { 
             this.ctx.beginPath(); 
             for (let i = 0; i < 6; i++) { 
                 const angle = 2 * Math.PI / 6 * (i + 0.5); 
