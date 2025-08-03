@@ -214,7 +214,7 @@ export const ZONE_BLUEPRINTS: Record<string, ZoneBlueprint> = {
     difficulty: 25,
     levelRequirement: 100,
     features: [
-      { type: "Sanctuary", q: 0, r: 0 },
+      { type: "Sanctuary", q: -2, r: 0 },
       { type: "AetheriumConduit", q: -1, r: -1 },
       { type: "Arcanum", q: 1, r: -1 },
       { type: "Bank", q: -1, r: 1 },

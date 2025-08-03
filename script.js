@@ -2274,6 +2274,193 @@ const EquipmentManager = {
             } 
         }, drawPlayer(cx, cy) { this.ctx.font = `${this.hexSize * 1.5}px sans-serif`; this.ctx.textAlign = 'center'; this.ctx.textBaseline = 'middle'; this.ctx.fillText('🟠', cx, cy); } };
     const BankManager = { isInitialized: false, init() { if (this.isInitialized) return; this.isInitialized = true; }, openBank() { this.renderBankUI(); }, renderBankUI() { const contentHTML = ` <div id="bank-content" class="p-4 text-center"> <div class="grid grid-cols-2 gap-4 mb-4 text-lg"> <div> <div class="text-sm text-gray-400 font-orbitron">Your Gold</div> <div id="bank-player-gold" class="font-bold text-yellow-400 font-orbitron">${state.player.gold.toLocaleString()}</div> </div> <div> <div class="text-sm text-gray-400 font-orbitron">Banked Gold</div> <div id="bank-vault-gold" class="font-bold text-yellow-400 font-orbitron">${state.player.bankGold.toLocaleString()}</div> </div> </div> <input type="number" id="bank-amount-input" class="w-full p-2 rounded text-lg text-black bg-gray-200" placeholder="Enter amount..."> <div class="grid grid-cols-2 gap-2 mt-4"> <button id="bank-deposit-btn" class="glass-button py-2 rounded-md">Deposit</button> <button id="bank-withdraw-btn" class="glass-button py-2 rounded-md">Withdraw</button> </div> </div> `; ModalManager.show('Bank Vault', contentHTML, { onContentReady: (contentDiv) => { contentDiv.querySelector('#bank-deposit-btn').addEventListener('click', () => this.handleTransaction('deposit')); contentDiv.querySelector('#bank-withdraw-btn').addEventListener('click', () => this.handleTransaction('withdraw')); } }); }, handleTransaction(type) { const input = document.getElementById('bank-amount-input'); const amount = parseInt(input.value); if (isNaN(amount) || amount <= 0) { showToast("Please enter a valid amount.", true); return; } if (type === 'deposit') { if (amount > state.player.gold) { showToast("You don't have enough gold to deposit.", true); return; } state.player.gold -= amount; state.player.bankGold += amount; showToast(`Deposited ${amount.toLocaleString()} gold.`); } else if (type === 'withdraw') { if (amount > state.player.bankGold) { showToast("You don't have enough gold in the bank.", true); return; } state.player.bankGold -= amount; state.player.gold += amount; showToast(`Withdrew ${amount.toLocaleString()} gold.`); } input.value = ''; ProfileManager.updateAllProfileUI(); document.getElementById('bank-player-gold').textContent = state.player.gold.toLocaleString(); document.getElementById('bank-vault-gold').textContent = state.player.bankGold.toLocaleString(); } };
+
+    const RevivalManager = {
+        isInitialized: false,
+        
+        init() {
+            if (this.isInitialized) return;
+            this.isInitialized = true;
+            console.log('RevivalManager initialized');
+        },
+        
+        // Check if player is defeated
+        isPlayerDefeated() {
+            return state.player.isDefeated || false;
+        },
+        
+        // Apply defeat effects to player
+        defeatPlayer() {
+            console.log('Player defeated - applying death penalties');
+            
+            // Calculate penalties
+            const goldLost = state.player.gold;
+            const expLost = state.player.experience - this.getExperienceForLevel(state.player.level);
+            
+            // Apply penalties
+            state.player.gold = 0; // Lose ALL carried gold
+            state.player.experience = this.getExperienceForLevel(state.player.level); // Lose XP progress but keep level
+            state.player.health = 0;
+            state.player.isDefeated = true;
+            
+            // Apply ghost visual effects
+            this.applyGhostMode();
+            
+            // Show defeat message
+            showToast(`💀 DEFEATED! Lost ${goldLost.toLocaleString()} gold and ${expLost.toLocaleString()} experience.`, true);
+            showToast("Find a Revive Station (🏥) to return to life!", true);
+            
+            // Update UI
+            ProfileManager.updateAllProfileUI();
+            
+            // Disable interactions while defeated
+            this.disableGameInteractions();
+        },
+        
+        // Calculate experience needed for a specific level
+        getExperienceForLevel(level) {
+            if (level <= 1) return 0;
+            return Math.floor(100 * Math.pow(level - 1, 1.5));
+        },
+        
+        // Apply ghost mode visual effects
+        applyGhostMode() {
+            const gameContainer = document.querySelector('.game-container') || document.body;
+            gameContainer.classList.add('ghost-mode');
+            
+            // Add ghost mode CSS if it doesn't exist
+            if (!document.getElementById('ghost-mode-styles')) {
+                const style = document.createElement('style');
+                style.id = 'ghost-mode-styles';
+                style.textContent = `
+                    .ghost-mode {
+                        filter: grayscale(0.8) brightness(0.6);
+                        opacity: 0.7;
+                    }
+                    .ghost-mode .minimap-canvas {
+                        filter: grayscale(1) brightness(0.4);
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        },
+        
+        // Remove ghost mode visual effects
+        removeGhostMode() {
+            const gameContainer = document.querySelector('.game-container') || document.body;
+            gameContainer.classList.remove('ghost-mode');
+        },
+        
+        // Disable game interactions while defeated
+        disableGameInteractions() {
+            state.player.canInteract = false;
+        },
+        
+        // Enable game interactions after revival
+        enableGameInteractions() {
+            state.player.canInteract = true;
+        },
+        
+        // Open Revive Station interface
+        openReviveStation() {
+            if (!this.isPlayerDefeated()) {
+                showToast("You don't need revival services right now.", false);
+                return;
+            }
+            
+            this.renderReviveUI();
+        },
+        
+        // Render the revival interface
+        renderReviveUI() {
+            const contentHTML = `
+                <div id="revive-content" class="p-4 text-center">
+                    <div class="mb-4">
+                        <h3 class="font-orbitron text-xl text-red-400 mb-2">💀 SANCTUARY REVIVAL 💀</h3>
+                        <p class="text-gray-300 mb-4">You have fallen in battle. The Sanctuary offers you a chance to return to life.</p>
+                    </div>
+                    
+                    <div class="bg-gray-800 rounded p-4 mb-4">
+                        <div class="text-sm text-gray-400 mb-2">Current Status:</div>
+                        <div class="text-red-400 font-bold">DEFEATED</div>
+                        <div class="text-sm text-gray-500 mt-2">Health: 0 / ${state.player.maxHealth}</div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="text-green-400 font-bold mb-2">✨ FREE REVIVAL AVAILABLE ✨</div>
+                        <p class="text-sm text-gray-400">The Sanctuary will restore you to full health at no cost.</p>
+                    </div>
+                    
+                    <button id="revive-btn" class="glass-button py-3 px-6 rounded-md text-lg font-bold bg-green-600 hover:bg-green-500">
+                        🏥 REVIVE ME
+                    </button>
+                </div>
+            `;
+            
+            ModalManager.show('Sanctuary Revival', contentHTML, {
+                onContentReady: (contentDiv) => {
+                    contentDiv.querySelector('#revive-btn').addEventListener('click', () => this.performRevival());
+                }
+            });
+        },
+        
+        // Perform the revival process
+        performRevival() {
+            console.log('Performing player revival');
+            
+            // Restore player to life
+            state.player.health = state.player.maxHealth;
+            state.player.isDefeated = false;
+            
+            // Remove ghost mode effects
+            this.removeGhostMode();
+            
+            // Re-enable interactions
+            this.enableGameInteractions();
+            
+            // Close modal
+            ModalManager.hide();
+            
+            // Show success message
+            showToast("✨ You have been revived! Welcome back to the world of the living.", false);
+            
+            // Update UI
+            ProfileManager.updateAllProfileUI();
+            
+            // Add revival animation effect
+            this.playRevivalAnimation();
+        },
+        
+        // Play revival animation
+        playRevivalAnimation() {
+            const gameContainer = document.querySelector('.game-container') || document.body;
+            gameContainer.style.animation = 'revival-flash 0.5s ease-out';
+            
+            // Add revival animation CSS if it doesn't exist
+            if (!document.getElementById('revival-animation-styles')) {
+                const style = document.createElement('style');
+                style.id = 'revival-animation-styles';
+                style.textContent = `
+                    @keyframes revival-flash {
+                        0% { filter: brightness(1); }
+                        50% { filter: brightness(2) hue-rotate(90deg); }
+                        100% { filter: brightness(1); }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            // Remove animation after completion
+            setTimeout(() => {
+                gameContainer.style.animation = '';
+            }, 500);
+        },
+        
+        // Check if player can interact (not defeated)
+        canPlayerInteract() {
+            return !this.isPlayerDefeated() && (state.player.canInteract !== false);
+        }
+    };
     const ShopManager = { isInitialized: false, init() { if (this.isInitialized) return; this.isInitialized = true; }, openShop(shopType) { const contentHTML = ` <div class="p-4 text-center"> <h3 class="font-orbitron text-lg mb-2">Welcome to the ${shopType} Shop!</h3> <p class="text-gray-400">Shop functionality is not yet implemented.</p> <div class="mt-4"> <div class="shop-item-row"> <span>Item Name</span> <span>Description</span> <span>Price</span> </div> <div class="shop-item-row"> <span>Placeholder Item</span> <span>A nice placeholder.</span> <span class="text-yellow-400">100g</span> </div> </div> </div> `; ModalManager.show(`${shopType.charAt(0).toUpperCase() + shopType.slice(1)} Shop`, contentHTML); } };
     
     const TeleportManager = {
@@ -3664,132 +3851,6 @@ const InfusionManager = {
 
         closeBank() {
             document.getElementById('banking-modal').style.display = 'none';
-        }
-    };
-
-    // ======================
-    // REVIVAL MANAGER (Death/Revival System)
-    // ======================
-    const RevivalManager = {
-        init() {
-            // Initialize revival system data
-            if (!ProfileManager.gameData.deathSystem) {
-                ProfileManager.gameData.deathSystem = {
-                    isDefeated: false,
-                    deathCount: 0
-                };
-                ProfileManager.saveGame();
-            }
-        },
-
-        checkForDeath() {
-            const player = ProfileManager.gameData.player;
-            if (player.health <= 0 && !ProfileManager.gameData.deathSystem.isDefeated) {
-                this.triggerDefeat();
-            }
-        },
-
-        triggerDefeat() {
-            const player = ProfileManager.gameData.player;
-            const deathSystem = ProfileManager.gameData.deathSystem;
-            
-            // Set defeated state
-            deathSystem.isDefeated = true;
-            deathSystem.deathCount++;
-            
-            // Apply death penalties
-            const lostGold = player.gold;
-            const lostXP = player.experience;
-            
-            // Keep banked gold safe, lose carried gold
-            player.gold = 0;
-            player.experience = 0; // Reset XP progress but keep level
-            player.health = 0; // Keep at 0 until revived
-            
-            // Apply visual effects
-            this.applyDefeatedEffects();
-            
-            ProfileManager.saveGame();
-            ProfileManager.updateUI();
-            
-            showToast(`DEFEATED! Lost ${lostGold.toLocaleString()} gold and ${lostXP.toLocaleString()} XP. Seek revival at a Sanctuary!`, true);
-            showToast('You are now in ghost form. Find a Sanctuary to revive!', false);
-        },
-
-        applyDefeatedEffects() {
-            // Add visual effect to indicate defeated state
-            const gameContainer = document.getElementById('game-container');
-            if (gameContainer) {
-                gameContainer.style.filter = 'grayscale(50%) brightness(0.7)';
-                gameContainer.style.border = '2px solid #FF6B6B';
-            }
-            
-            // Add defeated indicator to UI
-            const defeatedIndicator = document.createElement('div');
-            defeatedIndicator.id = 'defeated-indicator';
-            defeatedIndicator.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: rgba(255, 107, 107, 0.9);
-                color: white;
-                padding: 10px;
-                border-radius: 8px;
-                font-weight: bold;
-                z-index: 1000;
-                animation: pulse 2s infinite;
-            `;
-            defeatedIndicator.innerHTML = 'DEFEATED - Seek Revival';
-            document.body.appendChild(defeatedIndicator);
-        },
-
-        removeDefeatedEffects() {
-            // Remove visual effects
-            const gameContainer = document.getElementById('game-container');
-            if (gameContainer) {
-                gameContainer.style.filter = '';
-                gameContainer.style.border = '';
-            }
-            
-            // Remove defeated indicator
-            const defeatedIndicator = document.getElementById('defeated-indicator');
-            if (defeatedIndicator) {
-                defeatedIndicator.remove();
-            }
-        },
-
-        interactWithSanctuary() {
-            const deathSystem = ProfileManager.gameData.deathSystem;
-            
-            if (!deathSystem.isDefeated) {
-                showToast('Sanctuary: A place of peace and healing. Return here if you fall in battle.', false);
-                return;
-            }
-            
-            // Revive the player
-            this.revivePlayer();
-        },
-
-        revivePlayer() {
-            const player = ProfileManager.gameData.player;
-            const deathSystem = ProfileManager.gameData.deathSystem;
-            
-            // Restore health and clear defeated state
-            player.health = player.maxHealth;
-            deathSystem.isDefeated = false;
-            
-            // Remove visual effects
-            this.removeDefeatedEffects();
-            
-            ProfileManager.saveGame();
-            ProfileManager.updateUI();
-            
-            showToast('REVIVED! You have been restored to full health at the Sanctuary!', false);
-            showToast('Remember: Your lost gold and XP cannot be recovered.', false);
-        },
-
-        canInteractWithWorld() {
-            return !ProfileManager.gameData.deathSystem.isDefeated;
         }
     };
 
