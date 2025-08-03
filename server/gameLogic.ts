@@ -50,10 +50,11 @@ export class GameLogicManager {
     return gameState;
   }
 
-  // Initialize all zones from blueprints
+  // Initialize all zones from blueprints and generate missing ones
   private initializeZones(): Record<string, ZoneState> {
     const zones: Record<string, ZoneState> = {};
     
+    // Load zones from blueprints first
     Object.entries(ZONE_BLUEPRINTS).forEach(([zoneId, blueprint]) => {
       zones[zoneId] = {
         id: parseInt(zoneId),
@@ -68,6 +69,48 @@ export class GameLogicManager {
         currentMonsters: []
       };
     });
+
+    // Generate missing zones dynamically for complete 101 zone system
+    const standardFeatures = [
+      { type: "Sanctuary", q: 0, r: 0 },
+      { type: "Bank", q: -1, r: -1 },
+      { type: "Arcanum", q: 1, r: -1 },
+      { type: "Armory", q: -1, r: 1 },
+      { type: "AetheriumConduit", q: 1, r: 1 },
+      { type: "Gem Node", q: 0, r: 2 },
+      { type: "Monster Zone", q: -2, r: 0 },
+      { type: "Monster Zone", q: 0, r: -2 },
+      { type: "Monster Zone", q: 2, r: -2 },
+      { type: "Monster Zone", q: -2, r: 2 },
+      { type: "Boss Arena", q: 2, r: 0, name: "Boss Chamber" },
+      { type: "Resource Node", q: -1, r: 2, name: "Rare Resource" }
+    ];
+
+    // Ensure all 101 zones exist
+    for (let i = 1; i <= 101; i++) {
+      const zoneId = i.toString();
+      if (!zones[zoneId]) {
+        // Determine grid size based on level requirements
+        let gridSize = 4;
+        if (i >= 25 && i <= 33) gridSize = 5; // Level 100 zones
+        else if (i >= 34 && i <= 50) gridSize = 6; // Level 253 zones
+        else if (i >= 51 && i <= 58) gridSize = 7; // Level 1000 zones
+        else if (i >= 59 && i <= 66) gridSize = 8; // Level 6143 zones
+        else if (i >= 67 && i <= 73) gridSize = 9; // Level 13636 zones
+        else if (i >= 74 && i <= 78) gridSize = 10; // Level 35452 zones
+        else if (i >= 79 && i <= 81) gridSize = 11; // Level 83333 zones
+        else if (i >= 82 && i <= 100) gridSize = 11; // Level 172222 zones
+        else if (i === 101) gridSize = 12; // Level 400000 zone
+
+        zones[zoneId] = {
+          id: i,
+          name: `Zone ${i}`,
+          gridSize,
+          features: standardFeatures,
+          currentMonsters: []
+        };
+      }
+    }
 
     return zones;
   }
