@@ -5396,11 +5396,90 @@ const InfusionManager = {
             };
             AllZones = zonesData;
             console.log("Zone data successfully loaded.");
+            
+            // Load zone blueprints for the dynamic zone system
+            loadZoneBlueprints();
+            
             // In the future, you can add fetches for items.json, monsters.json, etc. here.
         } catch (error) {
             console.error("Failed to load game data:", error);
             showToast("CRITICAL ERROR: Could not load game data. Please refresh.", true);
         }
+    }
+
+    // Zone Blueprint Loader
+    function loadZoneBlueprints() {
+        // Load the zone blueprint data from TypeScript module
+        const zoneBlueprints = {
+            "1": {
+                name: "Crystal Caves",
+                gridSize: 4,
+                description: "A shimmering cavern filled with glowing crystals.",
+                difficulty: 1,
+                features: [
+                    { type: "Sanctuary", q: -2, r: 0 },
+                    { type: "Armory", q: 1, r: -1 },
+                    { type: "Arcanum", q: 1, r: 1 },
+                    { type: "AetheriumConduit", q: 2, r: 0 },
+                    { type: "Teleporter", q: 0, r: 2 }
+                ]
+            },
+            "2": {
+                name: "Whispering Woods",
+                gridSize: 5,
+                description: "Ancient trees that murmur secrets.",
+                difficulty: 2,
+                features: [
+                    { type: "Sanctuary", q: 0, r: 0 },
+                    { type: "Armory", q: -2, r: 2 },
+                    { type: "Teleporter", q: 3, r: -1 },
+                    { type: "AetheriumConduit", q: -3, r: 3 }
+                ]
+            },
+            "3": {
+                name: "Ember Peaks",
+                gridSize: 4,
+                description: "Volcanic peaks where earth breathes fire.",
+                difficulty: 3,
+                features: [
+                    { type: "Sanctuary", q: -1, r: -1 },
+                    { type: "Arcanum", q: 2, r: -1 },
+                    { type: "AetheriumConduit", q: 0, r: 2 },
+                    { type: "Teleporter", q: -2, r: 2 },
+                    { type: "Boss Arena", q: 1, r: 1, name: "Magma Lord's Chamber" }
+                ]
+            },
+            "4": {
+                name: "Frost Hollow",
+                gridSize: 5,
+                description: "An icy valley with frozen waterfalls.",
+                difficulty: 4,
+                features: [
+                    { type: "Sanctuary", q: 0, r: 0 },
+                    { type: "Armory", q: -2, r: 1 },
+                    { type: "Arcanum", q: 2, r: -2 },
+                    { type: "Teleporter", q: 1, r: 2 },
+                    { type: "AetheriumConduit", q: -1, r: -2 }
+                ]
+            },
+            "5": {
+                name: "Shadowmere Swamp",
+                gridSize: 6,
+                description: "A murky swamp where shadows dance.",
+                difficulty: 5,
+                features: [
+                    { type: "Sanctuary", q: 2, r: -1 },
+                    { type: "Armory", q: -3, r: 2 },
+                    { type: "Arcanum", q: 1, r: -3 },
+                    { type: "AetheriumConduit", q: -1, r: 3 },
+                    { type: "Teleporter", q: 0, r: 0 }
+                ]
+            }
+        };
+        
+        // Make blueprints globally available
+        window.zoneBlueprints = zoneBlueprints;
+        console.log("Zone blueprints loaded successfully.", Object.keys(zoneBlueprints).length, "zones");
     }
 
     // --- MAIN INITIALIZATION ---
