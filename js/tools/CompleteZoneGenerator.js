@@ -202,7 +202,7 @@ class CompleteZoneGenerator {
         const allBlueprintCode = this.generateAllBlueprintCode();
         
         console.log('✅ Generated zone blueprints for all 77 zones');
-        console.log('✅ All zones have standard 6 icons: 🆘🌀🔮🏧⚔️💎');
+        console.log('✅ All zones have standard 6 icons: 🆘🌀🔮🏧⚔️🆘');
         console.log('✅ Level requirements properly distributed');
         console.log('✅ Grid sizes scale with difficulty');
         
