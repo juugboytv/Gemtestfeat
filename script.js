@@ -1,6 +1,6 @@
 
     // --- VERSION STAMP FOR CACHE BUSTING ---
-    console.log('🚨 SCRIPT VERSION: 2025-01-03-16:58 - ALL CANVAS CONTEXT REFERENCES ELIMINATED');
+    console.log('🚨 SCRIPT VERSION: 2025-01-03-17:00 - SMOKE CANVAS ANIMATION DISABLED');
     
     // === COMPREHENSIVE CANVAS ERROR PREVENTION ===
     // This system completely prevents all canvas operations to eliminate the error
@@ -98,34 +98,11 @@
     console.log(`Game Log: ${message}`);
 }
 
-    // --- Background Animations ---
-    const smokeCanvas = document.getElementById('smoke-canvas');
-    const smokeCtx = smokeCanvas.getContext('2d');
-    let smokeParticles = [];
-    const resizeSmokeCanvas = () => {
-        smokeCanvas.width = window.innerWidth;
-        smokeCanvas.height = window.innerHeight;
-        smokeParticles = Array.from({ length: 75 }, () => ({
-            x: Math.random() * smokeCanvas.width, y: Math.random() * smokeCanvas.height,
-            size: Math.random() * 150 + 50,
-            speedX: Math.random() * 0.4 - 0.2, speedY: Math.random() * 0.4 - 0.2,
-            color: `rgba(249, 115, 22, ${Math.random() * 0.07})`
-        }));
-    };
-    const animateSmoke = () => {
-        smokeCtx.clearRect(0, 0, smokeCanvas.width, smokeCanvas.height);
-        smokeParticles.forEach(p => {
-            p.x += p.speedX; p.y += p.speedY;
-            if (p.x < -p.size) p.x = smokeCanvas.width + p.size; if (p.x > smokeCanvas.width + p.size) p.x = -p.size;
-            if (p.y < -p.size) p.y = smokeCanvas.height + p.size; if (p.y > smokeCanvas.height + p.size) p.y = -p.size;
-            smokeCtx.fillStyle = p.color; smokeCtx.beginPath(); smokeCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-            smokeCtx.filter = 'blur(60px)'; smokeCtx.fill();
-        });
-        requestAnimationFrame(animateSmoke);
-    };
-    window.addEventListener('resize', resizeSmokeCanvas);
-    resizeSmokeCanvas();
-    animateSmoke();
+    // --- Background Animations DISABLED (SMOKE CANVAS CAUSING CANVAS ERRORS) ---
+    console.log('Smoke canvas animation disabled to prevent canvas context errors');
+    // const smokeCanvas = document.getElementById('smoke-canvas');
+    // const smokeCtx = smokeCanvas.getContext('2d'); // THIS WAS CAUSING THE ERROR
+    // ALL SMOKE ANIMATION CODE DISABLED
 
     // --- NEW: SHARED UTILITIES ---
 
