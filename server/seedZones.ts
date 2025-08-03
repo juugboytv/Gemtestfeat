@@ -12,9 +12,9 @@ function generateZoneFeatures(zoneId: number, gridSize: number) {
     { type: 'Sanctuary', name: 'Healing Sanctuary', icon: '🆘' },
     { type: 'Armory', name: 'Weapons & Combat Shop', icon: '⚔️' },
     { type: 'Arcanum', name: 'Magic & Accessories Shop', icon: '🔮' },
-    { type: 'AetheriumConduit', name: 'Aetherium Conduit', icon: '💎' },
+    { type: 'AetheriumConduit', name: 'Aetherium Conduit', icon: '🏧' },  // Bank
     { type: 'Teleporter', name: 'Teleport Zone', icon: '🌀' },
-    { type: 'GemCrucible', name: 'Gem Crucible', icon: '🏧' }
+    { type: 'GemCrucible', name: 'Gem Crucible', icon: '💎' }             // Gems
   ];
   
   // Generate valid hex positions for the grid
