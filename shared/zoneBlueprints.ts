@@ -24,8 +24,8 @@ export interface ZoneBlueprint {
 // Standardized starter zone features: All 24 starter zones have these core features
 // 🆘 Sanctuary, 🏧 Bank, 🔮 Arcanum, ⚔️ Armory, 🌀 AetheriumConduit, 💎 Gem Node
 const starterZoneFeatures: ZoneFeature[] = [
-  { type: "Sanctuary", q: 0, r: 0 },      // 🆘 Center sanctuary for safety
-  { type: "Bank", q: -1, r: -1 },         // 🏧 Bank for item storage
+  { type: "Sanctuary", q: -2, r: 0 },      // 🆘 Center sanctuary for safety
+  { type: "Bank", q: 2, r: 0 },          //  🏧 Bank for item storage
   { type: "Arcanum", q: 1, r: -1 },       // 🔮 Arcanum for magic services
   { type: "Armory", q: -1, r: 1 },        // ⚔️ Armory for equipment
   { type: "AetheriumConduit", q: 1, r: 1 }, // 🌀 AetheriumConduit for energy
