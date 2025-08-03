@@ -1886,6 +1886,7 @@ const EquipmentManager = {
     populateFilterOptions() {
         const categorySelect = document.getElementById('inventory-filter-category-select');
         let categories = ['All', ...Object.keys(this.inventoryBags)];
+        console.log('EquipmentManager inventoryBags categories:', categories);
         categorySelect.innerHTML = categories.map(c => `<option value="${c}">${c}</option>`).join('');
 
         const tierSelect = document.getElementById('inventory-filter-tier-select');
