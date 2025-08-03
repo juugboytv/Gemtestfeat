@@ -58,9 +58,6 @@ export function SmokeCanvas() {
     };
 
     const drawParticles = () => {
-      // Add null check as suggested by user to prevent canvas errors
-      if (!ctx) return;
-      
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       particles.forEach(p => {

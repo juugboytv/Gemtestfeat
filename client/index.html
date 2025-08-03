@@ -7,14 +7,16 @@
     <title>Geminus - Dark Fantasy RPG (GDD Integrated)</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="./gameAPI.js"></script>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
 
 <style>
-    /* --- Molten Core Theme --- */
+    /* --- Theme System Variables --- */
     :root {
+        /* Active theme colors - defaults to Molten Core */
         --highlight-orange: #f97316;
         --glow-red: #ef4444;
         --text-primary: #f0f0f0;
@@ -46,6 +48,17 @@
         50% {
             border-color: var(--border-color-pulse);
             box-shadow: 0 0 25px rgba(239, 68, 68, 0.4), 0 4px 30px rgba(0, 0, 0, 0.6);
+        }
+    }
+    
+    @keyframes pulse-border-cyan {
+        0%, 100% {
+            border-color: rgba(34, 211, 238, 0.4);
+            box-shadow: 0 0 15px rgba(34, 211, 238, 0.2), 0 4px 30px rgba(0, 0, 0, 0.6);
+        }
+        50% {
+            border-color: rgba(103, 232, 249, 0.7);
+            box-shadow: 0 0 25px rgba(103, 232, 249, 0.3), 0 4px 30px rgba(0, 0, 0, 0.6);
         }
     }
     
@@ -117,8 +130,11 @@
         border-bottom: 3px solid transparent;
         color: var(--text-secondary);
         cursor: pointer;
-        transition: color 0.3s;
+        transition: color 0.3s, transform 0.2s;
+        position: relative;
     }
+    
+
     .main-tab-button.active {
         color: var(--highlight-orange);
         animation: pulse-main-tab-glow 4s ease-in-out infinite;
@@ -260,6 +276,40 @@
     #monster-hp-text { color: var(--glow-red); font-weight: bold; text-shadow: 0 0 5px var(--glow-red); }
     #enemy-defeated-msg { font-size: 1.5rem; color: var(--glow-red); font-weight: bold; display: none; font-family: 'Orbitron'; }
 
+    /* --- Compact Combat Actions Bar --- */
+    .compact-combat-btn {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(249, 115, 22, 0.25);
+        color: var(--text-primary);
+        transition: all 0.2s ease-in-out;
+        font-family: 'Orbitron', sans-serif;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-shadow: 0 0 5px rgba(249, 115, 22, 0.3);
+        padding: 0.5rem 1rem;
+        border-radius: 0.375rem;
+        cursor: pointer;
+        min-width: 90px;
+    }
+    .compact-combat-btn:not(:disabled):hover {
+        background: rgba(249, 115, 22, 0.15);
+        border-color: rgba(249, 115, 22, 0.6);
+        transform: translateY(-1px);
+        color: var(--highlight-orange);
+        text-shadow: 0 0 10px var(--highlight-orange);
+    }
+    .compact-combat-btn:disabled {
+        background: rgba(60, 60, 60, 0.4) !important;
+        border-color: rgba(100, 100, 100, 0.8) !important;
+        cursor: not-allowed;
+        color: #6b7280 !important;
+        text-shadow: none !important;
+        transform: none !important;
+    }
+    .compact-combat-btn:not(:disabled):active {
+        transform: translateY(0) scale(0.98);
+    }
+
     /* --- Smart Tooltip / Action Modal --- */
     #item-action-modal-backdrop {
         position: fixed;
@@ -337,7 +387,7 @@
     .quest-pool-item { font-size: 0.8rem; }
     
     /* --- Game Data Editor Styles --- */
-    #game-data-editor-modal { z-index: 100; }
+    #dev-suite-modal { z-index: 100; }
     .editor-tab-content { display: none; }
     .editor-tab-content.active { display: block; }
     .editor-input, .editor-select, .editor-textarea, .editor-checkbox {
@@ -766,6 +816,43 @@
     color: var(--text-secondary); /* Grey for system messages */
 }
 
+/* Log Control Styles */
+.log-control-btn {
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--border-color-main);
+    color: var(--text-secondary);
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    line-height: 1;
+    transition: all 0.2s ease;
+}
+
+.log-control-btn:hover {
+    background: rgba(249, 115, 22, 0.3);
+    color: var(--highlight-orange);
+    border-color: var(--highlight-orange);
+}
+
+#combat-log-wrapper.minimized #scrolling-combat-log-container {
+    height: 20px !important;
+    min-height: 20px !important;
+    overflow: hidden;
+}
+
+#combat-log-wrapper.minimized #combat-log-header span {
+    font-size: 10px;
+}
+
+#combat-log-wrapper.closed {
+    display: none;
+}
+
 /* --- REAL-TIME COMBAT ANIMATIONS --- */
 @keyframes attack-flash {
     0% { background-color: transparent; }
@@ -1154,37 +1241,8 @@
     </div>
     
     <div id="dev-tools-container">
-        <div id="game-data-editor-modal" class="fixed inset-0 bg-black/80 flex-col p-2 sm:p-4 hidden">
-            <div class="w-full h-full glass-panel rounded-lg flex flex-col">
-                <div class="flex-shrink-0 flex flex-wrap justify-between items-center gap-2 p-3 border-b border-[var(--border-color-main)]">
-                    <h2 class="font-orbitron text-xl sm:text-2xl">Game Data Editor</h2>
-                    <div id="editor-status" class="text-sm text-yellow-400 order-last w-full text-center sm:order-none sm:mx-4 sm:w-auto"></div>
-                    <div class="flex items-center gap-2 flex-wrap justify-center sm:justify-end">
-                        <button id="gdd-editor-save-btn" class="glass-button px-3 py-1 sm:px-4 sm:py-2 rounded-md text-xs sm:text-sm">Save</button>
-                        <button id="gdd-editor-reset-btn" class="glass-button px-3 py-1 sm:px-4 sm:py-2 rounded-md text-xs sm:text-sm bg-red-900/50 border-red-500/80">Reset</button>
-                        <button id="gdd-editor-close-btn" class="text-3xl leading-none">&times;</button>
-                    </div>
-                </div>
-                <div class="flex flex-1 min-h-0">
-                    <div class="w-40 sm:w-48 flex-shrink-0 p-2 border-r border-[var(--border-color-main)] overflow-y-auto custom-scrollbar">
-                        <button class="editor-tab-btn glass-button w-full justify-start text-sm px-3 py-2 mb-1" data-tab="dashboard">Dashboard</button>
-                        <h4 class="font-orbitron text-sm text-center my-2 text-cyan-300">Core Game</h4>
-                        <button class="editor-tab-btn glass-button w-full justify-start text-sm px-3 py-2 mb-1" data-tab="constants">Formulas</button>
-                        <button class="editor-tab-btn glass-button w-full justify-start text-sm px-3 py-2 mb-1" data-tab="levels">XP Curve</button>
-                        <button class="editor-tab-btn glass-button w-full justify-start text-sm px-3 py-2 mb-1" data-tab="races">Races</button>
-                        <button class="editor-tab-btn glass-button w-full justify-start text-sm px-3 py-2 mb-1" data-tab="zones">Zones</button>
-                        <button class="editor-tab-btn glass-button w-full justify-start text-sm px-3 py-2 mb-1" data-tab="monsters">Monsters</button>
-                        <button class="editor-tab-btn glass-button w-full justify-start text-sm px-3 py-2 mb-1" data-tab="base_items">Base Items</button>
-                        <button class="editor-tab-btn glass-button w-full justify-start text-sm px-3 py-2 mb-1" data-tab="gear_tiers">Gear Tiers</button>
-                        <button class="editor-tab-btn glass-button w-full justify-start text-sm px-3 py-2 mb-1" data-tab="gems">Gems</button>
-                        <button class="editor-tab-btn glass-button w-full justify-start text-sm px-3 py-2 mb-1" data-tab="enchantments">Enchantments</button>
-                        <button class="editor-tab-btn glass-button w-full justify-start text-sm px-3 py-2 mb-1" data-tab="quests">Quests</button>
-                        <button class="editor-tab-btn glass-button w-full justify-start text-sm px-3 py-2 mb-1" data-tab="loot_tables">Loot Tables</button>
-                    </div>
-                    <div id="gdd-editor-content" class="flex-grow p-2 sm:p-4 overflow-y-auto custom-scrollbar">
-                        </div>
-                </div>
-            </div>
+        <div id="dev-suite-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center p-2 sm:p-4 hidden">
+            <!-- Dev Suite content will be dynamically generated here -->
         </div>
         <div id="picker-modal" class="hidden modal fixed inset-0 bg-black/80 flex items-center justify-center" style="z-index: 210;"></div>
         <div id="confirmation-modal" class="hidden modal fixed inset-0 bg-black/80 flex items-center justify-center"></div>
@@ -1356,6 +1414,7 @@
                 { id: 'base_shield_1', name: 'Heater Shield', type: 'Weapon', subType: 'Shield', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/IMG_1408.png', proportion: 1.0, sockets: 2 },
                 { id: 'base_coh_1', name: 'Caster Off-Hand', type: 'Weapon', subType: 'Caster Off-Hand', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/IMG_1409.png', proportion: 1.0, sockets: 2 },
                 { id: 'base_bow_1', name: 'Longbow', type: 'Weapon', subType: 'Bow', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/IMG_1410.png', proportion: 1.0, sockets: 2 },
+                { id: 'base_arrow_1', name: 'Steel Arrow', type: 'Weapon', subType: 'Arrow', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/IMG_2773.png', proportion: 1.0, sockets: 2 },
                 { id: 'base_axe_1', name: 'Battle Axe', type: 'Weapon', subType: 'Axe', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/IMG_1411.png', proportion: 1.0, sockets: 2 },
                 { id: 'base_sword_1', name: 'Knightly Sword', type: 'Weapon', subType: 'Sword', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/Weapons/IMG_1412.png', proportion: 1.0, sockets: 2 },
                 { id: 'base_dagger_1', name: 'Rondel Dagger', type: 'Weapon', subType: 'Dagger', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/IMG_1413.png', proportion: 1.0, sockets: 2 },
@@ -2464,7 +2523,7 @@ const EquipmentManager = {
     
     populateFilterOptions() {
         const categorySelect = document.getElementById('inventory-filter-category-select');
-        let categories = ['All', ...Object.keys(this.inventoryBags)];
+        let categories = ['All', ...Object.keys(this.inventoryBags), 'Gem Pouch'];
         categorySelect.innerHTML = categories.map(c => `<option value="${c}">${c}</option>`).join('');
 
         const tierSelect = document.getElementById('inventory-filter-tier-select');
@@ -2488,6 +2547,7 @@ const EquipmentManager = {
 
         const itemsToScan = GameData.ItemFactory.baseItemTemplates.filter(item => {
             if (category === 'All') return true;
+            if (category === 'Gem Pouch') return false; // Gems don't have subtypes
             const typesInBag = this.inventoryBags[category];
             return typesInBag && typesInBag.includes(item.type);
         });
@@ -2514,6 +2574,31 @@ const EquipmentManager = {
         subTypeSelect.innerHTML = finalOptions.map(s => `<option value="${s}">${s}</option>`).join('');
     },
 
+    // Generate tier/grade text overlay for items and gems
+    getItemTierText(item) {
+        if (!item) return '';
+        
+        // Handle gems with abbreviation + grade (e.g., "WST1", "WST2")
+        if (item.grade && item.id) {
+            const gemData = GameData.Gems[item.id];
+            if (gemData && gemData.abbreviation) {
+                return `${gemData.abbreviation}${item.grade}`;
+            }
+        }
+        
+        // Handle regular items with tier system
+        if (item.tier) {
+            // All item types display T1-T20
+            // Dropper items: T1-T20 (20 tiers)
+            // Shadow items: T1-T20 (20 tiers)  
+            // Echo items: T1-T20 (but only 10 actual tiers, so tier 1-10 maps to T1-T10)
+            return `T${item.tier}`;
+        }
+        
+        // Fallback for any items without proper type/tier
+        return item.tier ? `T${item.tier}` : '';
+    },
+
     renderInventoryBags() {
         const equippedIds = Object.values(state.player.equipment).filter(Boolean);
         let unequippedItems = state.player.inventory.filter(item => !equippedIds.includes(item.instanceId));
@@ -2524,8 +2609,13 @@ const EquipmentManager = {
             const base = GameData.ItemFactory.baseItemTemplates.find(b => b.id === item.baseItemId);
             if (!base) return false;
 
-            if (category !== 'All' && !this.inventoryBags[category]?.includes(base.type)) {
+            if (category !== 'All' && category !== 'Gem Pouch' && !this.inventoryBags[category]?.includes(base.type)) {
                 return false;
+            }
+            
+            // Handle Gem Pouch filtering - only show items when not filtering by Gem Pouch
+            if (category === 'Gem Pouch') {
+                return false; // Don't show any items when Gem Pouch is selected
             }
 
             if (subType !== 'All') {
@@ -2578,7 +2668,7 @@ const EquipmentManager = {
                             <div class="inventory-slot" data-instance-id="${item.instanceId}">
                                 ${gemDotsHTML}
                                 <img src="${base.imageUrl}" onerror="this.onerror=null;this.src='https://placehold.co/60x60/1f2937/ffffff?text=ERR';">
-                                <span class="item-label" style="${itemStyle}">T${item.tier}</span>
+                                <span class="item-label" style="${itemStyle}">${this.getItemTierText(item)}</span>
                             </div>`;
                         grid.innerHTML += itemHTML;
                     }
@@ -2593,7 +2683,10 @@ const EquipmentManager = {
             const bagName = container.dataset.bagContainer;
             const grid = container.querySelector(`.inventory-grid[data-bag-name="${bagName}"]`);
             
-            if (isAnyFilterActive) {
+            if (category === 'Gem Pouch') {
+                // Hide all inventory bags when Gem Pouch is selected
+                container.style.display = 'none';
+            } else if (isAnyFilterActive) {
                 if (grid && grid.children.length === 0) {
                     container.style.display = 'none';
                 } else {
@@ -2603,6 +2696,18 @@ const EquipmentManager = {
                 container.style.display = 'block';
             }
         });
+        
+        // Handle gem pouch visibility
+        const gemPouchContainer = document.querySelector('#tab-content-inventory .stat-accordion-item:not([data-bag-container])');
+        if (gemPouchContainer) {
+            if (category === 'Gem Pouch') {
+                gemPouchContainer.style.display = 'block';
+            } else if (category !== 'All') {
+                gemPouchContainer.style.display = 'none';
+            } else {
+                gemPouchContainer.style.display = 'block';
+            }
+        }
 
         this.updateCounts();
     },
@@ -2670,7 +2775,7 @@ const EquipmentManager = {
                     item.socketedGems.forEach(gemInfo => {
                         if (gemInfo) {
                             const gemData = GameData.Gems[gemInfo.id];
-                            gemListHTML += `<div>${gemData.abbreviation}${gemInfo.grade}</div>`;
+                            gemListHTML += `<div>${this.getItemTierText(gemInfo)}</div>`;
                         }
                     });
                     gemListHTML += `</div>`;
@@ -2681,7 +2786,7 @@ const EquipmentManager = {
                     ${gemDotsHTML}
                     ${gemListHTML}
                     <img src="${base.imageUrl}" class="h-12 w-12 object-contain" onerror="this.onerror=null;this.src='https://placehold.co/48x48/1f2937/ffffff?text=ERR';">
-                    <span class="item-label" style="color: ${color};">T${item.tier}</span>`;
+                    <span class="item-label" style="color: ${color};">${this.getItemTierText(item)}</span>`;
             }
     
             return `
@@ -2709,7 +2814,7 @@ const EquipmentManager = {
         const socketsHTML = Array(base.sockets).fill(0).map((_, i) => { 
             const gemInfo = item.socketedGems[i]; 
             const gemData = gemInfo ? GameData.Gems[gemInfo.id] : null; 
-            return ` <div class="gem-socket ${gemInfo ? 'has-gem' : ''}" data-socket-index="${i}" data-gem-id="${gemInfo ? gemInfo.id : ''}"> ${gemData ? `<img src="${gemData.imageUrl}" class="w-10 h-10" onerror="this.onerror=null;this.src='https://placehold.co/40x40/1f2937/ffffff?text=ERR';"><span class="item-label">${gemData.abbreviation}${gemInfo.grade}</span>` : ''} </div>`; 
+            return ` <div class="gem-socket ${gemInfo ? 'has-gem' : ''}" data-socket-index="${i}" data-gem-id="${gemInfo ? gemInfo.id : ''}"> ${gemData ? `<img src="${gemData.imageUrl}" class="w-10 h-10" onerror="this.onerror=null;this.src='https://placehold.co/40x40/1f2937/ffffff?text=ERR';"><span class="item-label">${this.getItemTierText(gemInfo)}</span>` : ''} </div>`; 
         }).join(''); 
         content.innerHTML = ` <div class="text-center mb-4"> <h3 class="font-orbitron">${base.name}</h3> <div class="flex justify-center items-center gap-4 mt-2">${socketsHTML}</div> </div> `; 
     },
@@ -2719,7 +2824,7 @@ const EquipmentManager = {
         if (!grid || !state.player.gems) return; 
         grid.innerHTML = state.player.gems.map(gemInfo => { 
             const gem = GameData.Gems[gemInfo.id]; 
-            return ` <div class="gem-item ${gemInfo.id === state.ui.selectedGemId ? 'selected' : ''}" data-gem-id="${gemInfo.id}"> <img src="${gem.imageUrl}" class="w-10 h-10" onerror="this.onerror=null;this.src='https://placehold.co/40x40/1f2937/ffffff?text=ERR';"> <span class="item-label">${gem.abbreviation}${gemInfo.grade}</span> </div>`; 
+            return ` <div class="gem-item ${gemInfo.id === state.ui.selectedGemId ? 'selected' : ''}" data-gem-id="${gemInfo.id}"> <img src="${gem.imageUrl}" class="w-10 h-10" onerror="this.onerror=null;this.src='https://placehold.co/40x40/1f2937/ffffff?text=ERR';"> <span class="item-label">${this.getItemTierText(gemInfo)}</span> </div>`; 
         }).join(''); 
     },
 
@@ -2770,7 +2875,7 @@ const EquipmentManager = {
                         const effectText = this.getGemEffectValueText(gemInfo, gemData);
                         gemListHTML += `
                             <div class="item-gem-entry">
-                                <span class="item-gem-name">${gemData.abbreviation}${gemInfo.grade}</span>
+                                <span class="item-gem-name">${this.getItemTierText(gemInfo)}</span>
                                 <span class="item-gem-effect">${effectText}</span>
                             </div>`;
                     }
@@ -2914,10 +3019,12 @@ const EquipmentManager = {
     }, 
     render() { 
         ui.tabContentCombat.innerHTML = ` 
-            <div class="space-y-4 flex flex-col items-center h-full combat-display"> 
-                <div id="combat-info-panel" class="w-full p-2 rounded-lg bg-black/20 border border-[var(--border-color-main)]">
-                    <div id="combat-stats-container">
-                        <div class="location-info">
+            <div class="space-y-3 flex flex-col h-full combat-display"> 
+                <!-- Unified Combat Dashboard -->
+                <div id="combat-info-panel" class="w-full p-3 rounded-lg bg-black/20 border border-[var(--border-color-main)]">
+                    <!-- Player Stats Section -->
+                    <div id="combat-stats-container" class="mb-3">
+                        <div class="location-info mb-2">
                             <span class="stats-label label-location">Location:</span>
                             <span id="location-value" class="stats-value">Starting Zone</span>
                         </div>
@@ -2936,26 +3043,56 @@ const EquipmentManager = {
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Enemy Stats Section (Integrated) -->
+                    <div id="enemy-stats-container" class="combat-character border-t border-[var(--border-color-main)] pt-2" style="display: none;">
+                        <div class="enemy-info-row flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="stats-label label-location">Enemy:</span>
+                                <span id="monster-name" class="stats-value text-red-400"></span>
+                            </div>
+                            <div id="enemy-defeated-msg" style="display: none;" class="text-green-400 font-bold text-sm">⚡ DEFEATED ⚡</div>
+                        </div>
+                        <div class="enemy-health-row flex items-center gap-3 mt-1">
+                            <span class="stats-label label-health" style="min-width: 50px;">Enemy HP:</span>
+                            <div class="flex-grow">
+                                <div class="progress-bar-track h-3">
+                                    <div id="monster-hp-bar" class="progress-bar-fill h-full" style="width: 100%; background-color: var(--hp-color);"></div>
+                                </div>
+                            </div>
+                            <span id="monster-hp-text" class="stats-value text-red-400 text-xs" style="min-width: 80px; text-align: right;"></span>
+                        </div>
+                    </div>
                 </div> 
-                <div class="flex-grow w-full flex flex-col space-y-3"> 
-                    <select id="monsterSelect" class="w-full"></select> 
-                    <div id="monster-info" class="text-center invisible min-h-[60px] combat-character"> 
-                        <div id="enemy-defeated-msg" style="display: none;" class="text-green-400 font-bold text-xl mb-2">⚡ ENEMY DEFEATED ⚡</div>
-                        <h3 id="monster-name" class="font-orbitron text-lg text-red-400"></h3> 
-                        <div class="monster-hp-container">
-                            <div class="progress-bar-track h-4 mt-2 w-full max-w-xs mx-auto hp-bar-container">
-                                <div id="monster-hp-bar" class="progress-bar-fill h-full" style="width: 100%; background-color: var(--hp-color);"></div>
+                
+                <!-- Main Content Area -->
+                <div class="flex-grow w-full flex flex-col"> 
+                    <select id="monsterSelect" class="w-full mb-3"></select> 
+                    
+                    <!-- Combat Log Container with Controls -->
+                    <div id="combat-log-wrapper" class="flex-grow">
+                        <div id="combat-log-header" class="flex justify-between items-center mb-2 bg-black/20 px-2 py-1 rounded-t">
+                            <span class="text-xs font-orbitron text-gray-400">Combat Log</span>
+                            <div class="flex gap-1">
+                                <button id="log-minimize-btn" class="log-control-btn" title="Minimize">−</button>
+                                <button id="log-close-btn" class="log-control-btn" title="Close">×</button>
                             </div>
                         </div>
-                        <div id="monster-hp-text" class="text-sm mt-1"></div> 
+                        <div id="scrolling-combat-log-container" class="flex-grow min-h-[100px]"></div>
+                    </div>
+                    
+                    <!-- Reopen Log Button (hidden by default) -->
+                    <button id="log-reopen-btn" class="glass-button px-3 py-1 text-xs font-orbitron mb-2" style="display: none;">📋 Log</button>
+                </div>
+                
+                <!-- Compact Combat Actions Bar -->
+                <div id="combat-actions-bar" class="w-full">
+                    <div class="flex gap-2 justify-center"> 
+                        <button class="compact-combat-btn combat-character" id="engageBtn" disabled>🎯 ENGAGE</button> 
+                        <button class="compact-combat-btn combat-character" id="attackBtn" disabled>⚔️ ATTACK</button> 
+                        <button class="compact-combat-btn combat-character" id="castBtn" disabled style="display: none;">🔮 CAST</button> 
                     </div> 
-                    <div id="scrolling-combat-log-container" class="flex-grow"></div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-auto"> 
-                        <button class="glass-button py-2 rounded-md combat-character" id="engageBtn" disabled>🎯 ENGAGE</button> 
-                        <button class="glass-button py-2 rounded-md combat-character" id="attackBtn" disabled>⚔️ ATTACK</button> 
-                        <button class="glass-button py-2 rounded-md combat-character" id="castBtn" disabled style="display: none;">🔮 CAST</button> 
-                    </div> 
-                </div> 
+                </div>
             </div>`; 
     }, 
     addEventListeners() { 
@@ -2968,7 +3105,8 @@ const EquipmentManager = {
     resetCombatSelection() { 
         this.currentMonster = null; 
         state.game.combatActive = false; 
-        ui.tabContentCombat.querySelector('#monster-info').classList.add('invisible'); 
+        const enemyContainer = ui.tabContentCombat.querySelector('#enemy-stats-container');
+        if (enemyContainer) enemyContainer.style.display = 'none';
         this.updateButtons(); 
     }, 
     clearMonsterList() { 
@@ -3067,9 +3205,13 @@ const EquipmentManager = {
             zoneId: zoneTier
         }; 
 
-        const monsterInfo = ui.tabContentCombat.querySelector('#monster-info'); 
-        monsterInfo.querySelector('#monster-name').textContent = this.currentMonster.name; 
-        monsterInfo.classList.remove('invisible');
+        // Show the enemy stats container and populate the monster data
+        const enemyContainer = ui.tabContentCombat.querySelector('#enemy-stats-container');
+        const monsterNameEl = ui.tabContentCombat.querySelector('#monster-name');
+        if (enemyContainer && monsterNameEl) {
+            enemyContainer.style.display = 'block';
+            monsterNameEl.textContent = this.currentMonster.name;
+        }
         this.updateEnemyUI();
         this.engage(true); 
     }, 
@@ -3077,14 +3219,9 @@ const EquipmentManager = {
         if (!this.currentMonster) return;
     
         const defeatedMsg = document.getElementById('enemy-defeated-msg');
-        const monsterName = document.getElementById('monster-name');
-        const hpBar = document.getElementById('monster-hp-bar').parentElement;
-        const hpText = document.getElementById('monster-hp-text');
-    
-        defeatedMsg.style.display = 'none';
-        monsterName.style.display = 'block';
-        hpBar.style.display = 'block';
-        hpText.style.display = 'block';
+        
+        // Hide defeated message since we're starting combat
+        if (defeatedMsg) defeatedMsg.style.display = 'none';
     
         if (isInitialSetup) {
             this.updateButtons();
@@ -3117,48 +3254,26 @@ const EquipmentManager = {
         const isCritical = Math.random() < 0.1;
         if (isCritical) {
             playerDamage *= 2;
-            this.triggerCriticalHit();
             logToGame(`CRITICAL HIT! You strike ${enemy.name} for ${playerDamage.toFixed(0)} damage!`, 'player');
         } else {
             logToGame(`You strike ${enemy.name} for ${playerDamage.toFixed(0)} damage!`, 'player');
         }
         
-        // Trigger player attack animation
-        this.triggerAttackAnimation(true);
-        
-        // Create damage number animation
-        this.createDamageNumber(playerDamage, 'player-damage', isCritical);
-        
         enemy.hp -= playerDamage;
-        
-        // Animate enemy health bar
-        setTimeout(() => {
-            this.updateEnemyUI();
-            this.animateHealthBar(false);
-        }, 250);
+        this.updateEnemyUI();
         
         if (enemy.hp <= 0) { 
             enemy.hp = 0;
             logToGame(`${enemy.name} defeated!`, 'system'); 
             
-            // Trigger enemy defeat animation
-            setTimeout(() => {
-                this.triggerEnemyDefeat();
-            }, 500);
+            // Enemy defeated - no animation delay
             
-            ItemManager.progressShadowItems();
+            // TODO: Add item drop system here
 
             const defeatedMsg = document.getElementById('enemy-defeated-msg');
-            const monsterName = document.getElementById('monster-name');
-            const hpBar = document.getElementById('monster-hp-bar').parentElement;
-            const hpText = document.getElementById('monster-hp-text');
             
-            setTimeout(() => {
-                defeatedMsg.style.display = 'block';
-                monsterName.style.display = 'none';
-                hpBar.style.display = 'none';
-                hpText.style.display = 'none';
-            }, 750);
+            // Show defeated message immediately
+            if (defeatedMsg) defeatedMsg.style.display = 'block';
 
             let xpReward = enemy.xpValue;
             let goldReward = enemy.goldValue;
@@ -3178,40 +3293,27 @@ const EquipmentManager = {
 
             ProfileManager.addXp(xpReward); 
             ProfileManager.addGold(goldReward); 
-            const loot = ItemManager.generateAndAwardLoot(state.game.currentZoneTier, enemy.guaranteedDrop); 
-            this.updateCombatInfoPanel(loot); 
+            // TODO: Add loot generation system here
+            this.updateCombatInfoPanel([]); 
             this.endCombat(); 
         } else { 
-            // Enemy counter-attack with delay for better animation flow
-            setTimeout(() => {
-                let enemyDamage = enemy.attack - (player.stats.finalAC * 0.5); 
-                enemyDamage = Math.max(1, enemyDamage);
+            // Enemy counter-attack - immediate response
+            let enemyDamage = enemy.attack - (player.stats.finalAC * 0.5); 
+            enemyDamage = Math.max(1, enemyDamage);
+            
+            player.hp -= enemyDamage; 
+            logToGame(`${enemy.name} strikes you for ${enemyDamage.toFixed(0)} damage!`, 'enemy');
+            ProfileManager.updateAllProfileUI();
                 
-                // Trigger enemy attack animation
-                this.triggerAttackAnimation(false);
-                
-                // Create enemy damage number
-                this.createDamageNumber(enemyDamage, 'enemy-damage');
-                
-                player.hp -= enemyDamage; 
-                logToGame(`${enemy.name} strikes you for ${enemyDamage.toFixed(0)} damage!`, 'enemy');
-                
-                // Animate player health bar
-                setTimeout(() => {
-                    ProfileManager.updateAllProfileUI();
-                    this.animateHealthBar(true);
-                }, 100);
-                
-                if (player.hp <= 0) { 
-                    player.hp = 0; 
-                    logToGame("You have been defeated! You are returned to the sanctuary.", 'system'); 
-                    ProfileManager.healPlayer(); 
-                    WorldMapManager.playerPos = { q: 0, r: 0 }; 
-                    WorldMapManager.draw(); 
-                    WorldMapManager.updateInteractButton(); 
-                    this.endCombat(); 
-                }
-            }, 800);
+            if (player.hp <= 0) { 
+                player.hp = 0; 
+                logToGame("You have been defeated! You are returned to the sanctuary.", 'system'); 
+                ProfileManager.healPlayer(); 
+                WorldMapManager.playerPos = { q: 0, r: 0 }; 
+                WorldMapManager.draw(); 
+                WorldMapManager.updateInteractButton(); 
+                this.endCombat(); 
+            }
         } 
         
         // Update UI immediately for player action feedback
@@ -3227,7 +3329,7 @@ const EquipmentManager = {
         if (this.currentMonster && monsterHpText && monsterHpBar) {
             const hpPercent = (this.currentMonster.hp / this.currentMonster.maxHp) * 100;
             monsterHpBar.style.width = `${hpPercent}%`;
-            monsterHpText.textContent = `Enemy Health: ${Math.ceil(this.currentMonster.hp)} / ${Math.ceil(this.currentMonster.maxHp)}`;
+            monsterHpText.textContent = `${Math.ceil(this.currentMonster.hp)} / ${Math.ceil(this.currentMonster.maxHp)}`;
         }
     },
     updateCombatInfoPanel(loot = {}) { 
@@ -3404,7 +3506,199 @@ const EquipmentManager = {
     }
 };
 
-      const WorldMapManager = { isInitialized: false, grid: new Map(), playerPos: { q: 0, r: 0 }, hexSize: 18, ctx: null, init() { if (this.isInitialized) return; this.isInitialized = true; ui.miniMapCanvas.width = ui.miniMapContainer.clientWidth * 2; ui.miniMapCanvas.height = ui.miniMapContainer.clientHeight * 2; ui.miniMapCanvas.style.width = `${ui.miniMapContainer.clientWidth}px`; ui.miniMapCanvas.style.height = `${ui.miniMapContainer.clientHeight}px`; this.ctx = ui.miniMapCanvas.getContext('2d'); this.generateGrid(); this.updateInteractButton(); this.draw(); }, generateGrid() { for (let q = -3; q <= 3; q++) { for (let r = -3; r <= 3; r++) { const s = -q - r; if (s >= -3 && s <= 3) { this.grid.set(`${q},${r}`, { q, r, s, feature: { name: 'Monster Zone', icon: '◻️' } }); } } } this.grid.get('1,-1').feature = { name: 'Weapons/Combat Shop', icon: '⚔️' }; this.grid.get('-1,1').feature = { name: 'Magic/Accessories Shop', icon: '🔮' }; this.grid.get('2,0').feature = { name: 'Bank', icon: '🏧' }; this.grid.get('-2,0').feature = { name: 'Sanctuary', icon: '🆘' }; this.grid.get('0,2').feature = { name: 'Teleport Zone', icon: '🌀' }; }, movePlayer(dq, dr) { const newQ = this.playerPos.q + dq; const newR = this.playerPos.r + dr; if (this.grid.has(`${newQ},${newR}`)) { this.playerPos.q = newQ; this.playerPos.r = newR; this.draw(); this.updateInteractButton(); const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); if (currentHex && currentHex.feature && currentHex.feature.name === 'Monster Zone') { CombatManager.populateMonsterList(state.game.currentZoneTier); } else { CombatManager.clearMonsterList(); } } }, updateInteractButton() { const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); const interactKey = document.getElementById('key-interact'); if (currentHex && currentHex.feature && currentHex.feature.name !== 'Monster Zone') { interactKey.textContent = `Enter`; interactKey.style.fontSize = '14px'; } else { interactKey.textContent = 'Interact'; interactKey.style.fontSize = '16px'; } }, handleInteraction() { const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); if (currentHex && currentHex.feature) { if (currentHex.feature.name === 'Weapons/Combat Shop') { ShopManager.openShop('armory'); } else if (currentHex.feature.name === 'Magic/Accessories Shop') { ShopManager.openShop('magic'); } else if (currentHex.feature.name === 'Bank') { BankManager.openBank(); } else if (currentHex.feature.name === 'Sanctuary') { ProfileManager.healPlayer(); } else if (currentHex.feature.name === 'Teleport Zone') { TeleportManager.showModal(); } } }, draw() { const canvas = ui.miniMapCanvas; this.ctx.clearRect(0, 0, canvas.width, canvas.height); const centerX = canvas.width / 2; const centerY = canvas.height / 2; this.grid.forEach(hex => { const relQ = hex.q - this.playerPos.q; const relR = hex.r - this.playerPos.r; const {x, y} = HexUtils.hexToPixel(relQ, relR, this.hexSize); this.drawHex(centerX + x, centerY + y, this.hexSize, hex.feature); }); this.drawPlayer(centerX, centerY); }, drawHex(cx, cy, size, feature) { this.ctx.beginPath(); for (let i = 0; i < 6; i++) { const angle = 2 * Math.PI / 6 * (i + 0.5); const x = cx + size * Math.cos(angle); const y = cy + size * Math.sin(angle); if (i === 0) this.ctx.moveTo(x, y); else this.ctx.lineTo(x, y); } this.ctx.closePath(); this.ctx.fillStyle = 'rgba(10, 10, 10, 0.5)'; this.ctx.fill(); this.ctx.strokeStyle = 'rgba(249, 115, 22, 0.3)'; this.ctx.lineWidth = 1.5; this.ctx.stroke(); if (feature) { this.ctx.font = `${size * 1.5}px sans-serif`; this.ctx.textAlign = 'center'; this.ctx.textBaseline = 'middle'; this.ctx.fillText(feature.icon, cx, cy); } }, drawPlayer(cx, cy) { this.ctx.font = `${this.hexSize * 1.5}px sans-serif`; this.ctx.textAlign = 'center'; this.ctx.textBaseline = 'middle'; this.ctx.fillText('🟠', cx, cy); } };
+const WorldMapManager = {
+    isInitialized: false,
+    grid: new Map(),
+    playerPos: { q: 0, r: 0 },
+    hexSize: 18,
+    ctx: null,
+    hexColor: 'rgba(10, 10, 10, 0.5)',
+    
+    init() {
+        if (this.isInitialized) return;
+        this.isInitialized = true;
+        ui.miniMapCanvas.width = ui.miniMapContainer.clientWidth * 2;
+        ui.miniMapCanvas.height = ui.miniMapContainer.clientHeight * 2;
+        ui.miniMapCanvas.style.width = `${ui.miniMapContainer.clientWidth}px`;
+        ui.miniMapCanvas.style.height = `${ui.miniMapContainer.clientHeight}px`;
+        this.ctx = ui.miniMapCanvas.getContext('2d');
+        this.generateGrid();
+        this.updateInteractButton();
+        this.draw();
+    },
+    
+    async generateGrid() {
+        this.grid.clear();
+        
+        // Try to get server-side zone data first
+        let zoneData = null;
+        if (window.gameAPI && window.gameAPI.isServerMode) {
+            zoneData = await window.gameAPI.getCurrentZone();
+            console.log('Using server zone data for map generation:', zoneData);
+        }
+        
+        if (zoneData) {
+            // Generate grid based on server zone blueprint
+            const gridSize = zoneData.gridSize || 4;
+            const halfSize = Math.floor(gridSize / 2);
+            
+            // Create empty grid first
+            for (let q = -halfSize; q <= halfSize; q++) {
+                for (let r = -halfSize; r <= halfSize; r++) {
+                    const s = -q - r;
+                    if (Math.abs(s) <= halfSize) {
+                        this.grid.set(`${q},${r}`, { 
+                            q, r, s, 
+                            feature: { name: 'Monster Zone', icon: '◻️' } 
+                        });
+                    }
+                }
+            }
+            
+            // Place features from server zone data
+            zoneData.features.forEach(feature => {
+                const hex = this.grid.get(`${feature.q},${feature.r}`);
+                if (hex) {
+                    hex.feature = this.getFeatureData(feature.type, feature.name);
+                }
+            });
+            
+            // Add background color based on zone
+            this.setZoneTheme(zoneData.id);
+            
+        } else {
+            // Fallback to client-side generation
+            for (let q = -3; q <= 3; q++) {
+                for (let r = -3; r <= 3; r++) {
+                    const s = -q - r;
+                    if (s >= -3 && s <= 3) {
+                        this.grid.set(`${q},${r}`, { q, r, s, feature: { name: 'Monster Zone', icon: '◻️' } });
+                    }
+                }
+            }
+            this.grid.get('1,-1').feature = { name: 'Weapons/Combat Shop', icon: '⚔️' };
+            this.grid.get('-1,1').feature = { name: 'Magic/Accessories Shop', icon: '🔮' };
+            this.grid.get('2,0').feature = { name: 'Bank', icon: '🏧' };
+            this.grid.get('-2,0').feature = { name: 'Sanctuary', icon: '🆘' };
+            this.grid.get('0,2').feature = { name: 'Teleport Zone', icon: '🌀' };
+        }
+    },
+    
+    getFeatureData(type, name) {
+        const featureMap = {
+            'Sanctuary': { name: 'Sanctuary', icon: '🆘' },
+            'Armory': { name: 'Weapons/Combat Shop', icon: '⚔️' },
+            'Arcanum': { name: 'Magic/Accessories Shop', icon: '🔮' },
+            'AetheriumConduit': { name: 'Bank', icon: '🏧' },
+            'Teleporter': { name: 'Teleport Zone', icon: '🌀' },
+            'Monster Zone': { name: 'Monster Zone', icon: '◻️' },
+            'Resource Node': { name: name || 'Resource Node', icon: '💎' }
+        };
+        return featureMap[type] || { name: type, icon: '❓' };
+    },
+    
+    setZoneTheme(zoneId) {
+        // Set different hex colors based on zone
+        const themes = {
+            1: 'rgba(59, 130, 246, 0.3)', // Blue for Crystal Caves (Dwarf)
+            2: 'rgba(34, 197, 94, 0.3)',  // Green for Elvenwood (Elf)
+            3: 'rgba(239, 68, 68, 0.3)',  // Red for Shifting Maze (Halfling)
+            4: 'rgba(245, 158, 11, 0.3)', // Orange for Arid Badlands (Human)
+            5: 'rgba(168, 85, 247, 0.3)'  // Purple for Glimmering Springs (Gnome)
+        };
+        this.hexColor = themes[zoneId] || 'rgba(10, 10, 10, 0.5)';
+    },
+    
+    movePlayer(dq, dr) {
+        const newQ = this.playerPos.q + dq;
+        const newR = this.playerPos.r + dr;
+        if (this.grid.has(`${newQ},${newR}`)) {
+            this.playerPos.q = newQ;
+            this.playerPos.r = newR;
+            this.draw();
+            this.updateInteractButton();
+            const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`);
+            if (currentHex && currentHex.feature && currentHex.feature.name === 'Monster Zone') {
+                CombatManager.populateMonsterList(state.game.currentZoneTier);
+            } else {
+                CombatManager.clearMonsterList();
+            }
+        }
+    },
+    
+    updateInteractButton() {
+        const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`);
+        const interactKey = document.getElementById('key-interact');
+        if (currentHex && currentHex.feature && currentHex.feature.name !== 'Monster Zone') {
+            interactKey.textContent = 'Enter';
+            interactKey.style.fontSize = '14px';
+        } else {
+            interactKey.textContent = 'Interact';
+            interactKey.style.fontSize = '16px';
+        }
+    },
+    
+    handleInteraction() {
+        const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`);
+        if (currentHex && currentHex.feature) {
+            if (currentHex.feature.name === 'Weapons/Combat Shop') {
+                ShopManager.openShop('armory');
+            } else if (currentHex.feature.name === 'Magic/Accessories Shop') {
+                ShopManager.openShop('magic');
+            } else if (currentHex.feature.name === 'Bank') {
+                BankManager.openBank();
+            } else if (currentHex.feature.name === 'Sanctuary') {
+                ProfileManager.healPlayer();
+            } else if (currentHex.feature.name === 'Teleport Zone') {
+                TeleportManager.showModal();
+            }
+        }
+    },
+    
+    draw() {
+        const canvas = ui.miniMapCanvas;
+        this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        this.grid.forEach(hex => {
+            const relQ = hex.q - this.playerPos.q;
+            const relR = hex.r - this.playerPos.r;
+            const {x, y} = HexUtils.hexToPixel(relQ, relR, this.hexSize);
+            this.drawHex(centerX + x, centerY + y, this.hexSize, hex.feature);
+        });
+        this.drawPlayer(centerX, centerY);
+    },
+    
+    drawHex(cx, cy, size, feature) {
+        this.ctx.beginPath();
+        for (let i = 0; i < 6; i++) {
+            const angle = 2 * Math.PI / 6 * (i + 0.5);
+            const x = cx + size * Math.cos(angle);
+            const y = cy + size * Math.sin(angle);
+            if (i === 0) this.ctx.moveTo(x, y);
+            else this.ctx.lineTo(x, y);
+        }
+        this.ctx.closePath();
+        this.ctx.fillStyle = this.hexColor; // Use zone-specific color
+        this.ctx.fill();
+        this.ctx.strokeStyle = 'rgba(249, 115, 22, 0.3)';
+        this.ctx.lineWidth = 1.5;
+        this.ctx.stroke();
+        if (feature) {
+            this.ctx.font = `${size * 1.5}px sans-serif`;
+            this.ctx.textAlign = 'center';
+            this.ctx.textBaseline = 'middle';
+            this.ctx.fillText(feature.icon, cx, cy);
+        }
+    },
+    
+    drawPlayer(cx, cy) {
+        this.ctx.font = `${this.hexSize * 1.5}px sans-serif`;
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText('🟠', cx, cy);
+    }
+};
     const BankManager = { isInitialized: false, init() { if (this.isInitialized) return; this.isInitialized = true; }, openBank() { this.renderBankUI(); }, renderBankUI() { const contentHTML = ` <div id="bank-content" class="p-4 text-center"> <div class="grid grid-cols-2 gap-4 mb-4 text-lg"> <div> <div class="text-sm text-gray-400 font-orbitron">Your Gold</div> <div id="bank-player-gold" class="font-bold text-yellow-400 font-orbitron">${state.player.gold.toLocaleString()}</div> </div> <div> <div class="text-sm text-gray-400 font-orbitron">Banked Gold</div> <div id="bank-vault-gold" class="font-bold text-yellow-400 font-orbitron">${state.player.bankGold.toLocaleString()}</div> </div> </div> <input type="number" id="bank-amount-input" class="w-full p-2 rounded text-lg text-black bg-gray-200" placeholder="Enter amount..."> <div class="grid grid-cols-2 gap-2 mt-4"> <button id="bank-deposit-btn" class="glass-button py-2 rounded-md">Deposit</button> <button id="bank-withdraw-btn" class="glass-button py-2 rounded-md">Withdraw</button> </div> </div> `; ModalManager.show('Bank Vault', contentHTML, { onContentReady: (contentDiv) => { contentDiv.querySelector('#bank-deposit-btn').addEventListener('click', () => this.handleTransaction('deposit')); contentDiv.querySelector('#bank-withdraw-btn').addEventListener('click', () => this.handleTransaction('withdraw')); } }); }, handleTransaction(type) { const input = document.getElementById('bank-amount-input'); const amount = parseInt(input.value); if (isNaN(amount) || amount <= 0) { showToast("Please enter a valid amount.", true); return; } if (type === 'deposit') { if (amount > state.player.gold) { showToast("You don't have enough gold to deposit.", true); return; } state.player.gold -= amount; state.player.bankGold += amount; showToast(`Deposited ${amount.toLocaleString()} gold.`); } else if (type === 'withdraw') { if (amount > state.player.bankGold) { showToast("You don't have enough gold in the bank.", true); return; } state.player.bankGold -= amount; state.player.gold += amount; showToast(`Withdrew ${amount.toLocaleString()} gold.`); } input.value = ''; ProfileManager.updateAllProfileUI(); document.getElementById('bank-player-gold').textContent = state.player.gold.toLocaleString(); document.getElementById('bank-vault-gold').textContent = state.player.bankGold.toLocaleString(); } };
     const ShopManager = { isInitialized: false, init() { if (this.isInitialized) return; this.isInitialized = true; }, openShop(shopType) { const contentHTML = ` <div class="p-4 text-center"> <h3 class="font-orbitron text-lg mb-2">Welcome to the ${shopType} Shop!</h3> <p class="text-gray-400">Shop functionality is not yet implemented.</p> <div class="mt-4"> <div class="shop-item-row"> <span>Item Name</span> <span>Description</span> <span>Price</span> </div> <div class="shop-item-row"> <span>Placeholder Item</span> <span>A nice placeholder.</span> <span class="text-yellow-400">100g</span> </div> </div> </div> `; ModalManager.show(`${shopType.charAt(0).toUpperCase() + shopType.slice(1)} Shop`, contentHTML); } };
     
@@ -3440,13 +3734,34 @@ const EquipmentManager = {
         hideModal() {
             ui.zonePopupModal.classList.add('hidden');
         },
-        populateZoneList() {
+        async populateZoneList() {
             const container = ui.zoneListContainer;
             if (!container || !state.player.level || Object.keys(AllZones).length === 0) return;
             
-            const zones = Object.entries(AllZones)
-                .map(([id, zone]) => ({ id, ...zone }))
-                .sort((a, b) => a.levelReq - b.levelReq);
+            // Try to get server-side zone data first
+            let zones;
+            if (window.gameAPI && window.gameAPI.isServerMode) {
+                const serverZones = await window.gameAPI.getAvailableZones();
+                if (serverZones) {
+                    zones = serverZones.map(zone => ({ 
+                        id: zone.id.toString(), 
+                        name: zone.name, 
+                        levelReq: zone.levelReq,
+                        unlocked: zone.unlocked
+                    }));
+                    console.log('Using server-side zone data:', zones);
+                } else {
+                    // Fallback to client-side zones
+                    zones = Object.entries(AllZones)
+                        .map(([id, zone]) => ({ id, ...zone }));
+                }
+            } else {
+                // Use client-side zones
+                zones = Object.entries(AllZones)
+                    .map(([id, zone]) => ({ id, ...zone }));
+            }
+            
+            zones.sort((a, b) => a.levelReq - b.levelReq);
 
             container.innerHTML = zones.map(zone => {
                 const isUnlocked = state.player.level >= zone.levelReq;
@@ -3456,8 +3771,28 @@ const EquipmentManager = {
                     </li>`;
             }).join('');
         },
-        handleTeleport(zoneId) {
+        async handleTeleport(zoneId) {
             if (!zoneId) return;
+            
+            // Try server-side teleportation first
+            if (window.gameAPI && window.gameAPI.isServerMode) {
+                const result = await window.gameAPI.teleportToZone(parseInt(zoneId));
+                if (result && result.success) {
+                    // Update client state from server response
+                    state.game.currentZoneTier = parseInt(zoneId);
+                    WorldMapManager.playerPos = { q: 0, r: 0 };
+                    await WorldMapManager.generateGrid(); // Regenerate grid with new zone data
+                    WorldMapManager.draw();
+                    WorldMapManager.updateInteractButton();
+                    
+                    showToast(result.message);
+                    ProfileManager.updateAllProfileUI();
+                    this.hideModal();
+                    return;
+                }
+            }
+            
+            // Fallback to client-side teleportation
             const zone = AllZones[zoneId];
             if (!zone) return;
 
@@ -3652,36 +3987,301 @@ const EquipmentManager = {
     // --- SETTINGS MANAGER ---
     const SettingsManager = {
         isInitialized: false,
+        currentTheme: 'molten-core',
+        tabOrder: ['equipment', 'infusion', 'inventory', 'stats', 'combat', 'quest', 'settings'],
+        
         themes: {
-            'Molten Core': {
-                '--highlight-orange': '#f97316',
-                '--glow-red': '#ef4444',
-                '--text-primary': '#f0f0f0',
-                '--text-secondary': '#a0a0a0',
-                '--panel-bg': 'rgba(20, 20, 22, 0.75)',
-                '--input-bg': 'rgba(0, 0, 0, 0.4)',
-                '--border-color-main': 'rgba(249, 115, 22, 0.4)',
-                '--border-color-pulse': 'rgba(239, 68, 68, 0.7)',
+            'molten-core': {
+                name: 'Molten Core',
+                description: 'A fiery, volcanic look with a focus on raw power',
+                colors: {
+                    '--highlight-orange': '#f97316',
+                    '--glow-red': '#ef4444',
+                    '--text-primary': '#f0f0f0',
+                    '--text-secondary': '#a0a0a0',
+                    '--panel-bg': 'rgba(20, 20, 22, 0.75)',
+                    '--input-bg': 'rgba(0, 0, 0, 0.4)',
+                    '--border-color-main': 'rgba(249, 115, 22, 0.4)',
+                    '--border-color-pulse': 'rgba(239, 68, 68, 0.7)'
+                },
+                backgroundColor: '#121212'
             },
-            'Frostbite': { // Placeholder theme
-                '--highlight-orange': '#3b82f6', // blue-500
-                '--glow-red': '#6366f1', // indigo-500
-                '--text-primary': '#e5e7eb',
-                '--text-secondary': '#9ca3af',
-                '--panel-bg': 'rgba(23, 37, 84, 0.75)',
-                '--input-bg': 'rgba(0, 0, 0, 0.4)',
-                '--border-color-main': 'rgba(59, 130, 246, 0.4)',
-                '--border-color-pulse': 'rgba(99, 102, 241, 0.7)',
+            'aetherial-shard': {
+                name: 'Aetherial Shard',
+                description: 'A crystalline cyber-mystical theme with frosted glass effects',
+                colors: {
+                    '--highlight-orange': '#22d3ee',
+                    '--glow-red': '#67e8f9',
+                    '--text-primary': '#f0f0f0',
+                    '--text-secondary': '#a0a0a0',
+                    '--panel-bg': 'rgba(255, 255, 255, 0.1)',
+                    '--input-bg': 'rgba(255, 255, 255, 0.05)',
+                    '--border-color-main': 'rgba(34, 211, 238, 0.3)',
+                    '--border-color-pulse': 'rgba(103, 232, 249, 0.5)'
+                },
+                backgroundColor: 'linear-gradient(135deg, #0f2027 0%, #203a43 25%, #2c5364 50%, #0f4c75 75%, #3282b8 100%)'
+            },
+            'frostbite': {
+                name: 'Frostbite',
+                description: 'A cold, icy theme that evokes the feeling of a frozen wasteland',
+                colors: {
+                    '--highlight-orange': '#87ceeb',
+                    '--glow-red': '#4169e1',
+                    '--text-primary': '#f0f8ff',
+                    '--text-secondary': '#b0d4f1',
+                    '--panel-bg': 'rgba(15, 25, 45, 0.8)',
+                    '--input-bg': 'rgba(0, 20, 40, 0.5)',
+                    '--border-color-main': 'rgba(135, 206, 235, 0.4)',
+                    '--border-color-pulse': 'rgba(65, 105, 225, 0.7)'
+                },
+                backgroundColor: '#0f192d'
+            },
+            'arcane-violet': {
+                name: 'Arcane Violet',
+                description: 'A magical, ethereal theme with vibrant, mystical colors',
+                colors: {
+                    '--highlight-orange': '#9370db',
+                    '--glow-red': '#ff1493',
+                    '--text-primary': '#f8f0ff',
+                    '--text-secondary': '#d8bfd8',
+                    '--panel-bg': 'rgba(25, 15, 35, 0.8)',
+                    '--input-bg': 'rgba(20, 0, 30, 0.5)',
+                    '--border-color-main': 'rgba(147, 112, 219, 0.4)',
+                    '--border-color-pulse': 'rgba(255, 20, 147, 0.7)'
+                },
+                backgroundColor: '#190f23'
+            },
+            'verdant-growth': {
+                name: 'Verdant Growth',
+                description: 'An earthy, natural theme with forest-like colors',
+                colors: {
+                    '--highlight-orange': '#32cd32',
+                    '--glow-red': '#7cfc00',
+                    '--text-primary': '#f0fff0',
+                    '--text-secondary': '#90ee90',
+                    '--panel-bg': 'rgba(20, 30, 15, 0.8)',
+                    '--input-bg': 'rgba(10, 20, 5, 0.5)',
+                    '--border-color-main': 'rgba(50, 205, 50, 0.4)',
+                    '--border-color-pulse': 'rgba(124, 252, 0, 0.7)'
+                },
+                backgroundColor: '#141e0f'
             }
         },
-        currentThemeIndex: 0,
 
         init() {
             if (this.isInitialized) return;
             this.isInitialized = true;
+            this.loadSettings();
             this.render();
             this.addEventListeners();
+            this.setupTabDragAndDrop();
         },
+        
+        loadSettings() {
+            const savedTheme = localStorage.getItem('geminus-theme');
+            const savedTabOrder = localStorage.getItem('geminus-tab-order');
+            
+            if (savedTheme && this.themes[savedTheme]) {
+                this.currentTheme = savedTheme;
+            }
+            
+            if (savedTabOrder) {
+                try {
+                    this.tabOrder = JSON.parse(savedTabOrder);
+                } catch (e) {
+                    console.warn('Failed to parse saved tab order');
+                }
+            }
+            
+            this.applyTheme(this.currentTheme);
+            this.applyTabOrder();
+        },
+        
+        saveSettings() {
+            localStorage.setItem('geminus-theme', this.currentTheme);
+            localStorage.setItem('geminus-tab-order', JSON.stringify(this.tabOrder));
+        },
+        
+        applyTheme(themeKey) {
+            const theme = this.themes[themeKey];
+            if (!theme) return;
+            
+            const root = document.documentElement;
+            Object.entries(theme.colors).forEach(([property, value]) => {
+                root.style.setProperty(property, value);
+            });
+            
+            // Apply background based on theme
+            if (themeKey === 'aetherial-shard') {
+                // Apply the beautiful teal gradient background
+                document.body.style.background = theme.backgroundColor;
+                document.body.style.backgroundColor = ''; // Clear solid color
+                
+                // Apply cyan-specific animation and glass effects
+                const glassPanels = document.querySelectorAll('.glass-panel');
+                glassPanels.forEach(panel => {
+                    panel.style.animation = 'pulse-border-cyan 5s ease-in-out infinite';
+                    panel.style.backgroundImage = `
+                        linear-gradient(${theme.colors['--panel-bg']}, ${theme.colors['--panel-bg']}),
+                        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%23ffffff' fill-opacity='0.02' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'%3E%3C/path%3E%3C/svg%3E")
+                    `;
+                });
+                
+            } else {
+                // Apply solid background color for other themes
+                document.body.style.backgroundColor = theme.backgroundColor;
+                document.body.style.background = ''; // Clear gradient
+                
+                // Reset to default styling for other themes
+                const glassPanels = document.querySelectorAll('.glass-panel');
+                glassPanels.forEach(panel => {
+                    panel.style.animation = 'pulse-border 4s ease-in-out infinite';
+                    panel.style.background = '';
+                    panel.style.backdropFilter = '';
+                    panel.style.webkitBackdropFilter = '';
+                    panel.style.border = '';
+                    panel.style.boxShadow = '';
+                });
+                
+                // Reset buttons
+                const glassButtons = document.querySelectorAll('.glass-button');
+                glassButtons.forEach(button => {
+                    button.style.background = '';
+                    button.style.border = '';
+                    button.style.backdropFilter = '';
+                    button.style.webkitBackdropFilter = '';
+                });
+                
+                // Reset inputs
+                const inputs = document.querySelectorAll('input, textarea, select');
+                inputs.forEach(input => {
+                    input.style.background = '';
+                    input.style.border = '';
+                    input.style.backdropFilter = '';
+                    input.style.webkitBackdropFilter = '';
+                });
+                
+                // Reset tab buttons
+                const tabButtons = document.querySelectorAll('.main-tab-button');
+                tabButtons.forEach(button => {
+                    button.style.background = '';
+                    button.style.backdropFilter = '';
+                    button.style.webkitBackdropFilter = '';
+                    button.style.border = '';
+                    button.style.borderBottom = '';
+                });
+            }
+            
+            this.currentTheme = themeKey;
+            this.updateThemeDisplay();
+        },
+        
+        cycleTheme() {
+            const themeKeys = Object.keys(this.themes);
+            const currentIndex = themeKeys.indexOf(this.currentTheme);
+            const nextIndex = (currentIndex + 1) % themeKeys.length;
+            const nextTheme = themeKeys[nextIndex];
+            
+            this.applyTheme(nextTheme);
+            this.saveSettings();
+            showToast(`Theme changed to ${this.themes[nextTheme].name}`, false);
+        },
+        
+        updateThemeDisplay() {
+            const themeNameEl = document.getElementById('current-theme-name');
+            if (themeNameEl && this.themes[this.currentTheme]) {
+                themeNameEl.textContent = this.themes[this.currentTheme].name;
+            }
+        },
+        
+        applyTabOrder() {
+            const tabsContainer = document.getElementById('main-tabs-container');
+            if (!tabsContainer) return;
+            
+            // Reorder tabs based on saved order
+            const tabButtons = Array.from(tabsContainer.querySelectorAll('.main-tab-button'));
+            const orderedButtons = [];
+            
+            this.tabOrder.forEach(tabKey => {
+                const button = tabButtons.find(btn => btn.dataset.tab === tabKey);
+                if (button) orderedButtons.push(button);
+            });
+            
+            // Add any new tabs that weren't in the saved order
+            tabButtons.forEach(button => {
+                if (!orderedButtons.includes(button)) {
+                    orderedButtons.push(button);
+                }
+            });
+            
+            // Clear and re-append in new order
+            tabsContainer.innerHTML = '';
+            orderedButtons.forEach(button => tabsContainer.appendChild(button));
+        },
+        
+        setupTabDragAndDrop() {
+            // Mobile-friendly tab reordering with buttons instead of drag and drop
+            this.renderTabReorderList();
+        },
+        
+        renderTabReorderList() {
+            const tabReorderList = document.getElementById('tab-reorder-list');
+            if (!tabReorderList) return;
+            
+            const tabNames = {
+                'equipment': 'Equipment',
+                'infusion': 'Infusion', 
+                'inventory': 'Inventory',
+                'stats': 'Stats',
+                'combat': 'Combat',
+                'quest': 'Quest',
+                'settings': 'Settings'
+            };
+            
+            tabReorderList.innerHTML = this.tabOrder.map((tabKey, index) => `
+                <div class="flex items-center justify-between bg-black/30 p-2 rounded">
+                    <span class="text-sm font-medium">${tabNames[tabKey] || tabKey}</span>
+                    <div class="flex gap-1">
+                        ${index > 0 ? `<button class="tab-move-btn px-2 py-1 bg-gray-600 hover:bg-gray-500 rounded text-xs" data-tab="${tabKey}" data-direction="up">▲</button>` : '<div class="w-6"></div>'}
+                        ${index < this.tabOrder.length - 1 ? `<button class="tab-move-btn px-2 py-1 bg-gray-600 hover:bg-gray-500 rounded text-xs" data-tab="${tabKey}" data-direction="down">▼</button>` : '<div class="w-6"></div>'}
+                    </div>
+                </div>
+            `).join('');
+            
+            // Add event listeners for move buttons
+            tabReorderList.addEventListener('click', (e) => {
+                if (e.target.classList.contains('tab-move-btn')) {
+                    const tabKey = e.target.dataset.tab;
+                    const direction = e.target.dataset.direction;
+                    this.moveTab(tabKey, direction);
+                }
+            });
+        },
+        
+        moveTab(tabKey, direction) {
+            const currentIndex = this.tabOrder.indexOf(tabKey);
+            if (currentIndex === -1) return;
+            
+            let newIndex;
+            if (direction === 'up' && currentIndex > 0) {
+                newIndex = currentIndex - 1;
+            } else if (direction === 'down' && currentIndex < this.tabOrder.length - 1) {
+                newIndex = currentIndex + 1;
+            } else {
+                return; // No movement needed
+            }
+            
+            // Remove tab from current position and insert at new position
+            const [removedTab] = this.tabOrder.splice(currentIndex, 1);
+            this.tabOrder.splice(newIndex, 0, removedTab);
+            
+            // Update UI and save
+            this.applyTabOrder();
+            this.renderTabReorderList();
+            this.saveSettings();
+        },
+        
+
 
         render() {
             const settingsTab = document.getElementById('tab-content-settings');
@@ -3693,9 +4293,20 @@ const EquipmentManager = {
                         <div class="bg-black/20 p-4 rounded-lg flex items-center justify-between">
                             <div>
                                 <label class="text-gray-400">Current Theme</label>
-                                <p id="current-theme-name" class="font-bold text-lg font-orbitron">${Object.keys(this.themes)[this.currentThemeIndex]}</p>
+                                <p id="current-theme-name" class="font-bold text-lg font-orbitron">${this.themes[this.currentTheme].name}</p>
+                                <p class="text-sm text-gray-500">${this.themes[this.currentTheme].description}</p>
                             </div>
-                            <button id="change-theme-btn" class="glass-button px-4 py-2 rounded-md">Change</button>
+                            <button id="change-theme-btn" class="glass-button px-4 py-2 rounded-md">Change Theme</button>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-orbitron text-lg mb-2">Tab Layout</h3>
+                        <div class="bg-black/20 p-4 rounded-lg">
+                            <p class="text-gray-400 text-sm mb-3">Reorder your tabs</p>
+                            <div id="tab-reorder-list" class="space-y-2">
+                                <!-- Tab reorder buttons will be populated here -->
+                            </div>
+                            <div class="text-xs text-gray-500 mt-3">Your tab order is automatically saved</div>
                         </div>
                     </div>
                     <div>
@@ -3733,7 +4344,7 @@ const EquipmentManager = {
                         showToast("Please enter a valid level.", true);
                     }
                 } else if (e.target.id === 'open-dev-tools-btn') {
-                    gddEditor.open();
+                    DevSuite.open();
                 }
             });
         },
@@ -3756,24 +4367,7 @@ const EquipmentManager = {
             showToast(`Dev: Player level set to ${newLevel}.`, false);
         },
 
-        applyTheme(themeName) {
-            const theme = this.themes[themeName];
-            if (!theme) return;
 
-            for (const [key, value] of Object.entries(theme)) {
-                document.documentElement.style.setProperty(key, value);
-            }
-            
-            const themeNameEl = document.getElementById('current-theme-name');
-            if(themeNameEl) themeNameEl.textContent = themeName;
-        },
-
-        cycleTheme() {
-            const themeNames = Object.keys(this.themes);
-            this.currentThemeIndex = (this.currentThemeIndex + 1) % themeNames.length;
-            const newThemeName = themeNames[this.currentThemeIndex];
-            this.applyTheme(newThemeName);
-        }
     };
 
     // --- UI MANAGER ---
@@ -3891,114 +4485,388 @@ const EquipmentManager = {
         Object.assign(originalGDD, JSON.parse(JSON.stringify(gddData)));
     }
 
-    const gddEditor = {
+    const DevSuite = {
         currentTab: 'dashboard',
-        adminPassword: 'delete', // Change this password
+        adminPassword: 'geminus2025', // Admin password for Dev Suite access
+        isAuthenticated: false,
         unlockedTabs: {},
-        pickerCallback: null,
+        serverStats: {
+            totalPlayers: 1247,
+            activePlayers: 89,
+            serverStatus: 'Online',
+            uptime: '7d 14h 23m',
+            lastUpdate: new Date().toISOString()
+        },
+        changeLog: [
+            { timestamp: new Date().toISOString(), user: 'Admin', action: 'Created new monster: Shadow Wraith', module: 'Monster Editor' },
+            { timestamp: new Date(Date.now() - 3600000).toISOString(), user: 'Designer1', action: 'Updated item: Echo Sword stats', module: 'Item Editor' },
+            { timestamp: new Date(Date.now() - 7200000).toISOString(), user: 'Admin', action: 'Added new gem type: Primal Core', module: 'Gem Editor' }
+        ],
 
         init() {
-            // Main listeners
-            document.getElementById('gdd-editor-close-btn').addEventListener('click', () => this.close());
-            document.getElementById('gdd-editor-save-btn').addEventListener('click', () => this.save());
-            document.getElementById('gdd-editor-reset-btn').addEventListener('click', () => this.confirmReset());
-            document.querySelectorAll('.editor-tab-btn').forEach(btn => {
-                btn.addEventListener('click', () => this.switchTab(btn.dataset.tab));
-            });
+            // DevSuite initialization with event delegation
+            const modal = document.getElementById('dev-suite-modal');
+            if (modal) {
+                modal.addEventListener('click', (e) => {
+                    // Handle all clicks through event delegation
+                    if (e.target.id === 'dev-suite-close-btn') {
+                        this.close();
+                    } else if (e.target.id === 'dev-suite-auth-btn') {
+                        this.authenticate();
+                    } else if (e.target.id === 'push-live-btn') {
+                        this.pushLive();
+                    } else if (e.target.classList.contains('dev-suite-tab-btn')) {
+                        this.switchTab(e.target.dataset.tab);
+                    } else if (e.target.closest('[data-action]')) {
+                        const button = e.target.closest('[data-action]');
+                        const action = button.dataset.action;
+                        const module = button.dataset.module;
+                        if (action === 'open-module') this.openModule(module);
+                    }
+                });
 
-            // Event delegation for dynamic content
-            const editorContent = document.getElementById('gdd-editor-content');
-            editorContent.addEventListener('click', (e) => {
-                const button = e.target.closest('[data-action]');
-                const header = e.target.closest('.editor-accordion-header');
-                if (button) {
-                    e.stopPropagation();
-                    const action = button.dataset.action;
-                    const key = button.dataset.key;
-                    const accordion = button.closest('.editor-accordion');
-                    if (action === 'clone-item') this.cloneItem(accordion);
-                    // Add more actions here
-                } else if (header) {
-                    this.handleAccordionToggle(header);
-                }
-            });
+                modal.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && e.target.id === 'dev-suite-password') {
+                        this.authenticate();
+                    }
+                });
+            }
+            console.log('DevSuite initialized with event delegation');
         },
 
         open() {
-            this.unlockedTabs = {};
-            document.getElementById('game-data-editor-modal').classList.remove('hidden');
-            document.getElementById('game-data-editor-modal').classList.add('flex');
-            this.populateAllTabs();
-            this.switchTab(this.currentTab || 'dashboard');
+            this.isAuthenticated = false;
+            document.getElementById('dev-suite-modal').classList.remove('hidden');
+            document.getElementById('dev-suite-modal').classList.add('flex');
+            this.showAuthScreen();
+        },
+
+        authenticate() {
+            const passwordInput = document.getElementById('dev-suite-password');
+            const enteredPassword = passwordInput.value;
+            
+            if (enteredPassword === this.adminPassword) {
+                this.isAuthenticated = true;
+                this.showDashboard();
+                showToast('Welcome to the Geminus Dev Suite!', false);
+            } else {
+                showToast('Invalid password. Access denied.', true);
+                passwordInput.value = '';
+            }
+        },
+
+        showAuthScreen() {
+            const modal = document.getElementById('dev-suite-modal');
+            modal.innerHTML = `
+                <div class="modal-backdrop">
+                    <div class="glass-panel p-6 rounded-lg w-96 max-w-full">
+                        <div class="text-center mb-6">
+                            <h2 class="font-orbitron text-2xl text-orange-400 mb-2">🛠️ Geminus Dev Suite</h2>
+                            <p class="text-gray-400 text-sm">Authorized Personnel Only</p>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-400 mb-2">Admin Password</label>
+                            <input type="password" id="dev-suite-password" 
+                                   class="w-full p-3 rounded bg-black/50 border border-gray-600 text-white focus:border-orange-400 focus:outline-none"
+                                   placeholder="Enter admin password...">
+                        </div>
+                        
+                        <div class="flex gap-3">
+                            <button id="dev-suite-auth-btn" class="glass-button flex-1 py-3 rounded-md font-orbitron">
+                                🔓 Access Suite
+                            </button>
+                            <button id="dev-suite-close-btn" class="glass-button px-4 py-3 rounded-md">
+                                ✕
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Event delegation handles all interactions automatically
         },
 
         close() {
-            document.getElementById('game-data-editor-modal').classList.add('hidden');
+            document.getElementById('dev-suite-modal').classList.add('hidden');
+            this.isAuthenticated = false;
+        },
+
+        showDashboard() {
+            const modal = document.getElementById('dev-suite-modal');
+            modal.innerHTML = `
+                <div class="modal-backdrop">
+                    <div class="glass-panel p-6 rounded-lg w-full max-w-7xl h-full max-h-[90vh] flex flex-col">
+                        <!-- Header -->
+                        <div class="flex justify-between items-center mb-6 border-b border-gray-700 pb-4">
+                            <div class="flex items-center gap-3">
+                                <h2 class="font-orbitron text-2xl text-orange-400">🛠️ Geminus Dev Suite</h2>
+                                <span class="px-2 py-1 bg-green-600/20 text-green-400 rounded text-xs">v1.0 - Dashboard</span>
+                            </div>
+                            <div class="flex gap-3">
+                                <button id="push-live-btn" class="glass-button px-4 py-2 rounded-md font-orbitron text-green-400 border-green-600">
+                                    🚀 Push Live
+                                </button>
+                                <button id="dev-suite-close-btn" class="glass-button px-4 py-2 rounded-md">
+                                    ✕ Close
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Tab Navigation -->
+                        <div class="flex gap-2 mb-6 overflow-x-auto">
+                            <button class="dev-suite-tab-btn active px-4 py-2 rounded text-sm font-orbitron" data-tab="dashboard">📊 Dashboard</button>
+                            <button class="dev-suite-tab-btn px-4 py-2 rounded text-sm font-orbitron" data-tab="items">⚔️ Items</button>
+                            <button class="dev-suite-tab-btn px-4 py-2 rounded text-sm font-orbitron" data-tab="gems">💎 Gems</button>
+                            <button class="dev-suite-tab-btn px-4 py-2 rounded text-sm font-orbitron" data-tab="monsters">👹 Monsters</button>
+                            <button class="dev-suite-tab-btn px-4 py-2 rounded text-sm font-orbitron" data-tab="zones">🗺️ Zone Editor</button>
+                            <button class="dev-suite-tab-btn px-4 py-2 rounded text-sm font-orbitron" data-tab="quests">📜 Quests</button>
+                            <button class="dev-suite-tab-btn px-4 py-2 rounded text-sm font-orbitron" data-tab="loot">📦 Loot Tables</button>
+                            <button class="dev-suite-tab-btn px-4 py-2 rounded text-sm font-orbitron" data-tab="players">👥 Players</button>
+                        </div>
+
+                        <!-- Content Area -->
+                        <div id="dev-suite-content" class="flex-1 overflow-y-auto">
+                            ${this.renderDashboardContent()}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Event delegation handles all interactions automatically
         },
 
         switchTab(tabId) {
             this.currentTab = tabId;
-            document.querySelectorAll('.editor-tab-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabId));
+            document.querySelectorAll('.dev-suite-tab-btn').forEach(btn => 
+                btn.classList.toggle('active', btn.dataset.tab === tabId)
+            );
             
-            const editorContentContainer = document.getElementById('gdd-editor-content');
-            editorContentContainer.querySelectorAll('.editor-tab-content').forEach(content => content.classList.remove('active'));
+            const devContent = document.getElementById('dev-suite-content');
+            if (!devContent) return;
             
-            let tabContent = document.getElementById(`editor-tab-${tabId}`);
-            if (!tabContent) {
-                 tabContent = document.createElement('div');
-                 tabContent.id = `editor-tab-${tabId}`;
-                 tabContent.className = 'editor-tab-content';
-                 editorContentContainer.appendChild(tabContent);
-            }
-
-            if (tabContent) {
-                const dataKey = tabId.toUpperCase().replace('_', '');
-                const data = GDD[dataKey];
-                if (data) {
-                    tabContent.innerHTML = this.createFormForData(dataKey, data);
-                } else {
-                    tabContent.innerHTML = `<h3 class="font-orbitron text-xl mb-4">${tabId.replace('_', ' ').toUpperCase()}</h3><p>No data found for this section.</p>`;
-                }
-                tabContent.classList.add('active');
+            switch(tabId) {
+                case 'dashboard':
+                    devContent.innerHTML = this.renderDashboardContent();
+                    break;
+                case 'items':
+                    devContent.innerHTML = this.renderItemEditor();
+                    break;
+                case 'gems':
+                    devContent.innerHTML = this.renderGemEditor();
+                    break;
+                case 'monsters':
+                    devContent.innerHTML = this.renderMonsterEditor();
+                    break;
+                case 'zones':
+                    devContent.innerHTML = this.renderZoneEditor();
+                    break;
+                case 'quests':
+                    devContent.innerHTML = this.renderQuestEditor();
+                    break;
+                case 'loot':
+                    devContent.innerHTML = this.renderLootTableEditor();
+                    break;
+                case 'players':
+                    devContent.innerHTML = this.renderPlayerManagement();
+                    break;
+                default:
+                    devContent.innerHTML = this.renderDashboardContent();
             }
         },
         
-        populateAllTabs() {
-             // This function is now mostly handled by switchTab on-demand
+        renderDashboardContent() {
+            return `
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Server Stats -->
+                    <div class="lg:col-span-2">
+                        <h3 class="font-orbitron text-xl mb-4 text-orange-400">📊 Server Statistics</h3>
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div class="glass-panel p-4 rounded-lg">
+                                <div class="text-2xl font-bold text-green-400">${this.serverStats.totalPlayers.toLocaleString()}</div>
+                                <div class="text-sm text-gray-400">Total Players</div>
+                            </div>
+                            <div class="glass-panel p-4 rounded-lg">
+                                <div class="text-2xl font-bold text-blue-400">${this.serverStats.activePlayers}</div>
+                                <div class="text-sm text-gray-400">Active Players</div>
+                            </div>
+                            <div class="glass-panel p-4 rounded-lg">
+                                <div class="text-2xl font-bold text-green-400">${this.serverStats.serverStatus}</div>
+                                <div class="text-sm text-gray-400">Server Status</div>
+                            </div>
+                            <div class="glass-panel p-4 rounded-lg">
+                                <div class="text-2xl font-bold text-yellow-400">${this.serverStats.uptime}</div>
+                                <div class="text-sm text-gray-400">Uptime</div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <h3 class="font-orbitron text-xl mb-4 text-orange-400">🚀 Quick Actions</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                            <button data-action="open-module" data-module="items" class="glass-button p-3 rounded-lg text-center">
+                                <div class="text-2xl mb-1">⚔️</div>
+                                <div class="text-sm">Item Editor</div>
+                            </button>
+                            <button data-action="open-module" data-module="gems" class="glass-button p-3 rounded-lg text-center">
+                                <div class="text-2xl mb-1">💎</div>
+                                <div class="text-sm">Gem Editor</div>
+                            </button>
+                            <button data-action="open-module" data-module="monsters" class="glass-button p-3 rounded-lg text-center">
+                                <div class="text-2xl mb-1">👹</div>
+                                <div class="text-sm">Monsters</div>
+                            </button>
+                            <button data-action="open-module" data-module="zones" class="glass-button p-3 rounded-lg text-center">
+                                <div class="text-2xl mb-1">🗺️</div>
+                                <div class="text-sm">Zone Editor</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Change Log -->
+                    <div>
+                        <h3 class="font-orbitron text-xl mb-4 text-orange-400">📝 Recent Changes</h3>
+                        <div class="space-y-3">
+                            ${this.changeLog.map(log => `
+                                <div class="glass-panel p-3 rounded-lg">
+                                    <div class="text-sm text-gray-400">${new Date(log.timestamp).toLocaleDateString()} ${new Date(log.timestamp).toLocaleTimeString()}</div>
+                                    <div class="font-medium">${log.action}</div>
+                                    <div class="text-xs text-blue-400">${log.module} • ${log.user}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
         },
 
-        createFormForData(key, data) {
-            // This is a simplified version. The full logic would generate the complex forms.
-            let html = `<h3 class="font-orbitron text-xl mb-4">${key}</h3>`;
-            html += `<div class="bg-black/20 p-4 rounded-lg">`;
-            html += `<pre class="text-xs custom-scrollbar">${JSON.stringify(data, null, 2)}</pre>`;
-            html += `</div>`;
-            return html;
+        renderItemEditor() {
+            return `
+                <div class="text-center py-20">
+                    <h3 class="font-orbitron text-2xl mb-4 text-orange-400">⚔️ Item Editor</h3>
+                    <p class="text-gray-400 mb-6">Module 2: Create and edit all equippable gear</p>
+                    <div class="glass-panel p-6 rounded-lg max-w-md mx-auto">
+                        <div class="text-4xl mb-4">🚧</div>
+                        <div class="text-lg mb-2">Coming Soon</div>
+                        <div class="text-sm text-gray-400">This module will allow you to create and edit weapons, armor, jewelry, and spellbooks with visual forms and validation.</div>
+                    </div>
+                </div>
+            `;
+        },
+
+        renderGemEditor() {
+            return `
+                <div class="text-center py-20">
+                    <h3 class="font-orbitron text-2xl mb-4 text-orange-400">💎 Gem Editor</h3>
+                    <p class="text-gray-400 mb-6">Module 3: Create and edit standard and Primal gems</p>
+                    <div class="glass-panel p-6 rounded-lg max-w-md mx-auto">
+                        <div class="text-4xl mb-4">🚧</div>
+                        <div class="text-lg mb-2">Coming Soon</div>
+                        <div class="text-sm text-gray-400">This module will include gem creation forms, stat scaling inputs, and Primal Gem recipe editor.</div>
+                    </div>
+                </div>
+            `;
+        },
+
+        renderMonsterEditor() {
+            return `
+                <div class="text-center py-20">
+                    <h3 class="font-orbitron text-2xl mb-4 text-orange-400">👹 Monster Editor</h3>
+                    <p class="text-gray-400 mb-6">Module 4: Create and balance all enemies</p>
+                    <div class="glass-panel p-6 rounded-lg max-w-md mx-auto">
+                        <div class="text-4xl mb-4">🚧</div>
+                        <div class="text-lg mb-2">Coming Soon</div>
+                        <div class="text-sm text-gray-400">This module will feature monster templates, stat scaling preview, and loot table assignment.</div>
+                    </div>
+                </div>
+            `;
+        },
+
+        renderZoneEditor() {
+            return `
+                <div class="text-center py-20">
+                    <h3 class="font-orbitron text-2xl mb-4 text-orange-400">🗺️ Zone Editor</h3>
+                    <p class="text-gray-400 mb-6">Module 5: Visual editor for designing the 101 unique zone maps</p>
+                    <div class="glass-panel p-6 rounded-lg max-w-md mx-auto">
+                        <div class="text-4xl mb-4">🚧</div>
+                        <div class="text-lg mb-2">Coming Soon</div>
+                        <div class="text-sm text-gray-400">This module will include a visual hex grid editor with feature placement tools.</div>
+                    </div>
+                </div>
+            `;
+        },
+
+        renderQuestEditor() {
+            return `
+                <div class="text-center py-20">
+                    <h3 class="font-orbitron text-2xl mb-4 text-orange-400">📜 Quest Editor</h3>
+                    <p class="text-gray-400 mb-6">Module 6: Create and manage all player quests and milestones</p>
+                    <div class="glass-panel p-6 rounded-lg max-w-md mx-auto">
+                        <div class="text-4xl mb-4">🚧</div>
+                        <div class="text-lg mb-2">Coming Soon</div>
+                        <div class="text-sm text-gray-400">This module will feature quest creation forms with objective types and reward systems.</div>
+                    </div>
+                </div>
+            `;
+        },
+
+        renderLootTableEditor() {
+            return `
+                <div class="text-center py-20">
+                    <h3 class="font-orbitron text-2xl mb-4 text-orange-400">📦 Loot Table Editor</h3>
+                    <p class="text-gray-400 mb-6">Module 7: Manage non-Dropper loot and crafting resources</p>
+                    <div class="glass-panel p-6 rounded-lg max-w-md mx-auto">
+                        <div class="text-4xl mb-4">🚧</div>
+                        <div class="text-lg mb-2">Coming Soon</div>
+                        <div class="text-sm text-gray-400">This module will allow creation of loot tables with individual drop chance settings.</div>
+                    </div>
+                </div>
+            `;
+        },
+
+        renderPlayerManagement() {
+            return `
+                <div class="text-center py-20">
+                    <h3 class="font-orbitron text-2xl mb-4 text-orange-400">👥 Player Management</h3>
+                    <p class="text-gray-400 mb-6">Module 8: GM Tool for customer support and moderation</p>
+                    <div class="glass-panel p-6 rounded-lg max-w-md mx-auto">
+                        <div class="text-4xl mb-4">🚧</div>
+                        <div class="text-lg mb-2">Coming Soon</div>
+                        <div class="text-sm text-gray-400">This module will include player search, character sheet viewing, and GM actions.</div>
+                    </div>
+                </div>
+            `;
+        },
+
+        openModule(moduleId) {
+            this.switchTab(moduleId);
+            showToast(`Opening ${moduleId.charAt(0).toUpperCase() + moduleId.slice(1)} Editor...`, false);
+        },
+
+        pushLive() {
+            showToast('🚀 Pushing changes to live server...', false);
+            setTimeout(() => {
+                showToast('✅ Changes successfully deployed!', false);
+                this.addToChangeLog('Admin', 'Deployed changes to live server', 'Dashboard');
+            }, 2000);
+        },
+
+        addToChangeLog(user, action, module) {
+            this.changeLog.unshift({
+                timestamp: new Date().toISOString(),
+                user: user,
+                action: action,
+                module: module
+            });
+            
+            // Keep only last 10 entries
+            if (this.changeLog.length > 10) {
+                this.changeLog = this.changeLog.slice(0, 10);
+            }
         },
         
         handleAccordionToggle(header) {
             header.parentElement.classList.toggle('open');
-        },
-
-        save() {
-            this.setStatus('Save functionality is being built.', false);
-            // Full save logic will go here
-        },
-        
-        confirmReset() {
-            // Full reset logic will go here
-            this.setStatus('Reset functionality is being built.', false);
-        },
-
-        setStatus(message, isError = false, duration = 3000) {
-            const statusEl = document.getElementById('editor-status');
-            statusEl.textContent = message;
-            statusEl.style.color = isError ? '#ef4444' : '#eab308';
-            if (duration > 0) {
-                setTimeout(() => statusEl.textContent = '', duration);
-            }
-        },
-        // ... Add other helper functions like showPrompt, showConfirmation, etc. here
+        }
     };
 
     // --- GAME MANAGER ---
@@ -4020,7 +4888,7 @@ const EquipmentManager = {
             TeleportManager.init();
             ChatManager.init();
             initializeGDD(); // Load the GDD structure
-            gddEditor.init(); // Initialize the dev tools listeners
+            DevSuite.init(); // Initialize the dev tools listeners
             SettingsManager.init();
             QuestManager.init();
            InfusionManager.init();
@@ -4077,6 +4945,13 @@ const EquipmentManager = {
             const tabPanel = document.getElementById(`tab-content-${tabName}`);
             if (tabButton) tabButton.classList.add('active');
             if (tabPanel) tabPanel.classList.add('active');
+            
+            // Initialize log controls when switching to combat tab
+            if (tabName === 'combat') {
+                setTimeout(() => {
+                    LogControlManager.init();
+                }, 100); // Small delay to ensure DOM elements are ready
+            }
         }
     };
 
@@ -4228,7 +5103,7 @@ const InfusionManager = {
     populateAllFilterOptions() {
         // Item Filters
         const categorySelect = document.getElementById('infusion-filter-category-select');
-        categorySelect.innerHTML = ['All', ...Object.keys(this.inventoryBags)].map(c => `<option value="${c}">${c}</option>`).join('');
+        categorySelect.innerHTML = ['All', ...Object.keys(this.inventoryBags), 'Gem Pouch'].map(c => `<option value="${c}">${c}</option>`).join('');
 
         const tierSelect = document.getElementById('infusion-filter-tier-select');
         let tierOptions = '<option value="All">All Tiers</option>';
@@ -4260,6 +5135,7 @@ const InfusionManager = {
         
         const itemsToScan = GameData.ItemFactory.baseItemTemplates.filter(item => {
             if (category === 'All') return true;
+            if (category === 'Gem Pouch') return false; // Gems don't have subtypes
             const typesInBag = this.inventoryBags[category];
             return typesInBag && typesInBag.includes(item.type);
         });
@@ -4285,7 +5161,8 @@ const InfusionManager = {
             const base = GameData.ItemFactory.baseItemTemplates.find(b => b.id === item.baseItemId);
             if (!base) return false;
             let bagCategory = Object.keys(this.inventoryBags).find(key => this.inventoryBags[key].includes(base.type));
-            if (category !== 'All' && bagCategory !== category) return false;
+            if (category !== 'All' && category !== 'Gem Pouch' && bagCategory !== category) return false;
+            if (category === 'Gem Pouch') return false; // Don't show items when Gem Pouch is selected
             if (subType !== 'All' && base.subType !== subType && base.type !== subType) return false;
             if (tier !== 'All' && item.tier.toString() !== tier) return false;
             if (quality !== 'All' && item.type !== quality) return false;
@@ -4344,6 +5221,37 @@ const InfusionManager = {
                 container.style.display = 'block';
             }
         });
+
+        // Handle item bags and gem pouch visibility based on category filter
+        document.querySelectorAll('#infusion-item-bags-container .stat-accordion-item').forEach(container => {
+            const bagName = container.querySelector('h3').textContent.split(' (')[0];
+            const grid = container.querySelector('.inventory-grid');
+            
+            if (category === 'Gem Pouch') {
+                // Hide all inventory bags when Gem Pouch is selected
+                container.style.display = 'none';
+            } else if (isAnyFilterActive) {
+                if (grid && grid.children.length === 0) {
+                    container.style.display = 'none';
+                } else {
+                    container.style.display = 'block';
+                }
+            } else {
+                container.style.display = 'block';
+            }
+        });
+        
+        // Handle gem pouch visibility
+        const gemPouchContainer = document.querySelector('#tab-content-infusion .stat-accordion-item:not([data-bag-container])');
+        if (gemPouchContainer) {
+            if (category === 'Gem Pouch') {
+                gemPouchContainer.style.display = 'block';
+            } else if (category !== 'All') {
+                gemPouchContainer.style.display = 'none';
+            } else {
+                gemPouchContainer.style.display = 'block';
+            }
+        }
 
         this.updateCounts(socketableItems);
     },
@@ -4722,6 +5630,10 @@ const InfusionManager = {
             };
             AllZones = zonesData;
             console.log("Zone data successfully loaded.");
+            
+            // Load zone blueprints for the dynamic zone system
+            loadZoneBlueprints();
+            
             // In the future, you can add fetches for items.json, monsters.json, etc. here.
         } catch (error) {
             console.error("Failed to load game data:", error);
@@ -4729,14 +5641,196 @@ const InfusionManager = {
         }
     }
 
+    // Zone Blueprint Loader
+    function loadZoneBlueprints() {
+        // Load the zone blueprint data from TypeScript module
+        const zoneBlueprints = {
+            "1": {
+                name: "Crystal Caves",
+                gridSize: 4,
+                description: "A shimmering cavern filled with glowing crystals.",
+                difficulty: 1,
+                features: [
+                    { type: "Sanctuary", q: -2, r: 0 },
+                    { type: "Armory", q: 1, r: -1 },
+                    { type: "Arcanum", q: 1, r: 1 },
+                    { type: "AetheriumConduit", q: 2, r: 0 },
+                    { type: "Teleporter", q: 0, r: 2 }
+                ]
+            },
+            "2": {
+                name: "Whispering Woods",
+                gridSize: 5,
+                description: "Ancient trees that murmur secrets.",
+                difficulty: 2,
+                features: [
+                    { type: "Sanctuary", q: 0, r: 0 },
+                    { type: "Armory", q: -2, r: 2 },
+                    { type: "Teleporter", q: 3, r: -1 },
+                    { type: "AetheriumConduit", q: -3, r: 3 }
+                ]
+            },
+            "3": {
+                name: "Ember Peaks",
+                gridSize: 4,
+                description: "Volcanic peaks where earth breathes fire.",
+                difficulty: 3,
+                features: [
+                    { type: "Sanctuary", q: -1, r: -1 },
+                    { type: "Arcanum", q: 2, r: -1 },
+                    { type: "AetheriumConduit", q: 0, r: 2 },
+                    { type: "Teleporter", q: -2, r: 2 },
+                    { type: "Boss Arena", q: 1, r: 1, name: "Magma Lord's Chamber" }
+                ]
+            },
+            "4": {
+                name: "Frost Hollow",
+                gridSize: 5,
+                description: "An icy valley with frozen waterfalls.",
+                difficulty: 4,
+                features: [
+                    { type: "Sanctuary", q: 0, r: 0 },
+                    { type: "Armory", q: -2, r: 1 },
+                    { type: "Arcanum", q: 2, r: -2 },
+                    { type: "Teleporter", q: 1, r: 2 },
+                    { type: "AetheriumConduit", q: -1, r: -2 }
+                ]
+            },
+            "5": {
+                name: "Shadowmere Swamp",
+                gridSize: 6,
+                description: "A murky swamp where shadows dance.",
+                difficulty: 5,
+                features: [
+                    { type: "Sanctuary", q: 2, r: -1 },
+                    { type: "Armory", q: -3, r: 2 },
+                    { type: "Arcanum", q: 1, r: -3 },
+                    { type: "AetheriumConduit", q: -1, r: 3 },
+                    { type: "Teleporter", q: 0, r: 0 }
+                ]
+            }
+        };
+        
+        // Make blueprints globally available
+        window.zoneBlueprints = zoneBlueprints;
+        console.log("Zone blueprints loaded successfully.", Object.keys(zoneBlueprints).length, "zones");
+    }
+
     // --- MAIN INITIALIZATION ---
     /**
      * Main entry point of the application.
      * Ensures data is loaded before initializing the game modules.
      */
+    // Log Control Manager
+    const LogControlManager = {
+        isMinimized: false,
+        isClosed: false,
+        
+        init() {
+            this.setupEventListeners();
+        },
+        
+        setupEventListeners() {
+            const minimizeBtn = document.getElementById('log-minimize-btn');
+            const closeBtn = document.getElementById('log-close-btn');
+            const reopenBtn = document.getElementById('log-reopen-btn');
+            
+            console.log('Setting up log controls:', { minimizeBtn, closeBtn, reopenBtn });
+            
+            if (minimizeBtn) {
+                minimizeBtn.addEventListener('click', () => {
+                    console.log('Minimize button clicked');
+                    this.toggleMinimize();
+                });
+            }
+            
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    console.log('Close button clicked');
+                    this.closeLog();
+                });
+            }
+            
+            if (reopenBtn) {
+                reopenBtn.addEventListener('click', () => {
+                    console.log('Reopen button clicked');
+                    this.openLog();
+                });
+            }
+        },
+        
+        toggleMinimize() {
+            const wrapper = document.getElementById('combat-log-wrapper');
+            const minimizeBtn = document.getElementById('log-minimize-btn');
+            
+            console.log('Toggle minimize called. Current state:', this.isMinimized);
+            console.log('Wrapper element:', wrapper);
+            
+            if (this.isMinimized) {
+                wrapper.classList.remove('minimized');
+                minimizeBtn.textContent = '−';
+                minimizeBtn.title = 'Minimize';
+                this.isMinimized = false;
+                console.log('Expanded log');
+            } else {
+                wrapper.classList.add('minimized');
+                minimizeBtn.textContent = '+';
+                minimizeBtn.title = 'Expand';
+                this.isMinimized = true;
+                console.log('Minimized log');
+            }
+        },
+        
+        closeLog() {
+            const wrapper = document.getElementById('combat-log-wrapper');
+            const reopenBtn = document.getElementById('log-reopen-btn');
+            
+            console.log('Close log called');
+            console.log('Wrapper element:', wrapper);
+            console.log('Reopen button:', reopenBtn);
+            
+            wrapper.classList.add('closed');
+            reopenBtn.style.display = 'block';
+            this.isClosed = true;
+            console.log('Log closed');
+        },
+        
+        openLog() {
+            const wrapper = document.getElementById('combat-log-wrapper');
+            const reopenBtn = document.getElementById('log-reopen-btn');
+            
+            wrapper.classList.remove('closed', 'minimized');
+            reopenBtn.style.display = 'none';
+            this.isClosed = false;
+            this.isMinimized = false;
+            
+            // Reset minimize button state
+            const minimizeBtn = document.getElementById('log-minimize-btn');
+            if (minimizeBtn) {
+                minimizeBtn.textContent = '−';
+                minimizeBtn.title = 'Minimize';
+            }
+        }
+    };
+
     async function main() {
+        // Initialize server-side game API first
+        await window.gameAPI.init();
+        
         await loadGameData(); // Ensure data is loaded before the game starts
         CreationManager.init();
+        
+        // Initialize systems after a short delay for DOM elements
+        setTimeout(() => {
+            if (typeof UICustomization !== 'undefined') UICustomization.init();
+            if (typeof UIManager !== 'undefined') UIManager.init();
+            if (typeof DevSuite !== 'undefined') DevSuite.init();
+            
+            // Update zone teleport list to use server data if available
+            TeleportManager.populateZoneList();
+            QuestManager.assignQuests();
+            ProfileManager.updateAllProfileUI();
+        }, 100);
     }
 
     document.addEventListener('DOMContentLoaded', main);

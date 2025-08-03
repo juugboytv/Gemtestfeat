@@ -224,22 +224,27 @@
     /* --- END PRESERVED STYLES --- */
 
     #focus-mode-btn {
-        position: absolute;
-        bottom: 8px;
-        right: 8px;
-        width: 32px;
-        height: 32px;
+        position: fixed;
+        bottom: 16px;
+        right: 16px;
+        width: 48px;
+        height: 48px;
         border-radius: 50%;
         background-color: var(--glow-red);
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        border: 2px solid rgba(255, 255, 255, 0.5);
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        transition: background-color 0.2s;
-        z-index: 51; /* Ensures button is above the focused panel */
+        transition: all 0.2s ease;
+        z-index: 9999; /* Ensures button is always visible */
+        box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4);
     }
-    #focus-mode-btn:hover { background-color: #ff4d48; }
+    #focus-mode-btn:hover { 
+        background-color: #ff4d48; 
+        transform: scale(1.1);
+        box-shadow: 0 6px 24px rgba(239, 68, 68, 0.6);
+    }
     #focus-mode-btn svg { width: 18px; height: 18px; stroke: white; stroke-width: 2; }
 
     #monsterSelect {
@@ -766,217 +771,6 @@
     color: var(--text-secondary); /* Grey for system messages */
 }
 
-/* --- REAL-TIME COMBAT ANIMATIONS --- */
-@keyframes attack-flash {
-    0% { background-color: transparent; }
-    50% { background-color: rgba(249, 115, 22, 0.6); }
-    100% { background-color: transparent; }
-}
-
-@keyframes damage-shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-3px); }
-    75% { transform: translateX(3px); }
-}
-
-@keyframes health-pulse {
-    0%, 100% { box-shadow: 0 0 5px rgba(239, 68, 68, 0.5); }
-    50% { box-shadow: 0 0 15px rgba(239, 68, 68, 0.8); }
-}
-
-@keyframes critical-hit {
-    0% { transform: scale(1) rotate(0deg); }
-    25% { transform: scale(1.2) rotate(-5deg); }
-    50% { transform: scale(1.3) rotate(5deg); }
-    75% { transform: scale(1.1) rotate(-2deg); }
-    100% { transform: scale(1) rotate(0deg); }
-}
-
-@keyframes spell-cast {
-    0% { transform: scale(1); box-shadow: 0 0 0 rgba(147, 51, 234, 0.5); }
-    50% { transform: scale(1.1); box-shadow: 0 0 20px rgba(147, 51, 234, 0.8); }
-    100% { transform: scale(1); box-shadow: 0 0 0 rgba(147, 51, 234, 0.5); }
-}
-
-@keyframes enemy-defeat {
-    0% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(1.2); }
-    100% { opacity: 0; transform: scale(0.8); }
-}
-
-@keyframes damage-number {
-    0% { 
-        opacity: 1; 
-        transform: translateY(0) scale(1); 
-    }
-    50% { 
-        opacity: 1; 
-        transform: translateY(-30px) scale(1.2); 
-    }
-    100% { 
-        opacity: 0; 
-        transform: translateY(-60px) scale(0.8); 
-    }
-}
-
-@keyframes hp-bar-change {
-    0% { transform: scaleX(1.05); }
-    100% { transform: scaleX(1); }
-}
-
-@keyframes combat-screen-shake {
-    0%, 100% { transform: translate(0, 0); }
-    10% { transform: translate(-2px, -1px); }
-    20% { transform: translate(2px, 1px); }
-    30% { transform: translate(-1px, 2px); }
-    40% { transform: translate(1px, -2px); }
-    50% { transform: translate(-2px, 1px); }
-    60% { transform: translate(2px, -1px); }
-    70% { transform: translate(-1px, -2px); }
-    80% { transform: translate(1px, 2px); }
-    90% { transform: translate(-2px, -1px); }
-}
-
-.combat-action-attack {
-    animation: attack-flash 0.5s ease-out;
-}
-
-.combat-action-spell {
-    animation: spell-cast 0.8s ease-out;
-}
-
-.combat-damage-shake {
-    animation: damage-shake 0.4s ease-out;
-}
-
-.combat-critical-hit {
-    animation: critical-hit 0.6s ease-out;
-}
-
-.combat-health-warning {
-    animation: health-pulse 1s ease-in-out infinite;
-}
-
-.combat-enemy-defeat {
-    animation: enemy-defeat 1s ease-out forwards;
-}
-
-.combat-hp-bar-animate {
-    animation: hp-bar-change 0.3s ease-out;
-}
-
-.combat-screen-shake {
-    animation: combat-screen-shake 0.5s ease-out;
-}
-
-.damage-number {
-    position: absolute;
-    font-family: 'Orbitron', sans-serif;
-    font-weight: bold;
-    font-size: 1.2rem;
-    pointer-events: none;
-    z-index: 1000;
-    animation: damage-number 1.5s ease-out forwards;
-}
-
-.damage-number.player-damage {
-    color: #00ff00;
-    text-shadow: 0 0 8px #00ff00;
-}
-
-.damage-number.enemy-damage {
-    color: #ff4444;
-    text-shadow: 0 0 8px #ff4444;
-}
-
-.damage-number.critical {
-    color: #ffaa00;
-    text-shadow: 0 0 12px #ffaa00;
-    font-size: 1.5rem;
-}
-
-.damage-number.heal {
-    color: #44ff44;
-    text-shadow: 0 0 8px #44ff44;
-}
-
-/* Combat particle effects */
-.combat-particles {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 999;
-    overflow: hidden;
-}
-
-.particle {
-    position: absolute;
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    pointer-events: none;
-}
-
-.particle.fire {
-    background: radial-gradient(circle, #ff6600, #ff3300);
-    box-shadow: 0 0 6px #ff3300;
-}
-
-.particle.magic {
-    background: radial-gradient(circle, #9333ea, #7c3aed);
-    box-shadow: 0 0 6px #7c3aed;
-}
-
-.particle.blood {
-    background: radial-gradient(circle, #dc2626, #991b1b);
-    box-shadow: 0 0 4px #dc2626;
-}
-
-/* Enhanced combat interface */
-.combat-display {
-    position: relative;
-    overflow: hidden;
-}
-
-.combat-character {
-    transition: all 0.3s ease;
-    position: relative;
-}
-
-.combat-character.attacking {
-    transform: translateX(10px);
-}
-
-.combat-character.damaged {
-    animation: damage-shake 0.4s ease-out;
-}
-
-.monster-hp-container {
-    position: relative;
-    margin: 1rem 0;
-}
-
-.hp-bar-glow {
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    border-radius: inherit;
-    background: linear-gradient(45deg, rgba(239, 68, 68, 0.3), rgba(249, 115, 22, 0.3));
-    filter: blur(4px);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.hp-bar-container.critical .hp-bar-glow {
-    opacity: 1;
-    animation: health-pulse 0.8s ease-in-out infinite;
-}
-
 </style>
 </head>
 <body class="bg-black">
@@ -1465,393 +1259,15 @@
                 "True-Core's Aim": { effect: "Increase Hit", values: [0.75, 1.5, 2.25, 3, 3.75, 4.5, 5.25, 6.25, 7.5] },
             }
         },
-        // ZONE-SPECIFIC MONSTER SYSTEM: Each zone has unique monsters from the GDD
-        ZoneMonsters: {
-            // STARTER ZONES (1-24) - Generic monsters for racial starter zones
-            // Generate starter zone monsters for all 24 zones using the same base monsters
-            ...Array.from({length: 24}, (_, i) => {
-                const zoneId = i + 1;
-                return [zoneId, [
-                    { id: `z${zoneId}_e01`, name: 'StartZone Monster 1', baseHp: 25, baseAttack: 10, baseAC: 13, baseXP: 15, baseGold: 3 },
-                    { id: `z${zoneId}_e02`, name: 'StartZone Monster 2', baseHp: 28, baseAttack: 11, baseAC: 14, baseXP: 16, baseGold: 3 },
-                    { id: `z${zoneId}_e03`, name: 'StartZone Monster 3', baseHp: 31, baseAttack: 12, baseAC: 15, baseXP: 18, baseGold: 4 },
-                    { id: `z${zoneId}_e04`, name: 'StartZone Monster 4', baseHp: 34, baseAttack: 13, baseAC: 16, baseXP: 20, baseGold: 4 },
-                    { id: `z${zoneId}_e05`, name: 'StartZone Monster 5', baseHp: 37, baseAttack: 14, baseAC: 17, baseXP: 22, baseGold: 5 },
-                    { id: `z${zoneId}_e06`, name: 'StartZone Monster 6', baseHp: 41, baseAttack: 15, baseAC: 18, baseXP: 25, baseGold: 5 },
-                    { id: `z${zoneId}_e07`, name: 'StartZone Monster 7', baseHp: 45, baseAttack: 16, baseAC: 20, baseXP: 28, baseGold: 6 },
-                    { id: `z${zoneId}_e08`, name: 'StartZone Monster 8', baseHp: 49, baseAttack: 17, baseAC: 21, baseXP: 31, baseGold: 6 },
-                    { id: `z${zoneId}_e09`, name: 'StartZone Monster 9', baseHp: 54, baseAttack: 18, baseAC: 23, baseXP: 35, baseGold: 7 },
-                    { id: `z${zoneId}_e10`, name: 'StartZone Monster 10', baseHp: 59, baseAttack: 19, baseAC: 25, baseXP: 39, baseGold: 8 },
-                    { id: `z${zoneId}_boss`, name: 'StartZone Boss (24h Bonus)', baseHp: 60, baseAttack: 20, baseAC: 25, baseXP: 100, baseGold: 20, isBoss: true }
-                ]];
-            }).reduce((obj, [key, value]) => ({ ...obj, [key]: value }), {}),
-            
-            // ADVANCED ZONES (25-101) - All unique monsters from formatted zone data
-            25: [
-                { id: 'z25_e01', name: 'Shrieker', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
-                { id: 'z25_e02', name: 'Rocklurker', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
-                { id: 'z25_e03', name: 'Deep Crawler', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
-                { id: 'z25_e04', name: 'Echo Bat', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
-                { id: 'z25_e05', name: 'Chasm Worm', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
-                { id: 'z25_e06', name: 'Gloom Elemental', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
-                { id: 'z25_e07', name: 'Pit Spider', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
-                { id: 'z25_e08', name: 'Stone Sentinel', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
-                { id: 'z25_e09', name: 'Whisper Wraith', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
-                { id: 'z25_e10', name: 'Abyss Stalker', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
-                { id: 'z25_boss', name: 'Abyss Stalker - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
-            ],
-            26: [
-                { id: 'z26_e01', name: 'Sand Serpent', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
-                { id: 'z26_e02', name: 'Dune Strider', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
-                { id: 'z26_e03', name: 'Ember Scorpion', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
-                { id: 'z26_e04', name: 'Sun Golem', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
-                { id: 'z26_e05', name: 'Desert Drifter', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
-                { id: 'z26_e06', name: 'Dust Devil', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
-                { id: 'z26_e07', name: 'Meteorite Beetle', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
-                { id: 'z26_e08', name: 'Oasis Bandit', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
-                { id: 'z26_e09', name: 'Starfall Sprite', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
-                { id: 'z26_e10', name: 'Nomad Hunter', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
-                { id: 'z26_boss', name: 'Nomad Hunter - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
-            ],
-            27: [
-                { id: 'z27_e01', name: 'Bog Lurker', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
-                { id: 'z27_e02', name: 'Mire Slime', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
-                { id: 'z27_e03', name: 'Fen Strangler', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
-                { id: 'z27_e04', name: 'Murk Creeper', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
-                { id: 'z27_e05', name: 'Gloom Toad', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
-                { id: 'z27_e06', name: 'Moss Golem', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
-                { id: 'z27_e07', name: 'Swamp Serpent', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
-                { id: 'z27_e08', name: 'Water Hag', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
-                { id: 'z27_e09', name: 'Spore Cloud', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
-                { id: 'z27_e10', name: 'Reed Ambusher', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
-                { id: 'z27_boss', name: 'Reed Ambusher - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
-            ],
-            28: [
-                { id: 'z28_e01', name: 'Ice Drake', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
-                { id: 'z28_e02', name: 'Frost Elemental', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
-                { id: 'z28_e03', name: 'Glacier Yeti', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
-                { id: 'z28_e04', name: 'Snow Harpy', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
-                { id: 'z28_e05', name: 'Crystal Golem', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
-                { id: 'z28_e06', name: 'Blizzard Wight', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
-                { id: 'z28_e07', name: 'Rime Wolf', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
-                { id: 'z28_e08', name: 'Spire Guard', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
-                { id: 'z28_e09', name: 'Avalanche Beast', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
-                { id: 'z28_e10', name: 'Ice Construct', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
-                { id: 'z28_boss', name: 'Ice Construct - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
-            ],
-            29: [
-                { id: 'z29_e01', name: 'Stone Giant', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
-                { id: 'z29_e02', name: 'Earth Elemental', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
-                { id: 'z29_e03', name: 'Grotto Spider', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
-                { id: 'z29_e04', name: 'Mountain Ape', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
-                { id: 'z29_e05', name: 'Crystal Shardling', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
-                { id: 'z29_e06', name: 'Geomancer', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
-                { id: 'z29_e07', name: 'Deep Burrower', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
-                { id: 'z29_e08', name: 'Peak Harpy', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
-                { id: 'z29_e09', name: 'Basalt Ogre', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
-                { id: 'z29_e10', name: 'Vine Strangler', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
-                { id: 'z29_boss', name: 'Vine Strangler - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
-            ],
-            30: [
-                { id: 'z30_e01', name: 'Time Aberration', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
-                { id: 'z30_e02', name: 'Chrono Beetle', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
-                { id: 'z30_e03', name: 'Echo Spirit', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
-                { id: 'z30_e04', name: 'Temporal Worm', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
-                { id: 'z30_e05', name: 'Paradox Hound', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
-                { id: 'z30_e06', name: 'Rewind Wraith', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
-                { id: 'z30_e07', name: 'Flicker Drone', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
-                { id: 'z30_e08', name: 'Quantum Serpent', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
-                { id: 'z30_e09', name: 'Future Scavenger', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
-                { id: 'z30_e10', name: 'Past Echo', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
-                { id: 'z30_boss', name: 'Past Echo - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
-            ],
-            31: [
-                { id: 'z31_e01', name: 'Gale Elemental', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
-                { id: 'z31_e02', name: 'Cloud Serpent', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
-                { id: 'z31_e03', name: 'Wind Harpy', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
-                { id: 'z31_e04', name: 'Peak Lynx', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
-                { id: 'z31_e05', name: 'Echo Hawk', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
-                { id: 'z31_e06', name: 'Air Sprite', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
-                { id: 'z31_e07', name: 'Cliff Guardian', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
-                { id: 'z31_e08', name: 'Howling Beast', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
-                { id: 'z31_e09', name: 'Summit Yeti', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
-                { id: 'z31_e10', name: 'Gust Weaver', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
-                { id: 'z31_boss', name: 'Gust Weaver - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
-            ],
-            32: [
-                { id: 'z32_e01', name: 'Blight Creeper', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
-                { id: 'z32_e02', name: 'Venom Spider', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
-                { id: 'z32_e03', name: 'Acid Slug', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
-                { id: 'z32_e04', name: 'Mire Serpent', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
-                { id: 'z32_e05', name: 'Thorn Ogre', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
-                { id: 'z32_e06', name: 'Shadow Panther', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
-                { id: 'z32_e07', name: 'Spore Beast', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
-                { id: 'z32_e08', name: 'Rotting Zombie', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
-                { id: 'z32_e09', name: 'Corrupt Elemental', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
-                { id: 'z32_e10', name: 'Jungle Brute', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
-                { id: 'z32_boss', name: 'Jungle Brute - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
-            ],
-            33: [
-                { id: 'z33_e01', name: 'Acid Slime', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
-                { id: 'z33_e02', name: 'Caustic Crab', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
-                { id: 'z33_e03', name: 'Fume Stalker', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
-                { id: 'z33_e04', name: 'Fen Lurker', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
-                { id: 'z33_e05', name: 'Toxic Toad', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
-                { id: 'z33_e06', name: 'Corroder Beetle', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
-                { id: 'z33_e07', name: 'Melted Horror', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
-                { id: 'z33_e08', name: 'Sulfuric Elemental', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
-                { id: 'z33_e09', name: 'Bile Serpent', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
-                { id: 'z33_e10', name: 'Corrupt Shambler', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
-                { id: 'z33_boss', name: 'Corrupt Shambler - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
-            ],
-            34: [
-                { id: 'z34_e01', name: 'Bone Construct', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
-                { id: 'z34_e02', name: 'Skeleton Warrior', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
-                { id: 'z34_e03', name: 'Ghoul Scavenger', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
-                { id: 'z34_e04', name: 'Dust Wraith', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
-                { id: 'z34_e05', name: 'Sand Shrieker', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
-                { id: 'z34_e06', name: 'Carrion Crawler', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
-                { id: 'z34_e07', name: 'Fossil Golem', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
-                { id: 'z34_e08', name: 'Necro Serpent', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
-                { id: 'z34_e09', name: 'Boneyard Ogre', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
-                { id: 'z34_e10', name: 'Skull Spider', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
-                { id: 'z34_boss', name: 'Skull Spider - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
-            ],
-            35: [
-                { id: 'z35_e01', name: 'Gullet Beast', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
-                { id: 'z35_e02', name: 'Maw Worm', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
-                { id: 'z35_e03', name: 'Teeth Construct', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
-                { id: 'z35_e04', name: 'Digestion Slime', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
-                { id: 'z35_e05', name: 'Voracious Horror', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
-                { id: 'z35_e06', name: 'Throat Lurker', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
-                { id: 'z35_e07', name: 'Bile Ogre', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
-                { id: 'z35_e08', name: 'Acid Dripper', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
-                { id: 'z35_e09', name: 'Stomach Dweller', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
-                { id: 'z35_e10', name: 'Inner Demon', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
-                { id: 'z35_boss', name: 'Inner Demon - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
-            ],
-            36: [
-                { id: 'z36_e01', name: 'Toxi-Fairy', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
-                { id: 'z36_e02', name: 'Venom Blossom', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
-                { id: 'z36_e03', name: 'Nectar Slime', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
-                { id: 'z36_e04', name: 'Pollen Sprite', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
-                { id: 'z36_e05', name: 'Poison Bee', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
-                { id: 'z36_e06', name: 'Bloom Lurker', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
-                { id: 'z36_e07', name: 'Stinger Mantis', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
-                { id: 'z36_e08', name: 'Noxious Moth', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
-                { id: 'z36_e09', name: 'Thorn Creeper', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
-                { id: 'z36_e10', name: 'Soporific Cloud', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
-                { id: 'z36_boss', name: 'Soporific Cloud - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
-            ],
-            37: [
-                { id: 'z37_e01', name: 'Tempest Elemental', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
-                { id: 'z37_e02', name: 'Gale Serpent', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
-                { id: 'z37_e03', name: 'Wave Lurker', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
-                { id: 'z37_e04', name: 'Thunder Drake', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
-                { id: 'z37_e05', name: 'Lightning Spirit', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
-                { id: 'z37_e06', name: 'Shore Strider', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
-                { id: 'z37_e07', name: 'Sea Brute', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
-                { id: 'z37_e08', name: 'Mist Horror', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
-                { id: 'z37_e09', name: 'Coastal Predator', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
-                { id: 'z37_e10', name: 'Reef Guardian', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
-                { id: 'z37_boss', name: 'Reef Guardian - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
-            ],
-            38: [
-                { id: 'z38_e01', name: 'Rust Golem', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
-                { id: 'z38_e02', name: 'Corroded Automaton', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
-                { id: 'z38_e03', name: 'Scrap Scavenger', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
-                { id: 'z38_e04', name: 'Acidic Drone', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
-                { id: 'z38_e05', name: 'Metal Slime', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
-                { id: 'z38_e06', name: 'Gear Hound', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
-                { id: 'z38_e07', name: 'Oxide Lurker', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
-                { id: 'z38_e08', name: 'Rusted Knight', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
-                { id: 'z38_e09', name: 'Filament Horror', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
-                { id: 'z38_e10', name: 'Decay Spitter', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
-                { id: 'z38_boss', name: 'Decay Spitter - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
-            ],
-            39: [
-                { id: 'z39_e01', name: 'Giant Spider', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
-                { id: 'z39_e02', name: 'Silk Creeper', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
-                { id: 'z39_e03', name: 'Venom Sac', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
-                { id: 'z39_e04', name: 'Webspinner', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
-                { id: 'z39_e05', name: 'Cave Crawler', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
-                { id: 'z39_e06', name: 'Egg Cluster', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
-                { id: 'z39_e07', name: 'Shadow Weaver', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
-                { id: 'z39_e08', name: 'Brood Matron', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
-                { id: 'z39_e09', name: 'Cocoon Horror', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
-                { id: 'z39_e10', name: 'Chitin Brute', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
-                { id: 'z39_boss', name: 'Chitin Brute - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
-            ],
-            
-            // Continue implementing zones 40-101 with exact monster names from GDD
-            40: [
-                { id: 'z40_e01', name: 'Barb Thorn', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
-                { id: 'z40_e02', name: 'Crimson Creeper', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
-                { id: 'z40_e03', name: 'Blood Rose', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
-                { id: 'z40_e04', name: 'Thorn Beast', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
-                { id: 'z40_e05', name: 'Spiked Crawler', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
-                { id: 'z40_e06', name: 'Rose Guardian', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
-                { id: 'z40_e07', name: 'Razor Petal', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
-                { id: 'z40_e08', name: 'Bloody Vine', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
-                { id: 'z40_e09', name: 'Prickle Horror', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
-                { id: 'z40_e10', name: 'Bramble King', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
-                { id: 'z40_boss', name: 'Bramble King - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
-            ],
-            
-            50: [
-                { id: 'z50_e01', name: 'Coral Serpent', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
-                { id: 'z50_e02', name: 'Abyssal Guardian', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
-                { id: 'z50_e03', name: 'Drowned Citizen', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
-                { id: 'z50_e04', name: 'Spire Fish', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
-                { id: 'z50_e05', name: 'Kelp Lurker', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
-                { id: 'z50_e06', name: 'Tide Elemental', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
-                { id: 'z50_e07', name: 'Ruin Scavenger', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
-                { id: 'z50_e08', name: 'Pressure Horror', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
-                { id: 'z50_e09', name: 'Deep Crab', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
-                { id: 'z50_e10', name: 'Manta Ray', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
-                { id: 'z50_boss', name: 'Manta Ray - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
-            ],
-            
-            75: [
-                { id: 'z75_e01', name: 'Void Abomination', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
-                { id: 'z75_e02', name: 'Shadow Spawn', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
-                { id: 'z75_e03', name: 'Null Elemental', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
-                { id: 'z75_e04', name: 'Rift Horror', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
-                { id: 'z75_e05', name: 'Gravity Anomaly', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
-                { id: 'z75_e06', name: 'Echo of Nothing', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
-                { id: 'z75_e07', name: 'Devouring Swarm', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
-                { id: 'z75_e08', name: 'Dark Matter Beast', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
-                { id: 'z75_e09', name: 'Dimension Shifter', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
-                { id: 'z75_e10', name: 'Soul Eater', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
-                { id: 'z75_boss', name: 'Soul Eater - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
-            ],
-            
-            101: [
-                { id: 'z101_e01', name: 'Echo Titan', baseHp: 185, baseAttack: 93, baseAC: 123, baseXP: 1500, baseGold: 300 },
-                { id: 'z101_e02', name: 'Soul Shepherd', baseHp: 204, baseAttack: 102, baseAC: 135, baseXP: 1650, baseGold: 330 },
-                { id: 'z101_e03', name: 'Gorge Specter', baseHp: 224, baseAttack: 112, baseAC: 149, baseXP: 1815, baseGold: 363 },
-                { id: 'z101_e04', name: 'Void Wraith', baseHp: 246, baseAttack: 123, baseAC: 164, baseXP: 1997, baseGold: 399 },
-                { id: 'z101_e05', name: 'Lost Memoria', baseHp: 271, baseAttack: 135, baseAC: 180, baseXP: 2196, baseGold: 439 },
-                { id: 'z101_e06', name: 'Chasm Phantom', baseHp: 298, baseAttack: 149, baseAC: 198, baseXP: 2416, baseGold: 483 },
-                { id: 'z101_e07', name: 'Soul Devourer', baseHp: 328, baseAttack: 164, baseAC: 218, baseXP: 2657, baseGold: 531 },
-                { id: 'z101_e08', name: 'Echo Guardian', baseHp: 361, baseAttack: 180, baseAC: 240, baseXP: 2923, baseGold: 585 },
-                { id: 'z101_e09', name: 'Dimensional Rift', baseHp: 397, baseAttack: 198, baseAC: 264, baseXP: 3215, baseGold: 643 },
-                { id: 'z101_e10', name: 'Terminus Beast', baseHp: 433, baseAttack: 216, baseAC: 288, baseXP: 3507, baseGold: 701 },
-                { id: 'z101_boss', name: 'Terminus Beast - Boss', baseHp: 437, baseAttack: 218, baseAC: 290, baseXP: 10000, baseGold: 2000, isBoss: true }
-            ]
-        },
-        
-        // Legacy biome system maintained for backward compatibility with starter zones
         Monsters: {
-            mountain: [
-                { id: 'fr_e02', name: 'StartZone Monster 2', baseHp: 28, baseAttack: 11, baseAC: 14, baseXP: 16, baseGold: 3 },
-                { id: 'fr_e03', name: 'StartZone Monster 3', baseHp: 31, baseAttack: 12, baseAC: 15, baseXP: 18, baseGold: 4 },
-                { id: 'fr_e04', name: 'StartZone Monster 4', baseHp: 34, baseAttack: 13, baseAC: 16, baseXP: 20, baseGold: 4 },
-                { id: 'fr_e05', name: 'StartZone Monster 5', baseHp: 37, baseAttack: 14, baseAC: 17, baseXP: 22, baseGold: 5 },
-                { id: 'fr_e06', name: 'StartZone Monster 6', baseHp: 41, baseAttack: 15, baseAC: 18, baseXP: 25, baseGold: 5 },
-                { id: 'fr_e07', name: 'StartZone Monster 7', baseHp: 45, baseAttack: 16, baseAC: 20, baseXP: 28, baseGold: 6 },
-                { id: 'fr_e08', name: 'StartZone Monster 8', baseHp: 49, baseAttack: 17, baseAC: 21, baseXP: 31, baseGold: 6 },
-                { id: 'fr_e09', name: 'StartZone Monster 9', baseHp: 54, baseAttack: 18, baseAC: 23, baseXP: 35, baseGold: 7 },
-                { id: 'fr_e10', name: 'StartZone Monster 10', baseHp: 59, baseAttack: 19, baseAC: 25, baseXP: 39, baseGold: 8 },
-                // Boss Monster (E10*)
-                { id: 'fr_boss', name: 'StartZone Boss (24h Bonus)', baseHp: 60, baseAttack: 20, baseAC: 25, baseXP: 100, baseGold: 20, isBoss: true }
-            ],
-            // PLAINS BIOME MONSTERS - For Shifting Maze, Steppe
-            plains: [
-                // Regular Monsters (E01-E10)
-                { id: 'pl_e01', name: 'StartZone Monster 1', baseHp: 25, baseAttack: 10, baseAC: 13, baseXP: 15, baseGold: 3 },
-                { id: 'pl_e02', name: 'StartZone Monster 2', baseHp: 28, baseAttack: 11, baseAC: 14, baseXP: 16, baseGold: 3 },
-                { id: 'pl_e03', name: 'StartZone Monster 3', baseHp: 31, baseAttack: 12, baseAC: 15, baseXP: 18, baseGold: 4 },
-                { id: 'pl_e04', name: 'StartZone Monster 4', baseHp: 34, baseAttack: 13, baseAC: 16, baseXP: 20, baseGold: 4 },
-                { id: 'pl_e05', name: 'StartZone Monster 5', baseHp: 37, baseAttack: 14, baseAC: 17, baseXP: 22, baseGold: 5 },
-                { id: 'pl_e06', name: 'StartZone Monster 6', baseHp: 41, baseAttack: 15, baseAC: 18, baseXP: 25, baseGold: 5 },
-                { id: 'pl_e07', name: 'StartZone Monster 7', baseHp: 45, baseAttack: 16, baseAC: 20, baseXP: 28, baseGold: 6 },
-                { id: 'pl_e08', name: 'StartZone Monster 8', baseHp: 49, baseAttack: 17, baseAC: 21, baseXP: 31, baseGold: 6 },
-                { id: 'pl_e09', name: 'StartZone Monster 9', baseHp: 54, baseAttack: 18, baseAC: 23, baseXP: 35, baseGold: 7 },
-                { id: 'pl_e10', name: 'StartZone Monster 10', baseHp: 59, baseAttack: 19, baseAC: 25, baseXP: 39, baseGold: 8 },
-                // Boss Monster (E10*)
-                { id: 'pl_boss', name: 'StartZone Boss (24h Bonus)', baseHp: 60, baseAttack: 20, baseAC: 25, baseXP: 100, baseGold: 20, isBoss: true }
-            ],
-            // WASTES BIOME MONSTERS - For Arid Badlands, Blazefire Wastes, Cinder Barrens, Blazefire Forge
-            wastes: [
-                // Regular Monsters (E01-E10)
-                { id: 'ws_e01', name: 'StartZone Monster 1', baseHp: 25, baseAttack: 10, baseAC: 13, baseXP: 15, baseGold: 3 },
-                { id: 'ws_e02', name: 'StartZone Monster 2', baseHp: 28, baseAttack: 11, baseAC: 14, baseXP: 16, baseGold: 3 },
-                { id: 'ws_e03', name: 'StartZone Monster 3', baseHp: 31, baseAttack: 12, baseAC: 15, baseXP: 18, baseGold: 4 },
-                { id: 'ws_e04', name: 'StartZone Monster 4', baseHp: 34, baseAttack: 13, baseAC: 16, baseXP: 20, baseGold: 4 },
-                { id: 'ws_e05', name: 'StartZone Monster 5', baseHp: 37, baseAttack: 14, baseAC: 17, baseXP: 22, baseGold: 5 },
-                { id: 'ws_e06', name: 'StartZone Monster 6', baseHp: 41, baseAttack: 15, baseAC: 18, baseXP: 25, baseGold: 5 },
-                { id: 'ws_e07', name: 'StartZone Monster 7', baseHp: 45, baseAttack: 16, baseAC: 20, baseXP: 28, baseGold: 6 },
-                { id: 'ws_e08', name: 'StartZone Monster 8', baseHp: 49, baseAttack: 17, baseAC: 21, baseXP: 31, baseGold: 6 },
-                { id: 'ws_e09', name: 'StartZone Monster 9', baseHp: 54, baseAttack: 18, baseAC: 23, baseXP: 35, baseGold: 7 },
-                { id: 'ws_e10', name: 'StartZone Monster 10', baseHp: 59, baseAttack: 19, baseAC: 25, baseXP: 39, baseGold: 8 },
-                // Boss Monster (E10*)
-                { id: 'ws_boss', name: 'StartZone Boss (24h Bonus)', baseHp: 60, baseAttack: 20, baseAC: 25, baseXP: 100, baseGold: 20, isBoss: true }
-            ],
-            // SWAMP BIOME MONSTERS - For Abyssal Fen, Swamps
-            swamp: [
-                // Regular Monsters (E01-E10)
-                { id: 'sw_e01', name: 'StartZone Monster 1', baseHp: 25, baseAttack: 10, baseAC: 13, baseXP: 15, baseGold: 3 },
-                { id: 'sw_e02', name: 'StartZone Monster 2', baseHp: 28, baseAttack: 11, baseAC: 14, baseXP: 16, baseGold: 3 },
-                { id: 'sw_e03', name: 'StartZone Monster 3', baseHp: 31, baseAttack: 12, baseAC: 15, baseXP: 18, baseGold: 4 },
-                { id: 'sw_e04', name: 'StartZone Monster 4', baseHp: 34, baseAttack: 13, baseAC: 16, baseXP: 20, baseGold: 4 },
-                { id: 'sw_e05', name: 'StartZone Monster 5', baseHp: 37, baseAttack: 14, baseAC: 17, baseXP: 22, baseGold: 5 },
-                { id: 'sw_e06', name: 'StartZone Monster 6', baseHp: 41, baseAttack: 15, baseAC: 18, baseXP: 25, baseGold: 5 },
-                { id: 'sw_e07', name: 'StartZone Monster 7', baseHp: 45, baseAttack: 16, baseAC: 20, baseXP: 28, baseGold: 6 },
-                { id: 'sw_e08', name: 'StartZone Monster 8', baseHp: 49, baseAttack: 17, baseAC: 21, baseXP: 31, baseGold: 6 },
-                { id: 'sw_e09', name: 'StartZone Monster 9', baseHp: 54, baseAttack: 18, baseAC: 23, baseXP: 35, baseGold: 7 },
-                { id: 'sw_e10', name: 'StartZone Monster 10', baseHp: 59, baseAttack: 19, baseAC: 25, baseXP: 39, baseGold: 8 },
-                // Boss Monster (E10*)
-                { id: 'sw_boss', name: 'StartZone Boss (24h Bonus)', baseHp: 60, baseAttack: 20, baseAC: 25, baseXP: 100, baseGold: 20, isBoss: true }
-            ],
-            // JUNGLE BIOME MONSTERS - For Labyrinth, Corrupted Jungle
-            jungle: [
-                // Regular Monsters (E01-E10)
-                { id: 'jg_e01', name: 'StartZone Monster 1', baseHp: 25, baseAttack: 10, baseAC: 13, baseXP: 15, baseGold: 3 },
-                { id: 'jg_e02', name: 'StartZone Monster 2', baseHp: 28, baseAttack: 11, baseAC: 14, baseXP: 16, baseGold: 3 },
-                { id: 'jg_e03', name: 'StartZone Monster 3', baseHp: 31, baseAttack: 12, baseAC: 15, baseXP: 18, baseGold: 4 },
-                { id: 'jg_e04', name: 'StartZone Monster 4', baseHp: 34, baseAttack: 13, baseAC: 16, baseXP: 20, baseGold: 4 },
-                { id: 'jg_e05', name: 'StartZone Monster 5', baseHp: 37, baseAttack: 14, baseAC: 17, baseXP: 22, baseGold: 5 },
-                { id: 'jg_e06', name: 'StartZone Monster 6', baseHp: 41, baseAttack: 15, baseAC: 18, baseXP: 25, baseGold: 5 },
-                { id: 'jg_e07', name: 'StartZone Monster 7', baseHp: 45, baseAttack: 16, baseAC: 20, baseXP: 28, baseGold: 6 },
-                { id: 'jg_e08', name: 'StartZone Monster 8', baseHp: 49, baseAttack: 17, baseAC: 21, baseXP: 31, baseGold: 6 },
-                { id: 'jg_e09', name: 'StartZone Monster 9', baseHp: 54, baseAttack: 18, baseAC: 23, baseXP: 35, baseGold: 7 },
-                { id: 'jg_e10', name: 'StartZone Monster 10', baseHp: 59, baseAttack: 19, baseAC: 25, baseXP: 39, baseGold: 8 },
-                // Boss Monster (E10*)
-                { id: 'jg_boss', name: 'StartZone Boss (24h Bonus)', baseHp: 60, baseAttack: 20, baseAC: 25, baseXP: 100, baseGold: 20, isBoss: true }
-            ],
-            // TUNDRA BIOME MONSTERS - For Gravefrost Peaks
-            tundra: [
-                // Regular Monsters (E01-E10)
-                { id: 'td_e01', name: 'StartZone Monster 1', baseHp: 25, baseAttack: 10, baseAC: 13, baseXP: 15, baseGold: 3 },
-                { id: 'td_e02', name: 'StartZone Monster 2', baseHp: 28, baseAttack: 11, baseAC: 14, baseXP: 16, baseGold: 3 },
-                { id: 'td_e03', name: 'StartZone Monster 3', baseHp: 31, baseAttack: 12, baseAC: 15, baseXP: 18, baseGold: 4 },
-                { id: 'td_e04', name: 'StartZone Monster 4', baseHp: 34, baseAttack: 13, baseAC: 16, baseXP: 20, baseGold: 4 },
-                { id: 'td_e05', name: 'StartZone Monster 5', baseHp: 37, baseAttack: 14, baseAC: 17, baseXP: 22, baseGold: 5 },
-                { id: 'td_e06', name: 'StartZone Monster 6', baseHp: 41, baseAttack: 15, baseAC: 18, baseXP: 25, baseGold: 5 },
-                { id: 'td_e07', name: 'StartZone Monster 7', baseHp: 45, baseAttack: 16, baseAC: 20, baseXP: 28, baseGold: 6 },
-                { id: 'td_e08', name: 'StartZone Monster 8', baseHp: 49, baseAttack: 17, baseAC: 21, baseXP: 31, baseGold: 6 },
-                { id: 'td_e09', name: 'StartZone Monster 9', baseHp: 54, baseAttack: 18, baseAC: 23, baseXP: 35, baseGold: 7 },
-                { id: 'td_e10', name: 'StartZone Monster 10', baseHp: 59, baseAttack: 19, baseAC: 25, baseXP: 39, baseGold: 8 },
-                // Boss Monster (E10*)
-                { id: 'td_boss', name: 'StartZone Boss (24h Bonus)', baseHp: 60, baseAttack: 20, baseAC: 25, baseXP: 100, baseGold: 20, isBoss: true }
-            ],
-            // COASTAL BIOME MONSTERS - For Sunken City of Atla, Sunken City of Eldoria
-            coastal: [
-                // Regular Monsters (E01-E10)
-                { id: 'ct_e01', name: 'StartZone Monster 1', baseHp: 25, baseAttack: 10, baseAC: 13, baseXP: 15, baseGold: 3 },
-                { id: 'ct_e02', name: 'StartZone Monster 2', baseHp: 28, baseAttack: 11, baseAC: 14, baseXP: 16, baseGold: 3 },
-                { id: 'ct_e03', name: 'StartZone Monster 3', baseHp: 31, baseAttack: 12, baseAC: 15, baseXP: 18, baseGold: 4 },
-                { id: 'ct_e04', name: 'StartZone Monster 4', baseHp: 34, baseAttack: 13, baseAC: 16, baseXP: 20, baseGold: 4 },
-                { id: 'ct_e05', name: 'StartZone Monster 5', baseHp: 37, baseAttack: 14, baseAC: 17, baseXP: 22, baseGold: 5 },
-                { id: 'ct_e06', name: 'StartZone Monster 6', baseHp: 41, baseAttack: 15, baseAC: 18, baseXP: 25, baseGold: 5 },
-                { id: 'ct_e07', name: 'StartZone Monster 7', baseHp: 45, baseAttack: 16, baseAC: 20, baseXP: 28, baseGold: 6 },
-                { id: 'ct_e08', name: 'StartZone Monster 8', baseHp: 49, baseAttack: 17, baseAC: 21, baseXP: 31, baseGold: 6 },
-                { id: 'ct_e09', name: 'StartZone Monster 9', baseHp: 54, baseAttack: 18, baseAC: 23, baseXP: 35, baseGold: 7 },
-                { id: 'ct_e10', name: 'StartZone Monster 10', baseHp: 59, baseAttack: 19, baseAC: 25, baseXP: 39, baseGold: 8 },
-                // Boss Monster (E10*)
-                { id: 'ct_boss', name: 'StartZone Boss (24h Bonus)', baseHp: 60, baseAttack: 20, baseAC: 25, baseXP: 100, baseGold: 20, isBoss: true }
-            ]
+            mountain: [ { id: 'm_goblin', name: 'Mountain Goblin', baseHp: 25, baseAttack: 10, baseAC: 13, baseXP: 15, baseGold: 3 }, { id: 'm_troll', name: 'Rock Troll', baseHp: 54, baseAttack: 18, baseAC: 23, baseXP: 35, baseGold: 7 }, ],
+            forest: [ { id: 'f_spider', name: 'Forest Spider', baseHp: 25, baseAttack: 10, baseAC: 13, baseXP: 15, baseGold: 3 }, { id: 'f_wolf', name: 'Dire Wolf', baseHp: 54, baseAttack: 18, baseAC: 23, baseXP: 35, baseGold: 7 }, ],
+            plains: [ { id: 'p_bandit', name: 'Plains Bandit', baseHp: 25, baseAttack: 10, baseAC: 13, baseXP: 15, baseGold: 3 } ],
+            wastes: [ { id: 'w_scorpion', name: 'Giant Scorpion', baseHp: 25, baseAttack: 10, baseAC: 13, baseXP: 15, baseGold: 3 } ],
+            swamp: [ { id: 's_leech', name: 'Bloated Leech', baseHp: 25, baseAttack: 10, baseAC: 13, baseXP: 15, baseGold: 3 } ],
+            jungle: [ { id: 'j_panther', name: 'Shadow Panther', baseHp: 25, baseAttack: 10, baseAC: 13, baseXP: 15, baseGold: 3 } ],
+            tundra: [ { id: 't_yeti', name: 'Tundra Yeti', baseHp: 25, baseAttack: 10, baseAC: 13, baseXP: 15, baseGold: 3 } ],
+            coastal: [ { id: 'c_crab', name: 'Armored Crab', baseHp: 25, baseAttack: 10, baseAC: 13, baseXP: 15, baseGold: 3 } ],
         },
         SpecialMonsterTitles: {
             // Tier 1 (Normal Rarity), Base Spawn Chance: 1 in 250
@@ -2332,6 +1748,7 @@ const EquipmentManager = {
         'Armory': ['Helmet', 'Armor', 'Leggings', 'Boots', 'Gauntlets'],
         'Jewelry Box': ['Amulet', 'Ring'],
         'Spell Satchel': ['Spellbook'],
+        'Gem Pouch': ['Gem'],
     },
 
     init() {
@@ -2346,6 +1763,10 @@ const EquipmentManager = {
 
     renderEquipmentTab() {
         ui.tabContentEquipment.innerHTML = `
+            <div class="flex gap-2 mb-2">
+                <button class="glass-button flex-1 py-1 text-sm rounded-md active" data-view="equipment">Equipment</button>
+                <button class="glass-button flex-1 py-1 text-sm rounded-md" data-view="socket">Socket</button>
+            </div>
             <div id="equipment-view-content"></div>
         `;
     },
@@ -2465,6 +1886,7 @@ const EquipmentManager = {
     populateFilterOptions() {
         const categorySelect = document.getElementById('inventory-filter-category-select');
         let categories = ['All', ...Object.keys(this.inventoryBags)];
+        console.log('EquipmentManager inventoryBags categories:', categories);
         categorySelect.innerHTML = categories.map(c => `<option value="${c}">${c}</option>`).join('');
 
         const tierSelect = document.getElementById('inventory-filter-tier-select');
@@ -2914,7 +2336,7 @@ const EquipmentManager = {
     }, 
     render() { 
         ui.tabContentCombat.innerHTML = ` 
-            <div class="space-y-4 flex flex-col items-center h-full combat-display"> 
+            <div class="space-y-4 flex flex-col items-center h-full"> 
                 <div id="combat-info-panel" class="w-full p-2 rounded-lg bg-black/20 border border-[var(--border-color-main)]">
                     <div id="combat-stats-container">
                         <div class="location-info">
@@ -2939,21 +2361,19 @@ const EquipmentManager = {
                 </div> 
                 <div class="flex-grow w-full flex flex-col space-y-3"> 
                     <select id="monsterSelect" class="w-full"></select> 
-                    <div id="monster-info" class="text-center invisible min-h-[60px] combat-character"> 
-                        <div id="enemy-defeated-msg" style="display: none;" class="text-green-400 font-bold text-xl mb-2">⚡ ENEMY DEFEATED ⚡</div>
-                        <h3 id="monster-name" class="font-orbitron text-lg text-red-400"></h3> 
-                        <div class="monster-hp-container">
-                            <div class="progress-bar-track h-4 mt-2 w-full max-w-xs mx-auto hp-bar-container">
-                                <div id="monster-hp-bar" class="progress-bar-fill h-full" style="width: 100%; background-color: var(--hp-color);"></div>
-                            </div>
+                    <div id="monster-info" class="text-center invisible min-h-[60px]"> 
+                        <div id="enemy-defeated-msg">ENEMY DEFEATED</div>
+                        <h3 id="monster-name" class="font-orbitron text-lg"></h3> 
+                        <div class="progress-bar-track h-4 mt-2 w-full max-w-xs mx-auto">
+                            <div id="monster-hp-bar" class="progress-bar-fill h-full" style="width: 100%; background-color: var(--hp-color);"></div>
                         </div>
                         <div id="monster-hp-text" class="text-sm mt-1"></div> 
                     </div> 
                     <div id="scrolling-combat-log-container" class="flex-grow"></div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-auto"> 
-                        <button class="glass-button py-2 rounded-md combat-character" id="engageBtn" disabled>🎯 ENGAGE</button> 
-                        <button class="glass-button py-2 rounded-md combat-character" id="attackBtn" disabled>⚔️ ATTACK</button> 
-                        <button class="glass-button py-2 rounded-md combat-character" id="castBtn" disabled style="display: none;">🔮 CAST</button> 
+                        <button class="glass-button py-2 rounded-md" id="engageBtn" disabled>🎯 ENGAGE</button> 
+                        <button class="glass-button py-2 rounded-md" id="attackBtn" disabled>⚔️ ATTACK</button> 
+                        <button class="glass-button py-2 rounded-md" id="castBtn" disabled style="display: none;">🔮 CAST</button> 
                     </div> 
                 </div> 
             </div>`; 
@@ -2979,27 +2399,17 @@ const EquipmentManager = {
     populateMonsterList(zoneId) { 
         const zoneData = AllZones[zoneId]; 
         if (!zoneData) return this.clearMonsterList(); 
-        
-        // Use zone-specific monsters for advanced zones (25+), fallback to biome system for starter zones
-        let monsterTemplates;
-        if (GameData.ZoneMonsters[zoneId]) {
-            monsterTemplates = GameData.ZoneMonsters[zoneId];
-        } else {
-            // Fallback to biome system for starter zones
-            const biome = zoneData.biome;
-            monsterTemplates = GameData.Monsters[biome];
-        }
-        
+        const biome = zoneData.biome; 
+        const monsterTemplates = GameData.Monsters[biome]; 
         const monsterSelect = ui.tabContentCombat.querySelector('#monsterSelect'); 
         if (!monsterTemplates || monsterTemplates.length === 0) { 
-            monsterSelect.innerHTML = `<option value="">No monsters in this zone...</option>`; 
+            monsterSelect.innerHTML = `<option value="">No monsters in this biome...</option>`; 
             this.resetCombatSelection(); 
             return; 
         } 
         let optionsHTML = '<option value="">Select a monster...</option>'; 
         monsterTemplates.forEach(monster => { 
-            const displayName = monster.isBoss ? `👑 ${monster.name}` : monster.name;
-            optionsHTML += `<option value="${monster.id}">${displayName} (T${zoneData.gearTier})</option>`; 
+            optionsHTML += `<option value="${monster.id}">${monster.name} (T${zoneData.gearTier})</option>`; 
         }); 
         monsterSelect.innerHTML = optionsHTML; 
         this.resetCombatSelection(); 
@@ -3012,16 +2422,8 @@ const EquipmentManager = {
         const zoneTier = state.game.currentZoneTier;
         const zoneData = AllZones[zoneTier];
         const gearTier = zoneData.gearTier;
-        
-        // Find monster template from zone-specific or biome system
-        let monsterTemplate;
-        if (GameData.ZoneMonsters[zoneTier]) {
-            monsterTemplate = GameData.ZoneMonsters[zoneTier].find(m => m.id === monsterId);
-        } else {
-            // Fallback to biome system for starter zones
-            const biome = zoneData.biome;
-            monsterTemplate = GameData.Monsters[biome].find(m => m.id === monsterId);
-        }
+        const biome = zoneData.biome; 
+        const monsterTemplate = GameData.Monsters[biome].find(m => m.id === monsterId); 
         if (!monsterTemplate) return; 
 
         let finalHp = monsterTemplate.baseHp * Math.pow(1.20, gearTier - 1);
@@ -3113,38 +2515,12 @@ const EquipmentManager = {
         let playerDamage = (90 * attackClass) / enemy.AC;
         playerDamage = Math.max(1, playerDamage); 
         
-        // Check for critical hit (10% chance)
-        const isCritical = Math.random() < 0.1;
-        if (isCritical) {
-            playerDamage *= 2;
-            this.triggerCriticalHit();
-            logToGame(`CRITICAL HIT! You strike ${enemy.name} for ${playerDamage.toFixed(0)} damage!`, 'player');
-        } else {
-            logToGame(`You strike ${enemy.name} for ${playerDamage.toFixed(0)} damage!`, 'player');
-        }
-        
-        // Trigger player attack animation
-        this.triggerAttackAnimation(true);
-        
-        // Create damage number animation
-        this.createDamageNumber(playerDamage, 'player-damage', isCritical);
-        
-        enemy.hp -= playerDamage;
-        
-        // Animate enemy health bar
-        setTimeout(() => {
-            this.updateEnemyUI();
-            this.animateHealthBar(false);
-        }, 250);
+        enemy.hp -= playerDamage; 
+        logToGame(`You strike ${enemy.name} for ${playerDamage.toFixed(0)} damage!`, 'player'); 
         
         if (enemy.hp <= 0) { 
             enemy.hp = 0;
             logToGame(`${enemy.name} defeated!`, 'system'); 
-            
-            // Trigger enemy defeat animation
-            setTimeout(() => {
-                this.triggerEnemyDefeat();
-            }, 500);
             
             ItemManager.progressShadowItems();
 
@@ -3153,12 +2529,10 @@ const EquipmentManager = {
             const hpBar = document.getElementById('monster-hp-bar').parentElement;
             const hpText = document.getElementById('monster-hp-text');
             
-            setTimeout(() => {
-                defeatedMsg.style.display = 'block';
-                monsterName.style.display = 'none';
-                hpBar.style.display = 'none';
-                hpText.style.display = 'none';
-            }, 750);
+            defeatedMsg.style.display = 'block';
+            monsterName.style.display = 'none';
+            hpBar.style.display = 'none';
+            hpText.style.display = 'none';
 
             let xpReward = enemy.xpValue;
             let goldReward = enemy.goldValue;
@@ -3182,39 +2556,21 @@ const EquipmentManager = {
             this.updateCombatInfoPanel(loot); 
             this.endCombat(); 
         } else { 
-            // Enemy counter-attack with delay for better animation flow
-            setTimeout(() => {
-                let enemyDamage = enemy.attack - (player.stats.finalAC * 0.5); 
-                enemyDamage = Math.max(1, enemyDamage);
-                
-                // Trigger enemy attack animation
-                this.triggerAttackAnimation(false);
-                
-                // Create enemy damage number
-                this.createDamageNumber(enemyDamage, 'enemy-damage');
-                
-                player.hp -= enemyDamage; 
-                logToGame(`${enemy.name} strikes you for ${enemyDamage.toFixed(0)} damage!`, 'enemy');
-                
-                // Animate player health bar
-                setTimeout(() => {
-                    ProfileManager.updateAllProfileUI();
-                    this.animateHealthBar(true);
-                }, 100);
-                
-                if (player.hp <= 0) { 
-                    player.hp = 0; 
-                    logToGame("You have been defeated! You are returned to the sanctuary.", 'system'); 
-                    ProfileManager.healPlayer(); 
-                    WorldMapManager.playerPos = { q: 0, r: 0 }; 
-                    WorldMapManager.draw(); 
-                    WorldMapManager.updateInteractButton(); 
-                    this.endCombat(); 
-                }
-            }, 800);
+            let enemyDamage = enemy.attack - (player.stats.finalAC * 0.5); 
+            enemyDamage = Math.max(1, enemyDamage); 
+            player.hp -= enemyDamage; 
+            logToGame(`${enemy.name} strikes you for ${enemyDamage.toFixed(0)} damage!`, 'enemy'); 
+            if (player.hp <= 0) { 
+                player.hp = 0; 
+                logToGame("You have been defeated! You are returned to the sanctuary.", 'system'); 
+                ProfileManager.healPlayer(); 
+                WorldMapManager.playerPos = { q: 0, r: 0 }; 
+                WorldMapManager.draw(); 
+                WorldMapManager.updateInteractButton(); 
+                this.endCombat(); 
+            }
+            this.updateEnemyUI(); 
         } 
-        
-        // Update UI immediately for player action feedback
         ProfileManager.updateAllProfileUI(); 
     }, 
     endCombat() { 
@@ -3253,155 +2609,7 @@ const EquipmentManager = {
             attackBtn.style.display = 'none'; 
             castBtn.style.display = 'block'; 
         } 
-    },
-
-    // --- REAL-TIME COMBAT ANIMATIONS ---
-    createDamageNumber(amount, type, isCritical = false) {
-        const combatDisplay = document.querySelector('#tab-content-combat .combat-display') || document.querySelector('#tab-content-combat');
-        if (!combatDisplay) return;
-
-        const damageEl = document.createElement('div');
-        damageEl.className = `damage-number ${type}${isCritical ? ' critical' : ''}`;
-        damageEl.textContent = Math.ceil(amount);
-        
-        // Position randomly within combat area
-        const rect = combatDisplay.getBoundingClientRect();
-        damageEl.style.left = Math.random() * (rect.width - 100) + 50 + 'px';
-        damageEl.style.top = Math.random() * 50 + 20 + 'px';
-        
-        combatDisplay.appendChild(damageEl);
-        
-        // Remove after animation
-        setTimeout(() => {
-            if (damageEl.parentNode) damageEl.parentNode.removeChild(damageEl);
-        }, 1500);
-    },
-
-    createParticleEffect(type, count = 15) {
-        const combatDisplay = document.querySelector('#tab-content-combat .combat-display') || document.querySelector('#tab-content-combat');
-        if (!combatDisplay) return;
-
-        for (let i = 0; i < count; i++) {
-            const particle = document.createElement('div');
-            particle.className = `particle ${type}`;
-            
-            // Random starting position
-            particle.style.left = Math.random() * 100 + '%';
-            particle.style.top = Math.random() * 100 + '%';
-            
-            // Random animation
-            const duration = 800 + Math.random() * 400;
-            const distance = 50 + Math.random() * 100;
-            const angle = Math.random() * Math.PI * 2;
-            
-            particle.style.transition = `all ${duration}ms ease-out`;
-            combatDisplay.appendChild(particle);
-            
-            // Animate particle
-            requestAnimationFrame(() => {
-                particle.style.transform = `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px)`;
-                particle.style.opacity = '0';
-                particle.style.transform += ' scale(0.5)';
-            });
-            
-            // Remove after animation
-            setTimeout(() => {
-                if (particle.parentNode) particle.parentNode.removeChild(particle);
-            }, duration + 100);
-        }
-    },
-
-    triggerAttackAnimation(isPlayer = true) {
-        const combatDisplay = document.querySelector('#tab-content-combat .combat-display') || document.querySelector('#tab-content-combat');
-        if (!combatDisplay) return;
-
-        if (isPlayer) {
-            // Player attack animation
-            const actionType = state.player.class === 'Fighter' ? 'attack' : 'spell';
-            combatDisplay.classList.add(`combat-action-${actionType}`);
-            
-            // Create particles
-            this.createParticleEffect(actionType === 'attack' ? 'fire' : 'magic', 12);
-            
-            setTimeout(() => {
-                combatDisplay.classList.remove(`combat-action-${actionType}`);
-            }, actionType === 'attack' ? 500 : 800);
-        } else {
-            // Enemy attack animation
-            combatDisplay.classList.add('combat-damage-shake');
-            this.createParticleEffect('blood', 8);
-            
-            setTimeout(() => {
-                combatDisplay.classList.remove('combat-damage-shake');
-            }, 400);
-        }
-    },
-
-    triggerCriticalHit() {
-        const combatDisplay = document.querySelector('#tab-content-combat .combat-display') || document.querySelector('#tab-content-combat');
-        if (!combatDisplay) return;
-
-        combatDisplay.classList.add('combat-critical-hit');
-        this.createParticleEffect('fire', 20);
-        
-        // Screen shake for critical hits
-        const gameContainer = document.getElementById('game-container');
-        if (gameContainer) {
-            gameContainer.classList.add('combat-screen-shake');
-            setTimeout(() => {
-                gameContainer.classList.remove('combat-screen-shake');
-            }, 500);
-        }
-        
-        setTimeout(() => {
-            combatDisplay.classList.remove('combat-critical-hit');
-        }, 600);
-    },
-
-    animateHealthBar(isPlayer = false) {
-        const hpBar = isPlayer ? 
-            document.getElementById('hp-bar') : 
-            document.getElementById('monster-hp-bar');
-        
-        if (!hpBar) return;
-
-        hpBar.classList.add('combat-hp-bar-animate');
-        
-        // Check for critical health
-        const container = hpBar.parentElement;
-        if (container) {
-            const currentPercent = parseFloat(hpBar.style.width) || 0;
-            if (currentPercent <= 25) {
-                container.classList.add('critical');
-                if (!container.querySelector('.hp-bar-glow')) {
-                    const glow = document.createElement('div');
-                    glow.className = 'hp-bar-glow';
-                    container.appendChild(glow);
-                }
-            } else {
-                container.classList.remove('critical');
-                const glow = container.querySelector('.hp-bar-glow');
-                if (glow) glow.remove();
-            }
-        }
-        
-        setTimeout(() => {
-            hpBar.classList.remove('combat-hp-bar-animate');
-        }, 300);
-    },
-
-    triggerEnemyDefeat() {
-        const monsterInfo = document.querySelector('#monster-info');
-        if (!monsterInfo) return;
-
-        monsterInfo.classList.add('combat-enemy-defeat');
-        this.createParticleEffect('fire', 25);
-        
-        // Victory particles
-        setTimeout(() => {
-            this.createParticleEffect('magic', 15);
-        }, 300);
-    }
+    } 
 };
 
       const WorldMapManager = { isInitialized: false, grid: new Map(), playerPos: { q: 0, r: 0 }, hexSize: 18, ctx: null, init() { if (this.isInitialized) return; this.isInitialized = true; ui.miniMapCanvas.width = ui.miniMapContainer.clientWidth * 2; ui.miniMapCanvas.height = ui.miniMapContainer.clientHeight * 2; ui.miniMapCanvas.style.width = `${ui.miniMapContainer.clientWidth}px`; ui.miniMapCanvas.style.height = `${ui.miniMapContainer.clientHeight}px`; this.ctx = ui.miniMapCanvas.getContext('2d'); this.generateGrid(); this.updateInteractButton(); this.draw(); }, generateGrid() { for (let q = -3; q <= 3; q++) { for (let r = -3; r <= 3; r++) { const s = -q - r; if (s >= -3 && s <= 3) { this.grid.set(`${q},${r}`, { q, r, s, feature: { name: 'Monster Zone', icon: '◻️' } }); } } } this.grid.get('1,-1').feature = { name: 'Weapons/Combat Shop', icon: '⚔️' }; this.grid.get('-1,1').feature = { name: 'Magic/Accessories Shop', icon: '🔮' }; this.grid.get('2,0').feature = { name: 'Bank', icon: '🏧' }; this.grid.get('-2,0').feature = { name: 'Sanctuary', icon: '🆘' }; this.grid.get('0,2').feature = { name: 'Teleport Zone', icon: '🌀' }; }, movePlayer(dq, dr) { const newQ = this.playerPos.q + dq; const newR = this.playerPos.r + dr; if (this.grid.has(`${newQ},${newR}`)) { this.playerPos.q = newQ; this.playerPos.r = newR; this.draw(); this.updateInteractButton(); const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); if (currentHex && currentHex.feature && currentHex.feature.name === 'Monster Zone') { CombatManager.populateMonsterList(state.game.currentZoneTier); } else { CombatManager.clearMonsterList(); } } }, updateInteractButton() { const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); const interactKey = document.getElementById('key-interact'); if (currentHex && currentHex.feature && currentHex.feature.name !== 'Monster Zone') { interactKey.textContent = `Enter`; interactKey.style.fontSize = '14px'; } else { interactKey.textContent = 'Interact'; interactKey.style.fontSize = '16px'; } }, handleInteraction() { const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); if (currentHex && currentHex.feature) { if (currentHex.feature.name === 'Weapons/Combat Shop') { ShopManager.openShop('armory'); } else if (currentHex.feature.name === 'Magic/Accessories Shop') { ShopManager.openShop('magic'); } else if (currentHex.feature.name === 'Bank') { BankManager.openBank(); } else if (currentHex.feature.name === 'Sanctuary') { ProfileManager.healPlayer(); } else if (currentHex.feature.name === 'Teleport Zone') { TeleportManager.showModal(); } } }, draw() { const canvas = ui.miniMapCanvas; this.ctx.clearRect(0, 0, canvas.width, canvas.height); const centerX = canvas.width / 2; const centerY = canvas.height / 2; this.grid.forEach(hex => { const relQ = hex.q - this.playerPos.q; const relR = hex.r - this.playerPos.r; const {x, y} = HexUtils.hexToPixel(relQ, relR, this.hexSize); this.drawHex(centerX + x, centerY + y, this.hexSize, hex.feature); }); this.drawPlayer(centerX, centerY); }, drawHex(cx, cy, size, feature) { this.ctx.beginPath(); for (let i = 0; i < 6; i++) { const angle = 2 * Math.PI / 6 * (i + 0.5); const x = cx + size * Math.cos(angle); const y = cy + size * Math.sin(angle); if (i === 0) this.ctx.moveTo(x, y); else this.ctx.lineTo(x, y); } this.ctx.closePath(); this.ctx.fillStyle = 'rgba(10, 10, 10, 0.5)'; this.ctx.fill(); this.ctx.strokeStyle = 'rgba(249, 115, 22, 0.3)'; this.ctx.lineWidth = 1.5; this.ctx.stroke(); if (feature) { this.ctx.font = `${size * 1.5}px sans-serif`; this.ctx.textAlign = 'center'; this.ctx.textBaseline = 'middle'; this.ctx.fillText(feature.icon, cx, cy); } }, drawPlayer(cx, cy) { this.ctx.font = `${this.hexSize * 1.5}px sans-serif`; this.ctx.textAlign = 'center'; this.ctx.textBaseline = 'middle'; this.ctx.fillText('🟠', cx, cy); } };
@@ -4109,6 +3317,7 @@ const InfusionManager = {
         'Armory': ['Helmet', 'Armor', 'Leggings', 'Boots', 'Gauntlets'],
         'Jewelry Box': ['Amulet', 'Ring'],
         'Spell Satchel': ['Spellbook'],
+        'Gem Pouch': ['Gem'],
     },
 
     init() {
@@ -4614,112 +3823,7 @@ const InfusionManager = {
         try {
             // In a real project, you would have a 'data/zones.json' file.
             // For this simulation, we'll define it here.
-            const zonesData = {
-                // 24 STARTER ZONES - Each race has their own zone with specific biome themes
-                "1": { "name": "Crystal Caves (Dwarf)", "levelReq": 1, "biome": "mountain", "gearTier": 1 },
-                "2": { "name": "Elvenwood (Elf)", "levelReq": 1, "biome": "forest", "gearTier": 1 },
-                "3": { "name": "Shifting Maze (Halfling)", "levelReq": 1, "biome": "plains", "gearTier": 1 },
-                "4": { "name": "Arid Badlands (Human)", "levelReq": 1, "biome": "wastes", "gearTier": 1 },
-                "5": { "name": "Glimmering Springs (Gnome)", "levelReq": 1, "biome": "forest", "gearTier": 1 },
-                "6": { "name": "Blazefire Wastes (Tiefling)", "levelReq": 1, "biome": "wastes", "gearTier": 1 },
-                "7": { "name": "Abyssal Fen (Swampfolk)", "levelReq": 1, "biome": "swamp", "gearTier": 1 },
-                "8": { "name": "Moss-Covered Forest (Human/Fey)", "levelReq": 1, "biome": "forest", "gearTier": 1 },
-                "9": { "name": "Cinder Barrens (Orc)", "levelReq": 1, "biome": "wastes", "gearTier": 1 },
-                "10": { "name": "Echo Mountain (Dwarf/Giant)", "levelReq": 1, "biome": "mountain", "gearTier": 1 },
-                "11": { "name": "Labyrinth (Minotaur)", "levelReq": 1, "biome": "jungle", "gearTier": 1 },
-                "12": { "name": "Steppe (Centaur)", "levelReq": 1, "biome": "plains", "gearTier": 1 },
-                "13": { "name": "Cloud Peak (Griffin/Angel)", "levelReq": 1, "biome": "mountain", "gearTier": 1 },
-                "14": { "name": "Emberfall (Phoenix)", "levelReq": 1, "biome": "forest", "gearTier": 1 },
-                "15": { "name": "Glimmering Glade (Unicorn)", "levelReq": 1, "biome": "forest", "gearTier": 1 },
-                "16": { "name": "Swamps (Baba Yaga)", "levelReq": 1, "biome": "swamp", "gearTier": 1 },
-                "17": { "name": "Gravefrost Peaks (Draugr)", "levelReq": 1, "biome": "tundra", "gearTier": 1 },
-                "18": { "name": "Sunken City of Atla (Atlantean)", "levelReq": 1, "biome": "coastal", "gearTier": 1 },
-                "19": { "name": "Gloomwood (Vampire)", "levelReq": 1, "biome": "forest", "gearTier": 1 },
-                "20": { "name": "Corrupted Jungle (Shaman)", "levelReq": 1, "biome": "jungle", "gearTier": 1 },
-                "21": { "name": "Primal Chasm (Barbarian)", "levelReq": 1, "biome": "mountain", "gearTier": 1 },
-                "22": { "name": "Sunken City of Eldoria (Drow/Merfolk)", "levelReq": 1, "biome": "coastal", "gearTier": 1 },
-                "23": { "name": "Blazefire Forge (Firenewt)", "levelReq": 1, "biome": "wastes", "gearTier": 1 },
-                "24": { "name": "Heavenly Spires (Angel/Aasimar)", "levelReq": 1, "biome": "mountain", "gearTier": 1 },
-
-                // HIGHER TIER ZONES - Keep existing structure for progression
-                "25": { "name": "Echoing Chasms", "levelReq": 100, "biome": "mountain", "gearTier": 3 },
-                "26": { "name": "Starfall Deserts", "levelReq": 110, "biome": "wastes", "gearTier": 3 },
-                "27": { "name": "The Weeping Mire", "levelReq": 121, "biome": "swamp", "gearTier": 3 },
-                "28": { "name": "Frozen Spirelands", "levelReq": 135, "biome": "tundra", "gearTier": 4 },
-                "29": { "name": "Living Mountain", "levelReq": 149, "biome": "mountain", "gearTier": 4 },
-                "30": { "name": "Chrono-Distorted Fields", "levelReq": 166, "biome": "plains", "gearTier": 4 },
-                "31": { "name": "Whisperwind Peaks", "levelReq": 184, "biome": "mountain", "gearTier": 5 },
-                "32": { "name": "Corrupted Jungles", "levelReq": 205, "biome": "jungle", "gearTier": 5 },
-                "33": { "name": "Acidic Fens", "levelReq": 227, "biome": "swamp", "gearTier": 5 },
-                "34": { "name": "Bone Deserts", "levelReq": 253, "biome": "wastes", "gearTier": 6 },
-                "35": { "name": "The Maw", "levelReq": 281, "biome": "wastes", "gearTier": 6 },
-                "36": { "name": "Poisonbloom Meadows", "levelReq": 312, "biome": "plains", "gearTier": 6 },
-                "37": { "name": "Storm-Wrenched Coast", "levelReq": 347, "biome": "coastal", "gearTier": 6 },
-                "38": { "name": "The Rusting Wastes", "levelReq": 386, "biome": "wastes", "gearTier": 7 },
-                "39": { "name": "Webbed Caverns", "levelReq": 429, "biome": "mountain", "gearTier": 7 },
-                "40": { "name": "The Scarred Peaks", "levelReq": 477, "biome": "mountain", "gearTier": 7 },
-                "41": { "name": "Fungal Undergrowth", "levelReq": 530, "biome": "forest", "gearTier": 7 },
-                "42": { "name": "Obsidian Flats", "levelReq": 589, "biome": "wastes", "gearTier": 7 },
-                "43": { "name": "Quicksand Dunes", "levelReq": 655, "biome": "wastes", "gearTier": 7 },
-                "44": { "name": "Floating Islands", "levelReq": 728, "biome": "mountain", "gearTier": 7 },
-                "45": { "name": "Glass Sea", "levelReq": 809, "biome": "coastal", "gearTier": 7 },
-                "46": { "name": "Upside-Down Forest", "levelReq": 899, "biome": "forest", "gearTier": 7 },
-                "47": { "name": "Singing Sands", "levelReq": 1000, "biome": "wastes", "gearTier": 7 },
-                "48": { "name": "Aurora Borealis Caverns", "levelReq": 1000, "biome": "tundra", "gearTier": 7 },
-                "49": { "name": "Gloom-Shrouded Peaks", "levelReq": 1000, "biome": "mountain", "gearTier": 7 },
-                "50": { "name": "Sunken Spire City", "levelReq": 1000, "biome": "coastal", "gearTier": 7 },
-                "51": { "name": "Giant Mushroom Forests", "levelReq": 1000, "biome": "forest", "gearTier": 8 },
-                "52": { "name": "Living Stone Gardens", "levelReq": 9143, "biome": "plains", "gearTier": 8 },
-                "53": { "name": "The Whispering Wastes", "levelReq": 17286, "biome": "wastes", "gearTier": 8 },
-                "54": { "name": "Mirage Deserts", "levelReq": 25429, "biome": "wastes", "gearTier": 8 },
-                "55": { "name": "Gravity Wells", "levelReq": 33572, "biome": "mountain", "gearTier": 9 },
-                "56": { "name": "Chromatic Reefs", "levelReq": 41715, "biome": "coastal", "gearTier": 9 },
-                "57": { "name": "The Endless Bridge", "levelReq": 49858, "biome": "plains", "gearTier": 9 },
-                "58": { "name": "Sky-Whale Graveyard", "levelReq": 58001, "biome": "mountain", "gearTier": 9 },
-                "59": { "name": "The Weaving Caves", "levelReq": 66144, "biome": "mountain", "gearTier": 10 },
-                "60": { "name": "Echoing Valley of the Giants", "levelReq": 74287, "biome": "plains", "gearTier": 10 },
-                "61": { "name": "The Glimmering Shore", "levelReq": 82430, "biome": "coastal", "gearTier": 10 },
-                "62": { "name": "The Whispering Canyon", "levelReq": 90573, "biome": "mountain", "gearTier": 10 },
-                "63": { "name": "Floating River", "levelReq": 98716, "biome": "coastal", "gearTier": 11 },
-                "64": { "name": "The Cloud Sea", "levelReq": 106859, "biome": "mountain", "gearTier": 11 },
-                "65": { "name": "Obsidian Monolith Plains", "levelReq": 115002, "biome": "plains", "gearTier": 11 },
-                "66": { "name": "The Bloodfang Jungle", "levelReq": 123145, "biome": "jungle", "gearTier": 11 },
-                "67": { "name": "Sunstone Deserts", "levelReq": 131288, "biome": "wastes", "gearTier": 12 },
-                "68": { "name": "The Whispering Gardens", "levelReq": 139431, "biome": "forest", "gearTier": 12 },
-                "69": { "name": "Glass Peaks", "levelReq": 147574, "biome": "mountain", "gearTier": 12 },
-                "70": { "name": "Phantom Forests", "levelReq": 155717, "biome": "forest", "gearTier": 13 },
-                "71": { "name": "The Shrouded Isles", "levelReq": 163860, "biome": "coastal", "gearTier": 13 },
-                "72": { "name": "Gravity-Defying Rapids", "levelReq": 172003, "biome": "coastal", "gearTier": 13 },
-                "73": { "name": "The Azure Depths", "levelReq": 180146, "biome": "coastal", "gearTier": 14 },
-                "74": { "name": "Crystalline Spires", "levelReq": 188289, "biome": "mountain", "gearTier": 14 },
-                "75": { "name": "The Void Scar", "levelReq": 196432, "biome": "wastes", "gearTier": 14 },
-                "76": { "name": "Living Labyrinth", "levelReq": 204575, "biome": "jungle", "gearTier": 15 },
-                "77": { "name": "The Silent Sands", "levelReq": 212718, "biome": "wastes", "gearTier": 15 },
-                "78": { "name": "Acoustic Caves", "levelReq": 220861, "biome": "mountain", "gearTier": 15 },
-                "79": { "name": "The Glittering Grottos", "levelReq": 229004, "biome": "mountain", "gearTier": 16 },
-                "80": { "name": "Timeworn Badlands", "levelReq": 237147, "biome": "wastes", "gearTier": 16 },
-                "81": { "name": "The Canopy Kingdom", "levelReq": 245290, "biome": "jungle", "gearTier": 16 },
-                "82": { "name": "The Sunken Library", "levelReq": 253433, "biome": "coastal", "gearTier": 16 },
-                "83": { "name": "Chromatic Geysers", "levelReq": 261576, "biome": "plains", "gearTier": 17 },
-                "84": { "name": "The Whispering City", "levelReq": 269719, "biome": "plains", "gearTier": 17 },
-                "85": { "name": "The Labyrinthine Mangroves", "levelReq": 277862, "biome": "swamp", "gearTier": 17 },
-                "86": { "name": "The Frozen Heart of the World", "levelReq": 286005, "biome": "tundra", "gearTier": 17 },
-                "87": { "name": "Gelatinous Jungles", "levelReq": 294148, "biome": "jungle", "gearTier": 18 },
-                "88": { "name": "The Petrified Ocean", "levelReq": 302291, "biome": "coastal", "gearTier": 18 },
-                "89": { "name": "The Symphony Springs", "levelReq": 310434, "biome": "plains", "gearTier": 18 },
-                "90": { "name": "The Whispering Cliffs", "levelReq": 318577, "biome": "mountain", "gearTier": 18 },
-                "91": { "name": "The Bioluminescent Bog", "levelReq": 326720, "biome": "swamp", "gearTier": 19 },
-                "92": { "name": "The Stone Giant's Graveyard", "levelReq": 334863, "biome": "plains", "gearTier": 19 },
-                "93": { "name": "The Maze of Roots", "levelReq": 343006, "biome": "jungle", "gearTier": 19 },
-                "94": { "name": "The Endless Plains of Glass", "levelReq": 351149, "biome": "plains", "gearTier": 19 },
-                "95": { "name": "The Whispering Temple Ruins", "levelReq": 359292, "biome": "jungle", "gearTier": 19 },
-                "96": { "name": "The Crystal Ocean", "levelReq": 367435, "biome": "coastal", "gearTier": 19 },
-                "97": { "name": "The Sunken Palace of the Sea King", "levelReq": 375578, "biome": "coastal", "gearTier": 19 },
-                "98": { "name": "The Land of Shifting Colors", "levelReq": 383721, "biome": "plains", "gearTier": 19 },
-                "99": { "name": "The Cloud Forest of the Sky Serpents", "levelReq": 391864, "biome": "forest", "gearTier": 19 },
-                "100": { "name": "The Singing Rivers", "levelReq": 400000, "biome": "plains", "gearTier": 19 },
-                "101": { "name": "The Echoing Gorge of Lost Souls", "levelReq": 500000, "biome": "mountain", "gearTier": 20 }
-            };
+            const zonesData = { "1": { "name": "Crystal Caves (Dwarf)", "levelReq": 1, "biome": "mountain", "gearTier": 1 }, "2": { "name": "Glimmerwood (Elf)", "levelReq": 1, "biome": "forest", "gearTier": 1 }, "3": { "name": "The Shifting Maze (Halfling)", "levelReq": 1, "biome": "plains", "gearTier": 1 }, "4": { "name": "Chromatic Badlands (Human)", "levelReq": 1, "biome": "wastes", "gearTier": 1 }, "5": { "name": "Mana Springs (Gnome)", "levelReq": 1, "biome": "forest", "gearTier": 1 }, "6": { "name": "Blazefire Wastes (Dragonborn/Demon)", "levelReq": 1, "biome": "wastes", "gearTier": 1 }, "7": { "name": "Shadow Mire (Tiefling)", "levelReq": 1, "biome": "swamp", "gearTier": 1 }, "8": { "name": "Whispering Woods (Hobbit)", "levelReq": 1, "biome": "forest", "gearTier": 1 }, "9": { "name": "Ashfall Barrens (Orc)", "levelReq": 1, "biome": "wastes", "gearTier": 1 }, "10": { "name": "Screaming Crags (Troll)", "levelReq": 1, "biome": "mountain", "gearTier": 1 }, "11": { "name": "The Great Vine Labyrinth (Minotaur)", "levelReq": 1, "biome": "jungle", "gearTier": 1 }, "12": { "name": "The Howling Steppes (Centaur)", "levelReq": 1, "biome": "plains", "gearTier": 1 }, "13": { "name": "Cloud Peaks (Griffin/Angel)", "levelReq": 1, "biome": "mountain", "gearTier": 1 }, "14": { "name": "Emberfall Forest (Phoenix)", "levelReq": 1, "biome": "forest", "gearTier": 1 }, "15": { "name": "Aetherial Forests (Unicorn)", "levelReq": 1, "biome": "forest", "gearTier": 1 }, "16": { "name": "Grimwater Swamps (Baba Yaga)", "levelReq": 1, "biome": "swamp", "gearTier": 1 }, "17": { "name": "Gravefrost Tundra (Draugr)", "levelReq": 1, "biome": "tundra", "gearTier": 1 }, "18": { "name": "The Sunken City of Lumina (Mermaid)", "levelReq": 1, "biome": "coastal", "gearTier": 1 }, "19": { "name": "Gloomwood (Vampire)", "levelReq": 1, "biome": "forest", "gearTier": 1 }, "20": { "name": "Corrupted Jungles (Werewolf)", "levelReq": 1, "biome": "jungle", "gearTier": 1 }, "21": { "name": "Echoing Chasms (Banshee)", "levelReq": 1, "biome": "mountain", "gearTier": 1 }, "22": { "name": "Sunken Ruins (Paladin)", "levelReq": 1, "biome": "coastal", "gearTier": 1 }, "23": { "name": "Blazefire Wastes (Demon)", "levelReq": 1, "biome": "wastes", "gearTier": 1 }, "24": { "name": "Cloud Peaks (Angel)", "levelReq": 1, "biome": "mountain", "gearTier": 1 }, "25": { "name": "Echoing Chasms", "levelReq": 100, "biome": "mountain", "gearTier": 3 }, "26": { "name": "Starfall Deserts", "levelReq": 110, "biome": "wastes", "gearTier": 3 }, "27": { "name": "The Weeping Mire", "levelReq": 121, "biome": "swamp", "gearTier": 3 }, "28": { "name": "Frozen Spirelands", "levelReq": 135, "biome": "tundra", "gearTier": 4 }, "29": { "name": "Living Mountain", "levelReq": 149, "biome": "mountain", "gearTier": 4 }, "30": { "name": "Chrono-Distorted Fields", "levelReq": 166, "biome": "plains", "gearTier": 4 }, "31": { "name": "Whisperwind Peaks", "levelReq": 184, "biome": "mountain", "gearTier": 5 }, "32": { "name": "Corrupted Jungles", "levelReq": 205, "biome": "jungle", "gearTier": 5 }, "33": { "name": "Acidic Fens", "levelReq": 227, "biome": "swamp", "gearTier": 5 }, "34": { "name": "Bone Deserts", "levelReq": 253, "biome": "wastes", "gearTier": 6 }, "35": { "name": "The Maw", "levelReq": 281, "biome": "wastes", "gearTier": 6 }, "36": { "name": "Poisonbloom Meadows", "levelReq": 312, "biome": "plains", "gearTier": 6 }, "37": { "name": "Storm-Wrenched Coast", "levelReq": 347, "biome": "coastal", "gearTier": 6 }, "38": { "name": "The Rusting Wastes", "levelReq": 386, "biome": "wastes", "gearTier": 7 }, "39": { "name": "Webbed Caverns", "levelReq": 429, "biome": "mountain", "gearTier": 7 }, "40": { "name": "The Scarred Peaks", "levelReq": 477, "biome": "mountain", "gearTier": 7 }, "41": { "name": "Fungal Undergrowth", "levelReq": 530, "biome": "forest", "gearTier": 7 }, "42": { "name": "Obsidian Flats", "levelReq": 589, "biome": "wastes", "gearTier": 7 }, "43": { "name": "Quicksand Dunes", "levelReq": 655, "biome": "wastes", "gearTier": 7 }, "44": { "name": "Floating Islands", "levelReq": 728, "biome": "mountain", "gearTier": 7 }, "45": { "name": "Glass Sea", "levelReq": 809, "biome": "coastal", "gearTier": 7 }, "46": { "name": "Upside-Down Forest", "levelReq": 899, "biome": "forest", "gearTier": 7 }, "47": { "name": "Singing Sands", "levelReq": 1000, "biome": "wastes", "gearTier": 7 }, "48": { "name": "Aurora Borealis Caverns", "levelReq": 1000, "biome": "tundra", "gearTier": 7 }, "49": { "name": "Gloom-Shrouded Peaks", "levelReq": 1000, "biome": "mountain", "gearTier": 7 }, "50": { "name": "Sunken Spire City", "levelReq": 1000, "biome": "coastal", "gearTier": 7 }, "51": { "name": "Giant Mushroom Forests", "levelReq": 1000, "biome": "forest", "gearTier": 8 }, "52": { "name": "Living Stone Gardens", "levelReq": 9143, "biome": "plains", "gearTier": 8 }, "53": { "name": "The Whispering Wastes", "levelReq": 17286, "biome": "wastes", "gearTier": 8 }, "54": { "name": "Mirage Deserts", "levelReq": 25429, "biome": "wastes", "gearTier": 8 }, "55": { "name": "Gravity Wells", "levelReq": 33572, "biome": "mountain", "gearTier": 9 }, "56": { "name": "Chromatic Reefs", "levelReq": 41715, "biome": "coastal", "gearTier": 9 }, "57": { "name": "The Endless Bridge", "levelReq": 49858, "biome": "plains", "gearTier": 9 }, "58": { "name": "Sky-Whale Graveyard", "levelReq": 58001, "biome": "mountain", "gearTier": 9 }, "59": { "name": "The Weaving Caves", "levelReq": 66144, "biome": "mountain", "gearTier": 10 }, "60": { "name": "Echoing Valley of the Giants", "levelReq": 74287, "biome": "plains", "gearTier": 10 }, "61": { "name": "The Glimmering Shore", "levelReq": 82430, "biome": "coastal", "gearTier": 10 }, "62": { "name": "The Whispering Canyon", "levelReq": 90573, "biome": "mountain", "gearTier": 10 }, "63": { "name": "Floating River", "levelReq": 98716, "biome": "coastal", "gearTier": 11 }, "64": { "name": "The Cloud Sea", "levelReq": 106859, "biome": "mountain", "gearTier": 11 }, "65": { "name": "Obsidian Monolith Plains", "levelReq": 115002, "biome": "plains", "gearTier": 11 }, "66": { "name": "The Bloodfang Jungle", "levelReq": 123145, "biome": "jungle", "gearTier": 11 }, "67": { "name": "Sunstone Deserts", "levelReq": 131288, "biome": "wastes", "gearTier": 12 }, "68": { "name": "The Whispering Gardens", "levelReq": 139431, "biome": "forest", "gearTier": 12 }, "69": { "name": "Glass Peaks", "levelReq": 147574, "biome": "mountain", "gearTier": 12 }, "70": { "name": "Phantom Forests", "levelReq": 155717, "biome": "forest", "gearTier": 13 }, "71": { "name": "The Shrouded Isles", "levelReq": 163860, "biome": "coastal", "gearTier": 13 }, "72": { "name": "Gravity-Defying Rapids", "levelReq": 172003, "biome": "coastal", "gearTier": 13 }, "73": { "name": "The Azure Depths", "levelReq": 180146, "biome": "coastal", "gearTier": 14 }, "74": { "name": "Crystalline Spires", "levelReq": 188289, "biome": "mountain", "gearTier": 14 }, "75": { "name": "The Void Scar", "levelReq": 196432, "biome": "wastes", "gearTier": 14 }, "76": { "name": "Living Labyrinth", "levelReq": 204575, "biome": "jungle", "gearTier": 15 }, "77": { "name": "The Silent Sands", "levelReq": 212718, "biome": "wastes", "gearTier": 15 }, "78": { "name": "Acoustic Caves", "levelReq": 220861, "biome": "mountain", "gearTier": 15 }, "79": { "name": "The Glittering Grottos", "levelReq": 229004, "biome": "mountain", "gearTier": 16 }, "80": { "name": "Timeworn Badlands", "levelReq": 237147, "biome": "wastes", "gearTier": 16 }, "81": { "name": "The Canopy Kingdom", "levelReq": 245290, "biome": "jungle", "gearTier": 16 }, "82": { "name": "The Sunken Library", "levelReq": 253433, "biome": "coastal", "gearTier": 16 }, "83": { "name": "Chromatic Geysers", "levelReq": 261576, "biome": "plains", "gearTier": 17 }, "84": { "name": "The Whispering City", "levelReq": 269719, "biome": "plains", "gearTier": 17 }, "85": { "name": "The Labyrinthine Mangroves", "levelReq": 277862, "biome": "swamp", "gearTier": 17 }, "86": { "name": "The Frozen Heart of the World", "levelReq": 286005, "biome": "tundra", "gearTier": 17 }, "87": { "name": "Gelatinous Jungles", "levelReq": 294148, "biome": "jungle", "gearTier": 18 }, "88": { "name": "The Petrified Ocean", "levelReq": 302291, "biome": "coastal", "gearTier": 18 }, "89": { "name": "The Symphony Springs", "levelReq": 310434, "biome": "plains", "gearTier": 18 }, "90": { "name": "The Whispering Cliffs", "levelReq": 318577, "biome": "mountain", "gearTier": 18 }, "91": { "name": "The Bioluminescent Bog", "levelReq": 326720, "biome": "swamp", "gearTier": 19 }, "92": { "name": "The Stone Giant's Graveyard", "levelReq": 334863, "biome": "plains", "gearTier": 19 }, "93": { "name": "The Maze of Roots", "levelReq": 343006, "biome": "jungle", "gearTier": 19 }, "94": { "name": "The Endless Plains of Glass", "levelReq": 351149, "biome": "plains", "gearTier": 19 }, "95": { "name": "The Whispering Temple Ruins", "levelReq": 359292, "biome": "jungle", "gearTier": 19 }, "96": { "name": "The Crystal Ocean", "levelReq": 367435, "biome": "coastal", "gearTier": 19 }, "97": { "name": "The Sunken Palace of the Sea King", "levelReq": 375578, "biome": "coastal", "gearTier": 19 }, "98": { "name": "The Land of Shifting Colors", "levelReq": 383721, "biome": "plains", "gearTier": 19 }, "99": { "name": "The Cloud Forest of the Sky Serpents", "levelReq": 391864, "biome": "forest", "gearTier": 19 }, "100": { "name": "The Singing Rivers", "levelReq": 400000, "biome": "plains", "gearTier": 19 }, "101": { "name": "The Echoing Gorge of Lost Souls", "levelReq": 500000, "biome": "mountain", "gearTier": 20 } };
             AllZones = zonesData;
             console.log("Zone data successfully loaded.");
             // In the future, you can add fetches for items.json, monsters.json, etc. here.

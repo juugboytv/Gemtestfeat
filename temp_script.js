@@ -63,8 +63,6 @@
         }));
     };
     const animateSmoke = () => {
-        // Add null check as suggested by user to prevent canvas errors
-        if (!smokeCtx) return;
         smokeCtx.clearRect(0, 0, smokeCanvas.width, smokeCanvas.height);
         smokeParticles.forEach(p => {
             p.x += p.speedX; p.y += p.speedY;
