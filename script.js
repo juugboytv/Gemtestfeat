@@ -1937,6 +1937,12 @@ const EquipmentManager = {
             
             this.drawPlayer(centerX, centerY); 
         }, drawHex(cx, cy, size, feature) { 
+            // Additional safety check for context in drawHex
+            if (!this.ctx) {
+                console.error('Canvas context null in drawHex, aborting');
+                return;
+            }
+            
             this.ctx.beginPath(); 
             for (let i = 0; i < 6; i++) { 
                 const angle = 2 * Math.PI / 6 * (i + 0.5); 
@@ -1973,6 +1979,12 @@ const EquipmentManager = {
                 this.ctx.fillText(feature.icon, cx, cy); 
             } 
         }, drawPlayer(cx, cy) { 
+            // Additional safety check for context in drawPlayer
+            if (!this.ctx) {
+                console.error('Canvas context null in drawPlayer, aborting');
+                return;
+            }
+            
             // Use emoji-compatible font for player icon as well
             this.ctx.font = `${this.hexSize * 1.5}px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif`; 
             this.ctx.textAlign = 'center'; 
