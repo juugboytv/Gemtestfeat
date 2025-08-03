@@ -122,30 +122,7 @@
         position: relative;
     }
     
-    .main-tab-button.dragging {
-        opacity: 0.5;
-        transform: rotate(2deg);
-        z-index: 1000;
-    }
-    
-    .main-tab-button.drag-over {
-        transform: translateX(5px);
-    }
-    
-    .drag-indicator {
-        position: absolute;
-        top: 0;
-        left: -2px;
-        bottom: 0;
-        width: 3px;
-        background: var(--highlight-orange);
-        opacity: 0;
-        transition: opacity 0.2s;
-    }
-    
-    .drag-indicator.visible {
-        opacity: 1;
-    }
+
     .main-tab-button.active {
         color: var(--highlight-orange);
         animation: pulse-main-tab-glow 4s ease-in-out infinite;
@@ -3733,7 +3710,8 @@ const EquipmentManager = {
                     '--input-bg': 'rgba(0, 0, 0, 0.4)',
                     '--border-color-main': 'rgba(249, 115, 22, 0.4)',
                     '--border-color-pulse': 'rgba(239, 68, 68, 0.7)'
-                }
+                },
+                backgroundColor: '#121212'
             },
             'geminus-magi-tech': {
                 name: 'Geminus Magi-Tech',
@@ -3747,7 +3725,8 @@ const EquipmentManager = {
                     '--input-bg': 'rgba(0, 30, 40, 0.6)',
                     '--border-color-main': 'rgba(0, 255, 255, 0.4)',
                     '--border-color-pulse': 'rgba(0, 204, 204, 0.7)'
-                }
+                },
+                backgroundColor: '#0a1420'
             },
             'frostbite': {
                 name: 'Frostbite',
@@ -3761,7 +3740,8 @@ const EquipmentManager = {
                     '--input-bg': 'rgba(0, 20, 40, 0.5)',
                     '--border-color-main': 'rgba(135, 206, 235, 0.4)',
                     '--border-color-pulse': 'rgba(65, 105, 225, 0.7)'
-                }
+                },
+                backgroundColor: '#0f192d'
             },
             'arcane-violet': {
                 name: 'Arcane Violet',
@@ -3775,7 +3755,8 @@ const EquipmentManager = {
                     '--input-bg': 'rgba(20, 0, 30, 0.5)',
                     '--border-color-main': 'rgba(147, 112, 219, 0.4)',
                     '--border-color-pulse': 'rgba(255, 20, 147, 0.7)'
-                }
+                },
+                backgroundColor: '#190f23'
             },
             'verdant-growth': {
                 name: 'Verdant Growth',
@@ -3789,7 +3770,8 @@ const EquipmentManager = {
                     '--input-bg': 'rgba(10, 20, 5, 0.5)',
                     '--border-color-main': 'rgba(50, 205, 50, 0.4)',
                     '--border-color-pulse': 'rgba(124, 252, 0, 0.7)'
-                }
+                },
+                backgroundColor: '#141e0f'
             }
         },
 
@@ -3835,6 +3817,9 @@ const EquipmentManager = {
             Object.entries(theme.colors).forEach(([property, value]) => {
                 root.style.setProperty(property, value);
             });
+            
+            // Change background color
+            document.body.style.backgroundColor = theme.backgroundColor;
             
             this.currentTheme = themeKey;
             this.updateThemeDisplay();
@@ -3884,85 +3869,68 @@ const EquipmentManager = {
         },
         
         setupTabDragAndDrop() {
-            const tabsContainer = document.getElementById('main-tabs-container');
-            if (!tabsContainer) return;
+            // Mobile-friendly tab reordering with buttons instead of drag and drop
+            this.renderTabReorderList();
+        },
+        
+        renderTabReorderList() {
+            const tabReorderList = document.getElementById('tab-reorder-list');
+            if (!tabReorderList) return;
             
-            let draggedTab = null;
+            const tabNames = {
+                'equipment': 'Equipment',
+                'infusion': 'Infusion', 
+                'inventory': 'Inventory',
+                'stats': 'Stats',
+                'combat': 'Combat',
+                'quest': 'Quest',
+                'settings': 'Settings'
+            };
             
-            tabsContainer.addEventListener('dragstart', (e) => {
-                if (e.target.classList.contains('main-tab-button')) {
-                    draggedTab = e.target;
-                    e.target.classList.add('dragging');
-                    e.dataTransfer.effectAllowed = 'move';
+            tabReorderList.innerHTML = this.tabOrder.map((tabKey, index) => `
+                <div class="flex items-center justify-between bg-black/30 p-2 rounded">
+                    <span class="text-sm font-medium">${tabNames[tabKey] || tabKey}</span>
+                    <div class="flex gap-1">
+                        ${index > 0 ? `<button class="tab-move-btn px-2 py-1 bg-gray-600 hover:bg-gray-500 rounded text-xs" data-tab="${tabKey}" data-direction="up">▲</button>` : '<div class="w-6"></div>'}
+                        ${index < this.tabOrder.length - 1 ? `<button class="tab-move-btn px-2 py-1 bg-gray-600 hover:bg-gray-500 rounded text-xs" data-tab="${tabKey}" data-direction="down">▼</button>` : '<div class="w-6"></div>'}
+                    </div>
+                </div>
+            `).join('');
+            
+            // Add event listeners for move buttons
+            tabReorderList.addEventListener('click', (e) => {
+                if (e.target.classList.contains('tab-move-btn')) {
+                    const tabKey = e.target.dataset.tab;
+                    const direction = e.target.dataset.direction;
+                    this.moveTab(tabKey, direction);
                 }
-            });
-            
-            tabsContainer.addEventListener('dragend', (e) => {
-                if (e.target.classList.contains('main-tab-button')) {
-                    e.target.classList.remove('dragging');
-                    document.querySelectorAll('.drag-indicator').forEach(indicator => {
-                        indicator.remove();
-                    });
-                    draggedTab = null;
-                }
-            });
-            
-            tabsContainer.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                if (!draggedTab) return;
-                
-                const afterElement = this.getDragAfterElement(tabsContainer, e.clientX);
-                if (afterElement == null) {
-                    tabsContainer.appendChild(draggedTab);
-                } else {
-                    tabsContainer.insertBefore(draggedTab, afterElement);
-                }
-                
-                this.updateTabOrderFromDOM();
-            });
-            
-            // Make tabs draggable
-            const observer = new MutationObserver(() => {
-                tabsContainer.querySelectorAll('.main-tab-button').forEach(tab => {
-                    if (!tab.draggable) {
-                        tab.draggable = true;
-                    }
-                });
-            });
-            
-            observer.observe(tabsContainer, { childList: true });
-            
-            // Initial setup
-            tabsContainer.querySelectorAll('.main-tab-button').forEach(tab => {
-                tab.draggable = true;
             });
         },
         
-        getDragAfterElement(container, x) {
-            const draggableElements = [...container.querySelectorAll('.main-tab-button:not(.dragging)')];
+        moveTab(tabKey, direction) {
+            const currentIndex = this.tabOrder.indexOf(tabKey);
+            if (currentIndex === -1) return;
             
-            return draggableElements.reduce((closest, child) => {
-                const box = child.getBoundingClientRect();
-                const offset = x - box.left - box.width / 2;
-                
-                if (offset < 0 && offset > closest.offset) {
-                    return { offset: offset, element: child };
-                } else {
-                    return closest;
-                }
-            }, { offset: Number.NEGATIVE_INFINITY }).element;
-        },
-        
-        updateTabOrderFromDOM() {
-            const tabsContainer = document.getElementById('main-tabs-container');
-            if (!tabsContainer) return;
+            let newIndex;
+            if (direction === 'up' && currentIndex > 0) {
+                newIndex = currentIndex - 1;
+            } else if (direction === 'down' && currentIndex < this.tabOrder.length - 1) {
+                newIndex = currentIndex + 1;
+            } else {
+                return; // No movement needed
+            }
             
-            const newOrder = Array.from(tabsContainer.querySelectorAll('.main-tab-button'))
-                .map(button => button.dataset.tab);
+            // Remove tab from current position and insert at new position
+            const [removedTab] = this.tabOrder.splice(currentIndex, 1);
+            this.tabOrder.splice(newIndex, 0, removedTab);
             
-            this.tabOrder = newOrder;
+            // Update UI and save
+            this.applyTabOrder();
+            this.renderTabReorderList();
             this.saveSettings();
         },
+        
+
 
         render() {
             const settingsTab = document.getElementById('tab-content-settings');
@@ -3983,8 +3951,11 @@ const EquipmentManager = {
                     <div>
                         <h3 class="font-orbitron text-lg mb-2">Tab Layout</h3>
                         <div class="bg-black/20 p-4 rounded-lg">
-                            <p class="text-gray-400 text-sm mb-2">Drag and drop tabs to reorder them</p>
-                            <div class="text-xs text-gray-500">Your tab order is automatically saved</div>
+                            <p class="text-gray-400 text-sm mb-3">Reorder your tabs</p>
+                            <div id="tab-reorder-list" class="space-y-2">
+                                <!-- Tab reorder buttons will be populated here -->
+                            </div>
+                            <div class="text-xs text-gray-500 mt-3">Your tab order is automatically saved</div>
                         </div>
                     </div>
                     <div>
