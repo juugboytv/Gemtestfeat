@@ -205,22 +205,205 @@ export const ZONE_BLUEPRINTS: Record<string, ZoneBlueprint> = {
     features: [...starterZoneFeatures, { type: "Resource Node", q: -1, r: 2, name: "Divine Nexus" }]
   },
 
-  // === HIGHER LEVEL ZONES (25+) ===
+  // === HIGHER LEVEL ZONES (25-101) - ALL 77 ZONES ===
   "25": {
     name: "Echoing Chasms",
-    gridSize: 7,
-    description: "Deep canyons where every sound returns as a haunting echo.",
+    gridSize: 5,
+    description: "Deep canyons where every sound returns as a haunting echo. Level 100 required.",
     difficulty: 25,
+    levelRequirement: 100,
     features: [
-      { type: "Sanctuary", q: 5, r: -2 },
-      { type: "AetheriumConduit", q: -4, r: 1 },
-      { type: "Teleporter", q: 0, r: -5 },
-      { type: "Monster Zone", q: -2, r: 3 },
-      { type: "Monster Zone", q: 2, r: -3 },
-      { type: "Monster Zone", q: -1, r: -2 },
-      { type: "Monster Zone", q: 3, r: 1 },
-      { type: "Boss Arena", q: 0, r: 0, name: "Echo Chamber" },
-      { type: "Resource Node", q: -3, r: 4, name: "Resonance Crystal" }
+      { type: "Sanctuary", q: 0, r: 0 },
+      { type: "AetheriumConduit", q: -1, r: -1 },
+      { type: "Arcanum", q: 1, r: -1 },
+      { type: "Bank", q: -1, r: 1 },
+      { type: "Armory", q: 1, r: 1 },
+      { type: "Gem Node", q: 0, r: 2 },
+      { type: "Teleporter", q: 2, r: 0 },
+      { type: "Monster Zone", q: -2, r: 0 },
+      { type: "Monster Zone", q: 0, r: -2 },
+      { type: "Boss Arena", q: 1, r: 1, name: "Boss Chamber" },
+      { type: "Resource Node", q: -1, r: 2, name: "Rare Resource" }
+    ]
+  },
+  "26": {
+    name: "Starfall Deserts",
+    gridSize: 5,
+    description: "Desert sands that shimmer with fallen starlight. Level 100 required.",
+    difficulty: 26,
+    levelRequirement: 100,
+    features: [
+      { type: "Sanctuary", q: 0, r: 0 },
+      { type: "AetheriumConduit", q: -1, r: -1 },
+      { type: "Arcanum", q: 1, r: -1 },
+      { type: "Bank", q: -1, r: 1 },
+      { type: "Armory", q: 1, r: 1 },
+      { type: "Gem Node", q: 0, r: 2 },
+      { type: "Teleporter", q: 2, r: 0 },
+      { type: "Monster Zone", q: -2, r: 0 },
+      { type: "Monster Zone", q: 0, r: -2 },
+      { type: "Boss Arena", q: 1, r: 1, name: "Boss Chamber" },
+      { type: "Resource Node", q: -1, r: 2, name: "Rare Resource" }
+    ]
+  },
+  "27": {
+    name: "The Weeping Mire",
+    gridSize: 5,
+    description: "Sorrowful swamplands where ancient tears still fall. Level 100 required.",
+    difficulty: 27,
+    levelRequirement: 100,
+    features: [
+      { type: "Sanctuary", q: 0, r: 0 },
+      { type: "AetheriumConduit", q: -1, r: -1 },
+      { type: "Arcanum", q: 1, r: -1 },
+      { type: "Bank", q: -1, r: 1 },
+      { type: "Armory", q: 1, r: 1 },
+      { type: "Gem Node", q: 0, r: 2 },
+      { type: "Teleporter", q: 2, r: 0 },
+      { type: "Monster Zone", q: -2, r: 0 },
+      { type: "Monster Zone", q: 0, r: -2 },
+      { type: "Boss Arena", q: 1, r: 1, name: "Boss Chamber" },
+      { type: "Resource Node", q: -1, r: 2, name: "Rare Resource" }
+    ]
+  },
+  "28": {
+    name: "Frozen Spirelands",
+    gridSize: 5,
+    description: "Icy peaks that pierce the frozen sky. Level 100 required.",
+    difficulty: 28,
+    levelRequirement: 100,
+    features: [
+      { type: "Sanctuary", q: 0, r: 0 },
+      { type: "AetheriumConduit", q: -1, r: -1 },
+      { type: "Arcanum", q: 1, r: -1 },
+      { type: "Bank", q: -1, r: 1 },
+      { type: "Armory", q: 1, r: 1 },
+      { type: "Gem Node", q: 0, r: 2 },
+      { type: "Teleporter", q: 2, r: 0 },
+      { type: "Monster Zone", q: -2, r: 0 },
+      { type: "Monster Zone", q: 0, r: -2 },
+      { type: "Boss Arena", q: 1, r: 1, name: "Boss Chamber" },
+      { type: "Resource Node", q: -1, r: 2, name: "Rare Resource" }
+    ]
+  },
+  "29": {
+    name: "Living Mountain",
+    gridSize: 5,
+    description: "A mountain that breathes and moves with ancient life. Level 100 required.",
+    difficulty: 29,
+    levelRequirement: 100,
+    features: [
+      { type: "Sanctuary", q: 0, r: 0 },
+      { type: "AetheriumConduit", q: -1, r: -1 },
+      { type: "Arcanum", q: 1, r: -1 },
+      { type: "Bank", q: -1, r: 1 },
+      { type: "Armory", q: 1, r: 1 },
+      { type: "Gem Node", q: 0, r: 2 },
+      { type: "Teleporter", q: 2, r: 0 },
+      { type: "Monster Zone", q: -2, r: 0 },
+      { type: "Monster Zone", q: 0, r: -2 },
+      { type: "Boss Arena", q: 1, r: 1, name: "Boss Chamber" },
+      { type: "Resource Node", q: -1, r: 2, name: "Rare Resource" }
+    ]
+  },
+  "30": {
+    name: "Chrono-Distorted Fields",
+    gridSize: 5,
+    description: "Fields where time flows differently in each step. Level 100 required.",
+    difficulty: 30,
+    levelRequirement: 100,
+    features: [
+      { type: "Sanctuary", q: 0, r: 0 },
+      { type: "AetheriumConduit", q: -1, r: -1 },
+      { type: "Arcanum", q: 1, r: -1 },
+      { type: "Bank", q: -1, r: 1 },
+      { type: "Armory", q: 1, r: 1 },
+      { type: "Gem Node", q: 0, r: 2 },
+      { type: "Teleporter", q: 2, r: 0 },
+      { type: "Monster Zone", q: -2, r: 0 },
+      { type: "Monster Zone", q: 0, r: -2 },
+      { type: "Boss Arena", q: 1, r: 1, name: "Boss Chamber" },
+      { type: "Resource Node", q: -1, r: 2, name: "Rare Resource" }
+    ]
+  },
+  "31": {
+    name: "Whisperwind Peaks",
+    gridSize: 5,
+    description: "Mountain peaks where the wind carries ancient secrets. Level 100 required.",
+    difficulty: 31,
+    levelRequirement: 100,
+    features: [
+      { type: "Sanctuary", q: 0, r: 0 },
+      { type: "AetheriumConduit", q: -1, r: -1 },
+      { type: "Arcanum", q: 1, r: -1 },
+      { type: "Bank", q: -1, r: 1 },
+      { type: "Armory", q: 1, r: 1 },
+      { type: "Gem Node", q: 0, r: 2 },
+      { type: "Teleporter", q: 2, r: 0 },
+      { type: "Monster Zone", q: -2, r: 0 },
+      { type: "Monster Zone", q: 0, r: -2 },
+      { type: "Boss Arena", q: 1, r: 1, name: "Boss Chamber" },
+      { type: "Resource Node", q: -1, r: 2, name: "Rare Resource" }
+    ]
+  },
+  "32": {
+    name: "Corrupted Jungles",
+    gridSize: 5,
+    description: "Jungles twisted by dark magic and malevolent forces. Level 100 required.",
+    difficulty: 32,
+    levelRequirement: 100,
+    features: [
+      { type: "Sanctuary", q: 0, r: 0 },
+      { type: "AetheriumConduit", q: -1, r: -1 },
+      { type: "Arcanum", q: 1, r: -1 },
+      { type: "Bank", q: -1, r: 1 },
+      { type: "Armory", q: 1, r: 1 },
+      { type: "Gem Node", q: 0, r: 2 },
+      { type: "Teleporter", q: 2, r: 0 },
+      { type: "Monster Zone", q: -2, r: 0 },
+      { type: "Monster Zone", q: 0, r: -2 },
+      { type: "Boss Arena", q: 1, r: 1, name: "Boss Chamber" },
+      { type: "Resource Node", q: -1, r: 2, name: "Rare Resource" }
+    ]
+  },
+  "33": {
+    name: "Acidic Fens",
+    gridSize: 5,
+    description: "Toxic wetlands that dissolve all but the strongest materials. Level 100 required.",
+    difficulty: 33,
+    levelRequirement: 100,
+    features: [
+      { type: "Sanctuary", q: 0, r: 0 },
+      { type: "AetheriumConduit", q: -1, r: -1 },
+      { type: "Arcanum", q: 1, r: -1 },
+      { type: "Bank", q: -1, r: 1 },
+      { type: "Armory", q: 1, r: 1 },
+      { type: "Gem Node", q: 0, r: 2 },
+      { type: "Teleporter", q: 2, r: 0 },
+      { type: "Monster Zone", q: -2, r: 0 },
+      { type: "Monster Zone", q: 0, r: -2 },
+      { type: "Boss Arena", q: 1, r: 1, name: "Boss Chamber" },
+      { type: "Resource Node", q: -1, r: 2, name: "Rare Resource" }
+    ]
+  },
+  "34": {
+    name: "Bone Deserts",
+    gridSize: 5,
+    description: "Vast deserts carpeted with the bones of fallen giants. Level 253 required.",
+    difficulty: 34,
+    levelRequirement: 253,
+    features: [
+      { type: "Sanctuary", q: 0, r: 0 },
+      { type: "AetheriumConduit", q: -1, r: -1 },
+      { type: "Arcanum", q: 1, r: -1 },
+      { type: "Bank", q: -1, r: 1 },
+      { type: "Armory", q: 1, r: 1 },
+      { type: "Gem Node", q: 0, r: 2 },
+      { type: "Teleporter", q: 2, r: 0 },
+      { type: "Monster Zone", q: -2, r: 0 },
+      { type: "Monster Zone", q: 0, r: -2 },
+      { type: "Boss Arena", q: 1, r: 1, name: "Boss Chamber" },
+      { type: "Resource Node", q: -1, r: 2, name: "Rare Resource" }
     ]
   },
 
