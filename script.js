@@ -2032,10 +2032,7 @@ const EquipmentManager = {
                     zoneColor = 'rgba(200, 50, 50, 0.7)'; // Default to red
             }
             
-            // Debug logging for color generation
-            if (Math.random() < 0.1) { // Only log 10% of the time to avoid spam
-                console.log(`Zone Color Debug: currentZoneId=${currentZoneId}, patternIndex=${patternIndex}, color=${zoneColor}`);
-            }
+
             
             this.ctx.fillStyle = zoneColor;
             this.ctx.fill(); 
@@ -2047,13 +2044,11 @@ const EquipmentManager = {
                 this.ctx.textAlign = 'center'; 
                 this.ctx.textBaseline = 'middle'; 
                 
-                // Get the complete feature info including fallback
-                const fullFeatureInfo = this.getFeatureInfo(feature.type || 'Unknown');
+                // Handle both server data format (feature.type) and legacy format (feature.name/feature.icon)
+                const featureType = feature.type || feature.name || 'Unknown';
+                const fullFeatureInfo = this.getFeatureInfo(featureType);
                 
-                // Debug what we're getting
-                console.log(`Drawing feature: ${feature.type} -> Icon: ${fullFeatureInfo.icon}, Fallback: ${fullFeatureInfo.fallback}`);
-                
-                // Always use the text fallback for now to ensure visibility
+                // Use text fallback for reliable display
                 this.ctx.font = `bold ${Math.max(10, size * 1.0)}px Arial, sans-serif`;
                 this.ctx.fillStyle = fullFeatureInfo.color || '#FFFFFF';
                 this.ctx.fillText(fullFeatureInfo.fallback || '?', cx, cy);
