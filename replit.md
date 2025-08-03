@@ -53,6 +53,13 @@ The game uses minimal external dependencies to maintain the original architectur
 
 ## Recent Changes
 
+**January 2025 - Inventory Management UI Fixes**
+- Fixed focus button disappearing issue by implementing fixed CSS positioning in bottom-right corner
+- Added "Gem Pouch" category to both EquipmentManager and InfusionManager inventory dropdowns
+- Resolved architecture confusion between root index.html and client/index.html serving
+- Updated inventory naming from "Bag of Gear" to "Armory" for consistency
+- Enhanced inventory filtering system with proper category support for all item types
+
 **January 2025 - Complete Three-Tier Item System Implementation**
 - Implemented comprehensive PostgreSQL database schema with separate tables for all three item types
 - Created complete **Dropper Items** system: 20 gear tiers (Crude to Ascended) for store-bought equipment
