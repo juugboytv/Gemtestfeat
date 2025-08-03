@@ -42,16 +42,35 @@ router.get('/api/game/current-zone', async (req: Request, res: Response) => {
       !existingBuildings.some((f: any) => f.type === building)
     );
     
+    // Generate zone-specific hex color based on zone ID
+    const getZoneHexColor = (zoneId: number) => {
+      const colors = [
+        '#8b5cf6', // Purple
+        '#06b6d4', // Cyan  
+        '#10b981', // Emerald
+        '#f59e0b', // Amber
+        '#ef4444', // Red
+        '#3b82f6', // Blue
+        '#8b5cf6', // Violet
+        '#ec4899', // Pink
+        '#84cc16', // Lime
+        '#f97316'  // Orange
+      ];
+      return colors[zoneId % colors.length];
+    };
+
     // Format zone data for frontend
     const formattedZone = {
       id: currentZone.zoneId,
       name: currentZone.name,
       gridSize: currentZone.gridSize,
+      hexColor: getZoneHexColor(currentZone.zoneId),
       features: zoneFeatures.map((f: any) => ({
         q: f.q,
         r: f.r,
         type: f.type,
-        name: getFeatureName(f.type)
+        name: getFeatureName(f.type),
+        icon: getBuildingIcon(f.type)
       })),
       buildingCount: existingBuildings.length,
       missingBuildings: missingBuildings
@@ -152,6 +171,19 @@ function getFeatureName(featureType: string): string {
     'Monster Zone': 'Monster Zone'
   };
   return featureNames[featureType] || featureType;
+}
+
+// Helper function to get building icon
+function getBuildingIcon(featureType: string): string {
+  const buildingIcons: Record<string, string> = {
+    'Sanctuary': '🆘',
+    'Armory': '⚔️', 
+    'Arcanum': '🔮',
+    'AetheriumConduit': '💎',
+    'Teleporter': '🌀',
+    'GemCrucible': '🏧'
+  };
+  return buildingIcons[featureType] || '👹';
 }
 
 export default router;
