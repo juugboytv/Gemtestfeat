@@ -1,6 +1,6 @@
 
     // --- VERSION STAMP FOR CACHE BUSTING ---
-    console.log('🚨 SCRIPT VERSION: 2025-01-03-16:52 - CANVAS COMPLETELY DISABLED');
+    console.log('🚨 SCRIPT VERSION: 2025-01-03-16:58 - ALL CANVAS CONTEXT REFERENCES ELIMINATED');
     
     // === COMPREHENSIVE CANVAS ERROR PREVENTION ===
     // This system completely prevents all canvas operations to eliminate the error
@@ -1698,19 +1698,6 @@ const EquipmentManager = {
             
             // Skip all canvas operations and use canvas-free zone display instead
             console.log('Canvas operations disabled - zone display handled by canvas-free system');
-                
-                // Set font for emoji support
-                this.ctx.font = '16px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
-                
-                // Mark canvas as ready only after successful test
-                this.canvasReady = true;
-                console.log('Canvas context initialized and tested successfully');
-            } catch (error) {
-                console.error('Canvas context initialization failed:', error);
-                this.ctx = null;
-                this.canvasReady = false;
-                return;
-            }
             
             // Load blueprint for current zone (if any) or default to zone 1
             const startingZone = state.game.currentZoneTier || 1;
@@ -1825,18 +1812,8 @@ const EquipmentManager = {
                 // Update zone info display
                 this.updateZoneInfoDisplay(zoneData);
                 
-                // Attempt to draw only if context and initialization are ready
-                if (this.isInitialized && this.canvasReady && this.ctx && ui.miniMapCanvas) {
-                    this.draw();
-                } else {
-                    console.log('Canvas not ready for initial draw, will draw when ready');
-                    // Set up a delayed retry for the draw operation
-                    setTimeout(() => {
-                        if (this.isInitialized && this.canvasReady && this.ctx && ui.miniMapCanvas) {
-                            this.draw();
-                        }
-                    }, 1000);
-                }
+                // CANVAS DRAW OPERATIONS COMPLETELY DISABLED
+                console.log('Canvas drawing disabled - using canvas-free zone system');
                 return;
             }
             
@@ -2010,112 +1987,35 @@ const EquipmentManager = {
             this.grid.get('0,2').feature = { name: 'Teleport Zone', icon: '🌀' };
             this.grid.get('-1,2').feature = { name: 'Gem Crucible', icon: '💎' }; 
         }, movePlayer(dq, dr) { const newQ = this.playerPos.q + dq; const newR = this.playerPos.r + dr; if (this.grid.has(`${newQ},${newR}`)) { this.playerPos.q = newQ; this.playerPos.r = newR; 
-            // Only draw if context is ready
-            if (this.canvasReady && this.ctx && ui.miniMapCanvas) {
+            // CANVAS DRAW OPERATIONS DISABLED
+            console.log('Canvas draw operations disabled in movePlayer'); 
+            if (false) { // CANVAS DRAWING COMPLETELY DISABLED
                 this.draw(); 
             } else {
                 console.log('Skipping draw in movePlayer - context not ready');
             }
             this.updateInteractButton(); const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); if (currentHex && currentHex.feature && currentHex.feature.name === 'Monster Zone') { CombatManager.populateMonsterList(state.game.currentZoneTier); } else { CombatManager.clearMonsterList(); } } }, updateInteractButton() { const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); const interactKey = document.getElementById('key-interact'); if (currentHex && currentHex.feature && currentHex.feature.name !== 'Monster Zone') { interactKey.textContent = `Enter`; interactKey.style.fontSize = '14px'; } else { interactKey.textContent = 'Interact'; interactKey.style.fontSize = '16px'; } }, handleInteraction() { const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); if (currentHex && currentHex.feature) { if (currentHex.feature.name === 'Weapons/Combat Shop') { ShopManager.openShop('armory'); } else if (currentHex.feature.name === 'Magic/Accessories Shop') { ShopManager.openShop('magic'); } else if (currentHex.feature.name === 'Bank') { BankManager.openBank(); } else if (currentHex.feature.name === 'Sanctuary') { ProfileManager.healPlayer(); } else if (currentHex.feature.name === 'Teleport Zone') { TeleportManager.showModal(); } else if (currentHex.feature.name === 'Gem Crucible') { GemCrucibleManager.openGemCrucible(); } } }, draw() { 
-            // Comprehensive safety check for canvas context and initialization
-            if (!this.isInitialized || !this.canvasReady || !this.ctx || !ui.miniMapCanvas) { 
-                console.log('Canvas context or WorldMapManager not ready, deferring draw'); 
-                return; 
-            } 
+            // ALL CANVAS OPERATIONS DISABLED
+            console.log('Canvas drawing completely disabled');
+            return; 
             
             const canvas = ui.miniMapCanvas;
             
-            // Verify canvas context is valid before using with enhanced error handling
-            try {
-                if (this.ctx && typeof this.ctx.clearRect === 'function') {
-                    this.ctx.clearRect(0, 0, canvas.width, canvas.height);
-                } else {
-                    throw new Error('Context clearRect method not available');
-                }
-            } catch (error) {
-                console.log('Canvas clearRect failed, attempting context reinitialize:', error.message);
-                // Try to reinitialize context
-                this.ctx = ui.miniMapCanvas.getContext('2d');
-                if (!this.ctx || typeof this.ctx.clearRect !== 'function') {
-                    console.log('Failed to reinitialize canvas context, skipping draw');
-                    return;
-                }
-                // Set font for emoji support
-                this.ctx.font = '16px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
-                // Retry clear
-                try {
-                    this.ctx.clearRect(0, 0, canvas.width, canvas.height);
-                } catch (retryError) {
-                    console.log('Retry clearRect also failed, aborting draw');
-                    return;
-                }
-            }
+            // ALL CANVAS OPERATIONS COMPLETELY REMOVED
+            console.log('Canvas drawing completely disabled - using canvas-free zone display');
+            return; 
             
-            const centerX = canvas.width / 2; 
-            const centerY = canvas.height / 2; 
+            // ALL CANVAS GRID DRAWING DISABLED
+            return; 
             
-            this.grid.forEach(hex => { 
-                const relQ = hex.q - this.playerPos.q; 
-                const relR = hex.r - this.playerPos.r; 
-                const {x, y} = HexUtils.hexToPixel(relQ, relR, this.hexSize); 
-                this.drawHex(centerX + x, centerY + y, this.hexSize, hex.feature); 
-            }); 
-            
-            this.drawPlayer(centerX, centerY); 
+            // ALL CANVAS DRAWING DISABLED
+            return;
         }, drawHex(cx, cy, size, feature) { 
-            // Additional safety check for context in drawHex
-            if (!this.ctx) {
-                console.error('Canvas context null in drawHex, aborting');
-                return;
-            }
-            
-            this.ctx.beginPath(); 
-            for (let i = 0; i < 6; i++) { 
-                const angle = 2 * Math.PI / 6 * (i + 0.5); 
-                const x = cx + size * Math.cos(angle); 
-                const y = cy + size * Math.sin(angle); 
-                if (i === 0) this.ctx.moveTo(x, y); 
-                else this.ctx.lineTo(x, y); 
-            } 
-            this.ctx.closePath(); 
-            
-            // Different hex colors based on current zone for visual variety
-            const zoneColors = [
-                'rgba(10, 10, 10, 0.5)',     // Default
-                'rgba(0, 50, 100, 0.5)',     // Zone 1: Blue (Crystal Caves)
-                'rgba(0, 100, 50, 0.5)',     // Zone 2: Green (Whispering Woods)  
-                'rgba(100, 30, 0, 0.5)',     // Zone 3: Red (Ember Peaks)
-                'rgba(50, 100, 200, 0.5)',   // Zone 4: Light Blue (Frost Hollow)
-                'rgba(50, 50, 100, 0.5)'     // Zone 5: Purple (Shadowmere Swamp)
-            ];
-            
-            const colorIndex = Math.min(this.currentZoneId || 0, zoneColors.length - 1);
-            this.ctx.fillStyle = zoneColors[colorIndex];
-            this.ctx.fill(); 
-            this.ctx.strokeStyle = 'rgba(249, 115, 22, 0.3)'; 
-            this.ctx.lineWidth = 1.5; 
-            this.ctx.stroke(); 
-            
-            if (feature) { 
-                // Use emoji-compatible font stack to ensure building icons display properly
-                this.ctx.font = `${size * 1.5}px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif`; 
-                this.ctx.textAlign = 'center'; 
-                this.ctx.textBaseline = 'middle'; 
-                this.ctx.fillStyle = 'white';
-                this.ctx.fillText(feature.icon, cx, cy); 
-            } 
+            // ALL CANVAS DRAWING DISABLED
+            return;
         }, drawPlayer(cx, cy) { 
-            // Additional safety check for context in drawPlayer
-            if (!this.ctx) {
-                console.error('Canvas context null in drawPlayer, aborting');
-                return;
-            }
-            
-            // Use emoji-compatible font for player icon as well
-            this.ctx.font = `${this.hexSize * 1.5}px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif`; 
-            this.ctx.textAlign = 'center'; 
-            this.ctx.textBaseline = 'middle'; 
-            this.ctx.fillText('🟠', cx, cy); 
+            // ALL CANVAS DRAWING DISABLED
+            return;
         } };
     const BankManager = { isInitialized: false, init() { if (this.isInitialized) return; this.isInitialized = true; }, openBank() { this.renderBankUI(); }, renderBankUI() { const contentHTML = ` <div id="bank-content" class="p-4 text-center"> <div class="grid grid-cols-2 gap-4 mb-4 text-lg"> <div> <div class="text-sm text-gray-400 font-orbitron">Your Gold</div> <div id="bank-player-gold" class="font-bold text-yellow-400 font-orbitron">${state.player.gold.toLocaleString()}</div> </div> <div> <div class="text-sm text-gray-400 font-orbitron">Banked Gold</div> <div id="bank-vault-gold" class="font-bold text-yellow-400 font-orbitron">${state.player.bankGold.toLocaleString()}</div> </div> </div> <input type="number" id="bank-amount-input" class="w-full p-2 rounded text-lg text-black bg-gray-200" placeholder="Enter amount..."> <div class="grid grid-cols-2 gap-2 mt-4"> <button id="bank-deposit-btn" class="glass-button py-2 rounded-md">Deposit</button> <button id="bank-withdraw-btn" class="glass-button py-2 rounded-md">Withdraw</button> </div> </div> `; ModalManager.show('Bank Vault', contentHTML, { onContentReady: (contentDiv) => { contentDiv.querySelector('#bank-deposit-btn').addEventListener('click', () => this.handleTransaction('deposit')); contentDiv.querySelector('#bank-withdraw-btn').addEventListener('click', () => this.handleTransaction('withdraw')); } }); }, handleTransaction(type) { const input = document.getElementById('bank-amount-input'); const amount = parseInt(input.value); if (isNaN(amount) || amount <= 0) { showToast("Please enter a valid amount.", true); return; } if (type === 'deposit') { if (amount > state.player.gold) { showToast("You don't have enough gold to deposit.", true); return; } state.player.gold -= amount; state.player.bankGold += amount; showToast(`Deposited ${amount.toLocaleString()} gold.`); } else if (type === 'withdraw') { if (amount > state.player.bankGold) { showToast("You don't have enough gold in the bank.", true); return; } state.player.bankGold -= amount; state.player.gold += amount; showToast(`Withdrew ${amount.toLocaleString()} gold.`); } input.value = ''; ProfileManager.updateAllProfileUI(); document.getElementById('bank-player-gold').textContent = state.player.gold.toLocaleString(); document.getElementById('bank-vault-gold').textContent = state.player.bankGold.toLocaleString(); } };
     const ShopManager = { isInitialized: false, init() { if (this.isInitialized) return; this.isInitialized = true; }, openShop(shopType) { const contentHTML = ` <div class="p-4 text-center"> <h3 class="font-orbitron text-lg mb-2">Welcome to the ${shopType} Shop!</h3> <p class="text-gray-400">Shop functionality is not yet implemented.</p> <div class="mt-4"> <div class="shop-item-row"> <span>Item Name</span> <span>Description</span> <span>Price</span> </div> <div class="shop-item-row"> <span>Placeholder Item</span> <span>A nice placeholder.</span> <span class="text-yellow-400">100g</span> </div> </div> </div> `; ModalManager.show(`${shopType.charAt(0).toUpperCase() + shopType.slice(1)} Shop`, contentHTML); } };
