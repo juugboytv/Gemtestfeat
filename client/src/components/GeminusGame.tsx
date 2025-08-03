@@ -44,7 +44,7 @@ const GeminusGame: React.FC = () => {
           <div className="min-h-screen text-white">
             {/* Embed the original game HTML */}
             <iframe 
-              src="/index.html" 
+              src="/original_game.html" 
               className="w-full h-screen border-0"
               title="Geminus Full Game"
             />
