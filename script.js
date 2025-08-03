@@ -2166,8 +2166,8 @@ const EquipmentManager = {
                         break;
                 }
                 
-                // Use text fallback for reliable display
-                this.ctx.font = `bold ${Math.max(10, size * 1.0)}px Arial, sans-serif`;
+                // Use emoji-supporting font for reliable display
+                this.ctx.font = `bold ${Math.max(10, size * 1.0)}px "Noto Color Emoji", "Apple Color Emoji", "Segoe UI Emoji", Arial, sans-serif`;
                 this.ctx.fillStyle = displayColor;
                 this.ctx.fillText(displayChar, cx, cy);
             } 
