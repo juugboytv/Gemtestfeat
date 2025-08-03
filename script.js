@@ -1698,9 +1698,18 @@ const EquipmentManager = {
             }); 
         }, 
         
-        // Load zone blueprint dynamically
+        // Load zone from server data instead of blueprints
         async loadZoneBlueprint(zoneId) {
             this.currentZoneId = zoneId;
+            
+            // Use server-provided zone data if available
+            if (state.currentZone && state.currentZone.features) {
+                console.log(`Using server zone data for map generation:`, state.currentZone);
+                this.populateGridFromServerData(state.currentZone);
+                return;
+            }
+            
+            // Fallback to blueprint system if server data not available
             const blueprint = await this.getZoneBlueprint(zoneId);
             
             console.log(`Loading zone ${zoneId}:`, blueprint ? (blueprint.name || `Zone ${zoneId}`) : 'No blueprint found');
@@ -1761,6 +1770,54 @@ const EquipmentManager = {
             showToast(`Zone Layout: ${blueprint.name} (${gridSize}x${gridSize} grid)`, false);
             
             // Force redraw after loading blueprint
+            this.draw();
+        },
+        
+        // New method to populate grid from server-provided zone data
+        populateGridFromServerData(zoneData) {
+            console.log(`Populating grid from server data for zone ${zoneData.id}:`, zoneData);
+            
+            // Clear existing grid
+            this.grid.clear();
+            
+            // Generate hexagonal grid based on server-provided size
+            const gridSize = zoneData.gridSize;
+            for (let q = -gridSize; q <= gridSize; q++) {
+                for (let r = -gridSize; r <= gridSize; r++) {
+                    const s = -q - r;
+                    if (s >= -gridSize && s <= gridSize) {
+                        // Default all hexes to Monster Zones
+                        this.grid.set(`${q},${r}`, { 
+                            q, r, s, 
+                            feature: { name: 'Monster Zone', icon: '◻️' } 
+                        });
+                    }
+                }
+            }
+            
+            // Place features from server data
+            console.log(`Placing ${zoneData.features.length} server features on grid...`);
+            zoneData.features.forEach((feature, index) => {
+                const key = `${feature.q},${feature.r}`;
+                console.log(`Server Feature ${index + 1}: ${feature.type} at (${feature.q}, ${feature.r})`);
+                
+                if (this.grid.has(key)) {
+                    console.log(`  → Placing server feature ${feature.type} with proper structure`);
+                    this.grid.get(key).feature = {
+                        type: feature.type,  // This is what drawHex looks for
+                        name: feature.type,
+                        q: feature.q,
+                        r: feature.r
+                    };
+                } else {
+                    console.log(`  → WARNING: Grid position ${key} does not exist for server feature: ${feature.type}`);
+                }
+            });
+            
+            console.log(`Server zone grid populated: ${zoneData.name} (${gridSize}x${gridSize}) with ${zoneData.features.length} features`);
+            showToast(`Zone Layout: ${zoneData.name} (${gridSize}x${gridSize} server grid)`, false);
+            
+            // Force redraw after loading server data
             this.draw();
             
             // Add global test functions for debugging
@@ -2047,9 +2104,6 @@ const EquipmentManager = {
                 // Handle both server data format (feature.type) and legacy format (feature.name/feature.icon)
                 const featureType = feature.type || feature.name || 'Unknown';
                 const fullFeatureInfo = this.getFeatureInfo(featureType);
-                
-                // Debug output to see what we're drawing
-                console.log(`Drawing hex with feature:`, feature, `-> Using fallback: "${fullFeatureInfo.fallback}" in color: ${fullFeatureInfo.color}`);
                 
                 // Use text fallback for reliable display
                 this.ctx.font = `bold ${Math.max(10, size * 1.0)}px Arial, sans-serif`;
