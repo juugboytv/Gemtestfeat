@@ -1748,12 +1748,17 @@ const EquipmentManager = {
                 
                 if (this.grid.has(key)) {
                     console.log(`  → Placing ${feature.type} at grid position ${key}`);
-                    this.grid.get(key).feature = {
+                    const featureObj = {
                         type: feature.type,  // This is what drawHex looks for
                         name: feature.name || feature.type,
                         q: feature.q,
                         r: feature.r
                     };
+                    console.log(`  → Feature object being stored:`, JSON.stringify(featureObj));
+                    this.grid.get(key).feature = featureObj;
+                    
+                    // Verify it was stored correctly
+                    console.log(`  → Verification - stored feature:`, JSON.stringify(this.grid.get(key).feature));
                 } else {
                     console.log(`  → WARNING: Grid position ${key} does not exist! (Feature: ${feature.type})`);
                     console.log(`  → Available grid keys: ${Array.from(this.grid.keys()).slice(0, 10).join(', ')}...`);
@@ -1762,6 +1767,19 @@ const EquipmentManager = {
             
             console.log(`Loaded zone blueprint: ${blueprint.name} (Zone ${zoneId}) - Grid Size: ${gridSize}`, blueprint.features);
             console.log(`Grid generated with ${this.grid.size} hexes total`);
+            
+            // DEBUG: Final verification of what's actually stored before drawing
+            console.log(`\n=== PRE-DRAW GRID STATE DEBUG ===`);
+            let actualFeatureCount = 0;
+            this.grid.forEach((hex, key) => {
+                if (hex.feature && hex.feature.type && hex.feature.type !== 'Monster Zone') {
+                    actualFeatureCount++;
+                    console.log(`Grid ${key}: ${hex.feature.type} ->`, JSON.stringify(hex.feature));
+                }
+            });
+            console.log(`Total non-monster features stored: ${actualFeatureCount}`);
+            console.log(`=== END PRE-DRAW GRID DEBUG ===\n`);
+            
             showToast(`Zone Layout: ${blueprint.name} (${gridSize}x${gridSize} grid)`, false);
             
             // Force redraw after loading blueprint
@@ -1794,6 +1812,45 @@ const EquipmentManager = {
                         console.log(`${feature.type} at (${feature.q},${feature.r}) -> ${info.fallback} (${info.color})`);
                     });
                 }
+            };
+            
+            // EMERGENCY DEBUG - Force set known features and redraw immediately 
+            window.testDirectFeatureDisplay = () => {
+                console.log('=== DIRECT FEATURE DISPLAY TEST ===');
+                
+                // Clear grid and set up a simple test case
+                this.grid.clear();
+                
+                // Create test features at known positions
+                const testFeatures = [
+                    { q: 0, r: 0, type: 'Sanctuary' },
+                    { q: 1, r: 0, type: 'Bank' },
+                    { q: -1, r: 0, type: 'Armory' },
+                    { q: 0, r: 1, type: 'Arcanum' },
+                    { q: 0, r: -1, type: 'Teleporter' }
+                ];
+                
+                // Manually add these to grid
+                testFeatures.forEach(feat => {
+                    const key = `${feat.q},${feat.r}`;
+                    this.grid.set(key, {
+                        q: feat.q,
+                        r: feat.r,
+                        s: -feat.q - feat.r,
+                        feature: {
+                            type: feat.type,
+                            name: feat.type
+                        }
+                    });
+                    console.log(`Set test feature: ${feat.type} at ${key}`);
+                });
+                
+                console.log(`Total test grid size: ${this.grid.size}`);
+                
+                // Force immediate redraw
+                this.draw();
+                
+                console.log('=== END DIRECT TEST ===');
             };
             
             window.testCanvasEmoji = () => {
@@ -2066,12 +2123,53 @@ const EquipmentManager = {
                 
                 // Handle both server data format (feature.type) and legacy format (feature.name/feature.icon)
                 const featureType = feature.type || feature.name || 'Unknown';
-                const fullFeatureInfo = this.getFeatureInfo(featureType);
+                
+                // Direct mapping without relying on getFeatureInfo to avoid any lookup issues
+                let displayChar = '?';
+                let displayColor = '#F44336';
+                
+                switch (featureType) {
+                    case 'Bank':
+                        displayChar = '$';
+                        displayColor = '#FFC107';
+                        break;
+                    case 'Armory':
+                        displayChar = 'W';
+                        displayColor = '#F44336';
+                        break;
+                    case 'Arcanum':
+                        displayChar = 'M';
+                        displayColor = '#9C27B0';
+                        break;
+                    case 'Revive Station':
+                        displayChar = '+';
+                        displayColor = '#4CAF50';
+                        break;
+                    case 'Gem Crucible':
+                        displayChar = 'G';
+                        displayColor = '#00BCD4';
+                        break;
+                    case 'Teleporter':
+                        displayChar = 'T';
+                        displayColor = '#2196F3';
+                        break;
+                    case 'Sanctuary':
+                        displayChar = 'H';
+                        displayColor = '#FFEB3B';
+                        break;
+                    case 'Monster Zone':
+                        displayChar = '•';
+                        displayColor = '#757575';
+                        break;
+                    default:
+                        console.log(`Unknown feature type: "${featureType}" - using fallback`);
+                        break;
+                }
                 
                 // Use text fallback for reliable display
                 this.ctx.font = `bold ${Math.max(10, size * 1.0)}px Arial, sans-serif`;
-                this.ctx.fillStyle = fullFeatureInfo.color || '#FFFFFF';
-                this.ctx.fillText(fullFeatureInfo.fallback || '?', cx, cy);
+                this.ctx.fillStyle = displayColor;
+                this.ctx.fillText(displayChar, cx, cy);
             } 
         }, drawPlayer(cx, cy) { this.ctx.font = `${this.hexSize * 1.5}px sans-serif`; this.ctx.textAlign = 'center'; this.ctx.textBaseline = 'middle'; this.ctx.fillText('🟠', cx, cy); } };
     const BankManager = { isInitialized: false, init() { if (this.isInitialized) return; this.isInitialized = true; }, openBank() { this.renderBankUI(); }, renderBankUI() { const contentHTML = ` <div id="bank-content" class="p-4 text-center"> <div class="grid grid-cols-2 gap-4 mb-4 text-lg"> <div> <div class="text-sm text-gray-400 font-orbitron">Your Gold</div> <div id="bank-player-gold" class="font-bold text-yellow-400 font-orbitron">${state.player.gold.toLocaleString()}</div> </div> <div> <div class="text-sm text-gray-400 font-orbitron">Banked Gold</div> <div id="bank-vault-gold" class="font-bold text-yellow-400 font-orbitron">${state.player.bankGold.toLocaleString()}</div> </div> </div> <input type="number" id="bank-amount-input" class="w-full p-2 rounded text-lg text-black bg-gray-200" placeholder="Enter amount..."> <div class="grid grid-cols-2 gap-2 mt-4"> <button id="bank-deposit-btn" class="glass-button py-2 rounded-md">Deposit</button> <button id="bank-withdraw-btn" class="glass-button py-2 rounded-md">Withdraw</button> </div> </div> `; ModalManager.show('Bank Vault', contentHTML, { onContentReady: (contentDiv) => { contentDiv.querySelector('#bank-deposit-btn').addEventListener('click', () => this.handleTransaction('deposit')); contentDiv.querySelector('#bank-withdraw-btn').addEventListener('click', () => this.handleTransaction('withdraw')); } }); }, handleTransaction(type) { const input = document.getElementById('bank-amount-input'); const amount = parseInt(input.value); if (isNaN(amount) || amount <= 0) { showToast("Please enter a valid amount.", true); return; } if (type === 'deposit') { if (amount > state.player.gold) { showToast("You don't have enough gold to deposit.", true); return; } state.player.gold -= amount; state.player.bankGold += amount; showToast(`Deposited ${amount.toLocaleString()} gold.`); } else if (type === 'withdraw') { if (amount > state.player.bankGold) { showToast("You don't have enough gold in the bank.", true); return; } state.player.bankGold -= amount; state.player.gold += amount; showToast(`Withdrew ${amount.toLocaleString()} gold.`); } input.value = ''; ProfileManager.updateAllProfileUI(); document.getElementById('bank-player-gold').textContent = state.player.gold.toLocaleString(); document.getElementById('bank-vault-gold').textContent = state.player.bankGold.toLocaleString(); } };
