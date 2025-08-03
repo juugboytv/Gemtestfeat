@@ -1780,6 +1780,15 @@ const EquipmentManager = {
                     const info = WorldMapManager.getFeatureInfo(type);
                     console.log(`${type} -> Emoji: ${info.icon} | Fallback: ${info.fallback} | Color: ${info.color}`);
                 });
+                
+                // Also test with current zone features
+                console.log('\nTesting current zone features:');
+                if (state.currentZone && state.currentZone.features) {
+                    state.currentZone.features.forEach(feature => {
+                        const info = WorldMapManager.getFeatureInfo(feature.type);
+                        console.log(`${feature.type} at (${feature.q},${feature.r}) -> ${info.fallback} (${info.color})`);
+                    });
+                }
             };
             
             window.testCanvasEmoji = () => {
@@ -2041,27 +2050,13 @@ const EquipmentManager = {
                 // Get the complete feature info including fallback
                 const fullFeatureInfo = this.getFeatureInfo(feature.type || 'Unknown');
                 
-                // First try to render emoji
-                const fontSize = Math.max(12, size * 1.2);
-                this.ctx.font = `${fontSize}px "Noto Color Emoji", "Apple Color Emoji", "Segoe UI Emoji", system-ui, sans-serif`;
+                // Debug what we're getting
+                console.log(`Drawing feature: ${feature.type} -> Icon: ${fullFeatureInfo.icon}, Fallback: ${fullFeatureInfo.fallback}`);
                 
-                // Create a test to see if emoji renders properly
-                const testCanvas = document.createElement('canvas');
-                const testCtx = testCanvas.getContext('2d');
-                testCtx.font = this.ctx.font;
-                const emojiWidth = testCtx.measureText(fullFeatureInfo.icon).width;
-                
-                // If emoji doesn't render properly (width is 0 or very small), use fallback
-                if (emojiWidth < 5 || fullFeatureInfo.icon === '❓') {
-                    // Use reliable text fallback with color coding
-                    this.ctx.font = `bold ${Math.max(10, size * 1.0)}px Arial, sans-serif`;
-                    this.ctx.fillStyle = fullFeatureInfo.color || '#FFFFFF';
-                    this.ctx.fillText(fullFeatureInfo.fallback || '?', cx, cy);
-                } else {
-                    // Use emoji
-                    this.ctx.fillStyle = 'white';
-                    this.ctx.fillText(fullFeatureInfo.icon, cx, cy);
-                }
+                // Always use the text fallback for now to ensure visibility
+                this.ctx.font = `bold ${Math.max(10, size * 1.0)}px Arial, sans-serif`;
+                this.ctx.fillStyle = fullFeatureInfo.color || '#FFFFFF';
+                this.ctx.fillText(fullFeatureInfo.fallback || '?', cx, cy);
             } 
         }, drawPlayer(cx, cy) { this.ctx.font = `${this.hexSize * 1.5}px sans-serif`; this.ctx.textAlign = 'center'; this.ctx.textBaseline = 'middle'; this.ctx.fillText('🟠', cx, cy); } };
     const BankManager = { isInitialized: false, init() { if (this.isInitialized) return; this.isInitialized = true; }, openBank() { this.renderBankUI(); }, renderBankUI() { const contentHTML = ` <div id="bank-content" class="p-4 text-center"> <div class="grid grid-cols-2 gap-4 mb-4 text-lg"> <div> <div class="text-sm text-gray-400 font-orbitron">Your Gold</div> <div id="bank-player-gold" class="font-bold text-yellow-400 font-orbitron">${state.player.gold.toLocaleString()}</div> </div> <div> <div class="text-sm text-gray-400 font-orbitron">Banked Gold</div> <div id="bank-vault-gold" class="font-bold text-yellow-400 font-orbitron">${state.player.bankGold.toLocaleString()}</div> </div> </div> <input type="number" id="bank-amount-input" class="w-full p-2 rounded text-lg text-black bg-gray-200" placeholder="Enter amount..."> <div class="grid grid-cols-2 gap-2 mt-4"> <button id="bank-deposit-btn" class="glass-button py-2 rounded-md">Deposit</button> <button id="bank-withdraw-btn" class="glass-button py-2 rounded-md">Withdraw</button> </div> </div> `; ModalManager.show('Bank Vault', contentHTML, { onContentReady: (contentDiv) => { contentDiv.querySelector('#bank-deposit-btn').addEventListener('click', () => this.handleTransaction('deposit')); contentDiv.querySelector('#bank-withdraw-btn').addEventListener('click', () => this.handleTransaction('withdraw')); } }); }, handleTransaction(type) { const input = document.getElementById('bank-amount-input'); const amount = parseInt(input.value); if (isNaN(amount) || amount <= 0) { showToast("Please enter a valid amount.", true); return; } if (type === 'deposit') { if (amount > state.player.gold) { showToast("You don't have enough gold to deposit.", true); return; } state.player.gold -= amount; state.player.bankGold += amount; showToast(`Deposited ${amount.toLocaleString()} gold.`); } else if (type === 'withdraw') { if (amount > state.player.bankGold) { showToast("You don't have enough gold in the bank.", true); return; } state.player.bankGold -= amount; state.player.gold += amount; showToast(`Withdrew ${amount.toLocaleString()} gold.`); } input.value = ''; ProfileManager.updateAllProfileUI(); document.getElementById('bank-player-gold').textContent = state.player.gold.toLocaleString(); document.getElementById('bank-vault-gold').textContent = state.player.bankGold.toLocaleString(); } };
