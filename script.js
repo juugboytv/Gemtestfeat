@@ -1580,7 +1580,7 @@ const EquipmentManager = {
                 ProfileManager.healPlayer(); 
                 WorldMapManager.playerPos = { q: 0, r: 0 }; 
                 // Only draw if WorldMapManager is properly initialized
-                if (WorldMapManager.ctx && WorldMapManager.isInitialized) {
+                if (WorldMapManager.canvasReady && WorldMapManager.ctx && WorldMapManager.isInitialized) {
                     WorldMapManager.draw(); 
                 } else {
                     console.log('Skipping draw in combat - WorldMapManager not ready');
@@ -1633,6 +1633,7 @@ const EquipmentManager = {
 
       const WorldMapManager = { 
         isInitialized: false, 
+        canvasReady: false,
         grid: new Map(), 
         playerPos: { q: 0, r: 0 }, 
         hexSize: 18, 
@@ -1654,15 +1655,29 @@ const EquipmentManager = {
             ui.miniMapCanvas.style.width = `${ui.miniMapContainer.clientWidth}px`; 
             ui.miniMapCanvas.style.height = `${ui.miniMapContainer.clientHeight}px`; 
             
-            // Get context with error handling
-            this.ctx = ui.miniMapCanvas.getContext('2d');
-            if (!this.ctx) {
-                console.error('Failed to get canvas 2d context!');
+            // Get context with comprehensive error handling
+            try {
+                this.ctx = ui.miniMapCanvas.getContext('2d');
+                if (!this.ctx || typeof this.ctx.clearRect !== 'function') {
+                    console.error('Failed to get valid canvas 2d context!');
+                    return;
+                }
+                
+                // Test the context immediately
+                this.ctx.clearRect(0, 0, 1, 1);
+                
+                // Set font for emoji support
+                this.ctx.font = '16px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
+                
+                // Mark canvas as ready only after successful test
+                this.canvasReady = true;
+                console.log('Canvas context initialized and tested successfully');
+            } catch (error) {
+                console.error('Canvas context initialization failed:', error);
+                this.ctx = null;
+                this.canvasReady = false;
                 return;
             }
-            
-            // Set font for emoji support
-            this.ctx.font = '16px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
             
             // Load blueprint for current zone (if any) or default to zone 1
             const startingZone = state.game.currentZoneTier || 1;
@@ -1734,16 +1749,16 @@ const EquipmentManager = {
                 showToast(`Zone Layout: ${serverZoneData.name} (${gridSize}x${gridSize} grid)`, false);
                 
                 // Attempt to draw only if context and initialization are ready
-                if (this.isInitialized && this.ctx && ui.miniMapCanvas) {
+                if (this.isInitialized && this.canvasReady && this.ctx && ui.miniMapCanvas) {
                     this.draw();
                 } else {
                     console.log('Canvas not ready for initial draw, will draw when ready');
                     // Set up a delayed retry for the draw operation
                     setTimeout(() => {
-                        if (this.isInitialized && this.ctx && ui.miniMapCanvas) {
+                        if (this.isInitialized && this.canvasReady && this.ctx && ui.miniMapCanvas) {
                             this.draw();
                         }
-                    }, 500);
+                    }, 1000);
                 }
                 return;
             }
@@ -1919,14 +1934,14 @@ const EquipmentManager = {
             this.grid.get('-1,2').feature = { name: 'Gem Crucible', icon: '💎' }; 
         }, movePlayer(dq, dr) { const newQ = this.playerPos.q + dq; const newR = this.playerPos.r + dr; if (this.grid.has(`${newQ},${newR}`)) { this.playerPos.q = newQ; this.playerPos.r = newR; 
             // Only draw if context is ready
-            if (this.ctx && ui.miniMapCanvas) {
+            if (this.canvasReady && this.ctx && ui.miniMapCanvas) {
                 this.draw(); 
             } else {
                 console.log('Skipping draw in movePlayer - context not ready');
             }
             this.updateInteractButton(); const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); if (currentHex && currentHex.feature && currentHex.feature.name === 'Monster Zone') { CombatManager.populateMonsterList(state.game.currentZoneTier); } else { CombatManager.clearMonsterList(); } } }, updateInteractButton() { const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); const interactKey = document.getElementById('key-interact'); if (currentHex && currentHex.feature && currentHex.feature.name !== 'Monster Zone') { interactKey.textContent = `Enter`; interactKey.style.fontSize = '14px'; } else { interactKey.textContent = 'Interact'; interactKey.style.fontSize = '16px'; } }, handleInteraction() { const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); if (currentHex && currentHex.feature) { if (currentHex.feature.name === 'Weapons/Combat Shop') { ShopManager.openShop('armory'); } else if (currentHex.feature.name === 'Magic/Accessories Shop') { ShopManager.openShop('magic'); } else if (currentHex.feature.name === 'Bank') { BankManager.openBank(); } else if (currentHex.feature.name === 'Sanctuary') { ProfileManager.healPlayer(); } else if (currentHex.feature.name === 'Teleport Zone') { TeleportManager.showModal(); } else if (currentHex.feature.name === 'Gem Crucible') { GemCrucibleManager.openGemCrucible(); } } }, draw() { 
             // Comprehensive safety check for canvas context and initialization
-            if (!this.isInitialized || !this.ctx || !ui.miniMapCanvas) { 
+            if (!this.isInitialized || !this.canvasReady || !this.ctx || !ui.miniMapCanvas) { 
                 console.log('Canvas context or WorldMapManager not ready, deferring draw'); 
                 return; 
             } 
