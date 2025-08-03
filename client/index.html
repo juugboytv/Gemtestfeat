@@ -4270,28 +4270,8 @@ const EquipmentManager = {
         ],
 
         init() {
-            // Main listeners
-            document.getElementById('dev-suite-close-btn').addEventListener('click', () => this.close());
-            document.getElementById('dev-suite-auth-btn').addEventListener('click', () => this.authenticate());
-            document.getElementById('push-live-btn').addEventListener('click', () => this.pushLive());
-            
-            document.querySelectorAll('.dev-suite-tab-btn').forEach(btn => {
-                btn.addEventListener('click', () => this.switchTab(btn.dataset.tab));
-            });
-
-            // Event delegation for dynamic content
-            const devContent = document.getElementById('dev-suite-content');
-            if (devContent) {
-                devContent.addEventListener('click', (e) => {
-                    const button = e.target.closest('[data-action]');
-                    if (button) {
-                        e.stopPropagation();
-                        const action = button.dataset.action;
-                        const module = button.dataset.module;
-                        if (action === 'open-module') this.openModule(module);
-                    }
-                });
-            }
+            // DevSuite initialization - event listeners will be attached when modal opens
+            console.log('DevSuite initialized');
         },
 
         open() {
@@ -4344,7 +4324,7 @@ const EquipmentManager = {
                 </div>
             `;
             
-            // Re-attach event listeners
+            // Attach event listeners
             document.getElementById('dev-suite-close-btn').addEventListener('click', () => this.close());
             document.getElementById('dev-suite-auth-btn').addEventListener('click', () => this.authenticate());
             
@@ -4400,7 +4380,7 @@ const EquipmentManager = {
                 </div>
             `;
             
-            // Re-attach event listeners
+            // Attach event listeners
             document.getElementById('dev-suite-close-btn').addEventListener('click', () => this.close());
             document.getElementById('push-live-btn').addEventListener('click', () => this.pushLive());
             
