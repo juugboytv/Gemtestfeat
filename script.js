@@ -2203,11 +2203,11 @@ const EquipmentManager = {
                         displayColor = '#2196F3';
                         break;
                     case 'Bank':
-                        displayChar = '🏦';  // Bank building emoji for The Grand Vault
+                        displayChar = '💰';  // Money bag emoji for The Grand Vault (more widely supported)
                         displayColor = '#FFC107';
                         break;
                     case 'Revive Station':
-                        displayChar = '⛑️';  // Rescue helmet emoji for Sanctuary
+                        displayChar = '🏥';  // Hospital emoji for Sanctuary (more widely supported)
                         displayColor = '#4CAF50';
                         break;
                     case 'Monster Zone':
@@ -2242,7 +2242,10 @@ const EquipmentManager = {
                                displayChar === '🏧' || displayChar === '🆘' || // Keep old emojis for compatibility
                                /[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/u.test(displayChar);
                 
-                // Debug removed - Bank and Revive Station features removed for rebuild
+                // Log emoji rendering for Bank and Revive Station
+                if (displayChar === '🏦' || displayChar === '⛑️') {
+                    console.log(`RENDERING EMOJI: "${displayChar}" (${displayChar.charCodeAt(0)}) at (${cx}, ${cy})`);
+                }
                 
                 if (isEmoji) {
                     // For emojis, use larger size and comprehensive emoji font fallback
