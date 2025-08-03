@@ -72,7 +72,7 @@ The game uses minimal external dependencies to maintain the original architectur
 
 **January 2025 - Complete Three-Tier Item System Implementation**
 - Implemented comprehensive PostgreSQL database schema with separate tables for all three item types
-- Created complete **Dropper Items** system: 20 gear tiers (Crude to Ascended) for store-bought equipment
+- Created complete **Dropper Items** system: 20 gear tiers (Crude to Ascended) for store-bought equipment including Steel Arrow weapon
 - Built **Shadow Items** system: T1-T20 tiers with GitHub image integration and equipment-based drop logic
 - Developed **Echo Items** system: Unique resonance-based progression with 10 tiers and object storage integration
 - Added **Gem System**: T1-T9 grades with Fighter/Caster/Utility/Farming categories and zone-based drops
