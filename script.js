@@ -1643,6 +1643,14 @@ const EquipmentManager = {
             // Load blueprint for current zone (if any) or default to zone 1
             const startingZone = state.game.currentZoneTier || 1;
             console.log(`WorldMapManager initializing with zone ${startingZone}`);
+            
+            // Debug: Check if blueprints are available
+            if (window.zoneBlueprints) {
+                console.log('Zone blueprints available:', Object.keys(window.zoneBlueprints));
+            } else {
+                console.log('WARNING: Zone blueprints not loaded yet');
+            }
+            
             this.loadZoneBlueprint(startingZone);
             this.updateInteractButton(); 
             this.draw(); 
@@ -1653,11 +1661,17 @@ const EquipmentManager = {
             this.currentZoneId = zoneId;
             const blueprint = this.getZoneBlueprint(zoneId);
             
+            console.log(`Loading zone ${zoneId}:`, blueprint ? blueprint.name : 'No blueprint found');
+            
             if (!blueprint) {
+                console.log('Falling back to static grid for zone', zoneId);
                 // Fallback to old static grid if blueprint not found
                 this.generateStaticGrid();
                 return;
             }
+            
+            console.log(`Using blueprint for zone ${zoneId}: ${blueprint.name}, grid size: ${blueprint.gridSize}`);
+            console.log('Blueprint features:', blueprint.features);
             
             // Clear existing grid
             this.grid.clear();
@@ -1704,11 +1718,25 @@ const EquipmentManager = {
             
             window.forceZoneChange = (zoneId) => {
                 console.log(`Forcing zone change to ${zoneId}`);
+                
+                // Update game state
+                state.game.currentZoneTier = parseInt(zoneId);
+                
+                // Load new blueprint
                 this.loadZoneBlueprint(zoneId);
                 this.playerPos = { q: 0, r: 0 };
                 this.draw();
                 this.updateInteractButton();
-                showToast(`Force changed to zone ${zoneId}`, false);
+                
+                // Get blueprint info for toast
+                const blueprint = this.getZoneBlueprint(zoneId);
+                const zoneName = blueprint ? blueprint.name : `Zone ${zoneId}`;
+                const gridInfo = blueprint ? ` (${blueprint.gridSize}x${blueprint.gridSize})` : '';
+                
+                showToast(`Force changed to ${zoneName}${gridInfo}`, false);
+                
+                // Also update the zone display
+                ProfileManager.updateAllProfileUI();
             };
         },
         
@@ -1854,11 +1882,15 @@ const EquipmentManager = {
             
             const blueprint = WorldMapManager.getZoneBlueprint(zoneId);
             const zoneName = blueprint ? blueprint.name : zone.name;
-            showToast(`Teleported to ${zoneName} - New layout loaded!`);
+            const gridInfo = blueprint ? ` (${blueprint.gridSize}x${blueprint.gridSize})` : '';
+            
+            console.log(`Teleporting to zone ${zoneId}: ${zoneName}${gridInfo}`);
+            showToast(`Teleported to ${zoneName}${gridInfo}`, false);
             ProfileManager.updateAllProfileUI();
             
             // Force a complete redraw to ensure blueprint changes are visible
             setTimeout(() => {
+                console.log('Forcing redraw after teleport');
                 WorldMapManager.draw();
             }, 100);
             
