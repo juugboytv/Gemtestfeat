@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Minimap Features</title>
+    <style>
+        body { 
+            margin: 20px; 
+            font-family: Arial, sans-serif; 
+            background: #1a1a1a;
+            color: white;
+        }
+        canvas { 
+            border: 1px solid #333; 
+            background: #000;
+        }
+        .debug-info {
+            margin: 20px 0;
+            padding: 10px;
+            background: #333;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Minimap Feature Debug Test</h1>
+    <div class="debug-info" id="debug-info">Loading...</div>
+    <canvas id="minimap-canvas" width="400" height="400"></canvas>
+    
+    <script>
+    async function testFeatureDisplay() {
+        const canvas = document.getElementById('minimap-canvas');
+        const ctx = canvas.getContext('2d');
+        const debugInfo = document.getElementById('debug-info');
+        
+        // Clear canvas
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, 400, 400);
+        
+        let debugLog = [];
+        
+        try {
+            // Fetch current zone data from server
+            const response = await fetch('/api/game/current-zone');
+            const data = await response.json();
+            
+            debugLog.push('Server response: ' + JSON.stringify(data, null, 2));
+            
+            if (data.success && data.zone) {
+                const zone = data.zone;
+                debugLog.push(`Zone ${zone.id} (${zone.gridSize}x${zone.gridSize}) features:`);
+                
+                // Feature mapping
+                const featureMap = {
+                    'Bank': { fallback: '$', color: '#FFC107' },                        
+                    'Armory': { fallback: 'W', color: '#F44336' },       
+                    'Arcanum': { fallback: 'M', color: '#9C27B0' },   
+                    'Revive Station': { fallback: '+', color: '#4CAF50' },    
+                    'Gem Crucible': { fallback: 'G', color: '#00BCD4' },        
+                    'Teleporter': { fallback: 'T', color: '#2196F3' },         
+                    'Sanctuary': { fallback: 'H', color: '#FFEB3B' }
+                };
+                
+                // Draw each feature
+                zone.features.forEach((feature, index) => {
+                    const featureInfo = featureMap[feature.type] || { fallback: '?', color: '#F44336' };
+                    
+                    debugLog.push(`Feature ${index + 1}: ${feature.type} at (${feature.q}, ${feature.r})`);
+                    debugLog.push(`  - Mapped to: ${featureInfo.fallback} (${featureInfo.color})`);
+                    
+                    // Calculate screen position (simplified hexagonal layout)
+                    const centerX = 200;
+                    const centerY = 200;
+                    const hexSize = 25;
+                    const x = centerX + (feature.q * hexSize * 1.5);
+                    const y = centerY + (feature.r * hexSize * Math.sqrt(3)/2) + (feature.q * hexSize * Math.sqrt(3)/2);
+                    
+                    // Draw hex background
+                    ctx.beginPath();
+                    for (let i = 0; i < 6; i++) {
+                        const angle = (i * Math.PI) / 3;
+                        const hexX = x + hexSize * Math.cos(angle);
+                        const hexY = y + hexSize * Math.sin(angle);
+                        if (i === 0) ctx.moveTo(hexX, hexY);
+                        else ctx.lineTo(hexX, hexY);
+                    }
+                    ctx.closePath();
+                    ctx.strokeStyle = '#555';
+                    ctx.stroke();
+                    
+                    // Draw feature text
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.font = 'bold 16px Arial';
+                    ctx.fillStyle = featureInfo.color;
+                    ctx.fillText(featureInfo.fallback, x, y);
+                    
+                    debugLog.push(`  - Drawn at screen position (${Math.round(x)}, ${Math.round(y)})`);
+                });
+                
+            } else {
+                debugLog.push('ERROR: No valid zone data received');
+            }
+            
+        } catch (error) {
+            debugLog.push('ERROR: ' + error.message);
+        }
+        
+        debugInfo.innerHTML = '<pre>' + debugLog.join('\n') + '</pre>';
+    }
+    
+    // Run test when page loads
+    testFeatureDisplay();
+    </script>
+</body>
+</html>
