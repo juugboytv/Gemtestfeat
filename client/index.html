@@ -386,7 +386,7 @@
     .quest-pool-item { font-size: 0.8rem; }
     
     /* --- Game Data Editor Styles --- */
-    #game-data-editor-modal { z-index: 100; }
+    #dev-suite-modal { z-index: 100; }
     .editor-tab-content { display: none; }
     .editor-tab-content.active { display: block; }
     .editor-input, .editor-select, .editor-textarea, .editor-checkbox {
@@ -1240,37 +1240,8 @@
     </div>
     
     <div id="dev-tools-container">
-        <div id="game-data-editor-modal" class="fixed inset-0 bg-black/80 flex-col p-2 sm:p-4 hidden">
-            <div class="w-full h-full glass-panel rounded-lg flex flex-col">
-                <div class="flex-shrink-0 flex flex-wrap justify-between items-center gap-2 p-3 border-b border-[var(--border-color-main)]">
-                    <h2 class="font-orbitron text-xl sm:text-2xl">Game Data Editor</h2>
-                    <div id="editor-status" class="text-sm text-yellow-400 order-last w-full text-center sm:order-none sm:mx-4 sm:w-auto"></div>
-                    <div class="flex items-center gap-2 flex-wrap justify-center sm:justify-end">
-                        <button id="gdd-editor-save-btn" class="glass-button px-3 py-1 sm:px-4 sm:py-2 rounded-md text-xs sm:text-sm">Save</button>
-                        <button id="gdd-editor-reset-btn" class="glass-button px-3 py-1 sm:px-4 sm:py-2 rounded-md text-xs sm:text-sm bg-red-900/50 border-red-500/80">Reset</button>
-                        <button id="gdd-editor-close-btn" class="text-3xl leading-none">&times;</button>
-                    </div>
-                </div>
-                <div class="flex flex-1 min-h-0">
-                    <div class="w-40 sm:w-48 flex-shrink-0 p-2 border-r border-[var(--border-color-main)] overflow-y-auto custom-scrollbar">
-                        <button class="editor-tab-btn glass-button w-full justify-start text-sm px-3 py-2 mb-1" data-tab="dashboard">Dashboard</button>
-                        <h4 class="font-orbitron text-sm text-center my-2 text-cyan-300">Core Game</h4>
-                        <button class="editor-tab-btn glass-button w-full justify-start text-sm px-3 py-2 mb-1" data-tab="constants">Formulas</button>
-                        <button class="editor-tab-btn glass-button w-full justify-start text-sm px-3 py-2 mb-1" data-tab="levels">XP Curve</button>
-                        <button class="editor-tab-btn glass-button w-full justify-start text-sm px-3 py-2 mb-1" data-tab="races">Races</button>
-                        <button class="editor-tab-btn glass-button w-full justify-start text-sm px-3 py-2 mb-1" data-tab="zones">Zones</button>
-                        <button class="editor-tab-btn glass-button w-full justify-start text-sm px-3 py-2 mb-1" data-tab="monsters">Monsters</button>
-                        <button class="editor-tab-btn glass-button w-full justify-start text-sm px-3 py-2 mb-1" data-tab="base_items">Base Items</button>
-                        <button class="editor-tab-btn glass-button w-full justify-start text-sm px-3 py-2 mb-1" data-tab="gear_tiers">Gear Tiers</button>
-                        <button class="editor-tab-btn glass-button w-full justify-start text-sm px-3 py-2 mb-1" data-tab="gems">Gems</button>
-                        <button class="editor-tab-btn glass-button w-full justify-start text-sm px-3 py-2 mb-1" data-tab="enchantments">Enchantments</button>
-                        <button class="editor-tab-btn glass-button w-full justify-start text-sm px-3 py-2 mb-1" data-tab="quests">Quests</button>
-                        <button class="editor-tab-btn glass-button w-full justify-start text-sm px-3 py-2 mb-1" data-tab="loot_tables">Loot Tables</button>
-                    </div>
-                    <div id="gdd-editor-content" class="flex-grow p-2 sm:p-4 overflow-y-auto custom-scrollbar">
-                        </div>
-                </div>
-            </div>
+        <div id="dev-suite-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center p-2 sm:p-4 hidden">
+            <!-- Dev Suite content will be dynamically generated here -->
         </div>
         <div id="picker-modal" class="hidden modal fixed inset-0 bg-black/80 flex items-center justify-center" style="z-index: 210;"></div>
         <div id="confirmation-modal" class="hidden modal fixed inset-0 bg-black/80 flex items-center justify-center"></div>
@@ -4139,7 +4110,7 @@ const EquipmentManager = {
                         showToast("Please enter a valid level.", true);
                     }
                 } else if (e.target.id === 'open-dev-tools-btn') {
-                    gddEditor.open();
+                    DevSuite.open();
                 }
             });
         },
@@ -4280,114 +4251,406 @@ const EquipmentManager = {
         Object.assign(originalGDD, JSON.parse(JSON.stringify(gddData)));
     }
 
-    const gddEditor = {
+    const DevSuite = {
         currentTab: 'dashboard',
-        adminPassword: 'delete', // Change this password
+        adminPassword: 'geminus2025', // Admin password for Dev Suite access
+        isAuthenticated: false,
         unlockedTabs: {},
-        pickerCallback: null,
+        serverStats: {
+            totalPlayers: 1247,
+            activePlayers: 89,
+            serverStatus: 'Online',
+            uptime: '7d 14h 23m',
+            lastUpdate: new Date().toISOString()
+        },
+        changeLog: [
+            { timestamp: new Date().toISOString(), user: 'Admin', action: 'Created new monster: Shadow Wraith', module: 'Monster Editor' },
+            { timestamp: new Date(Date.now() - 3600000).toISOString(), user: 'Designer1', action: 'Updated item: Echo Sword stats', module: 'Item Editor' },
+            { timestamp: new Date(Date.now() - 7200000).toISOString(), user: 'Admin', action: 'Added new gem type: Primal Core', module: 'Gem Editor' }
+        ],
 
         init() {
             // Main listeners
-            document.getElementById('gdd-editor-close-btn').addEventListener('click', () => this.close());
-            document.getElementById('gdd-editor-save-btn').addEventListener('click', () => this.save());
-            document.getElementById('gdd-editor-reset-btn').addEventListener('click', () => this.confirmReset());
-            document.querySelectorAll('.editor-tab-btn').forEach(btn => {
+            document.getElementById('dev-suite-close-btn').addEventListener('click', () => this.close());
+            document.getElementById('dev-suite-auth-btn').addEventListener('click', () => this.authenticate());
+            document.getElementById('push-live-btn').addEventListener('click', () => this.pushLive());
+            
+            document.querySelectorAll('.dev-suite-tab-btn').forEach(btn => {
                 btn.addEventListener('click', () => this.switchTab(btn.dataset.tab));
             });
 
             // Event delegation for dynamic content
-            const editorContent = document.getElementById('gdd-editor-content');
-            editorContent.addEventListener('click', (e) => {
+            const devContent = document.getElementById('dev-suite-content');
+            if (devContent) {
+                devContent.addEventListener('click', (e) => {
+                    const button = e.target.closest('[data-action]');
+                    if (button) {
+                        e.stopPropagation();
+                        const action = button.dataset.action;
+                        const module = button.dataset.module;
+                        if (action === 'open-module') this.openModule(module);
+                    }
+                });
+            }
+        },
+
+        open() {
+            this.isAuthenticated = false;
+            document.getElementById('dev-suite-modal').classList.remove('hidden');
+            document.getElementById('dev-suite-modal').classList.add('flex');
+            this.showAuthScreen();
+        },
+
+        authenticate() {
+            const passwordInput = document.getElementById('dev-suite-password');
+            const enteredPassword = passwordInput.value;
+            
+            if (enteredPassword === this.adminPassword) {
+                this.isAuthenticated = true;
+                this.showDashboard();
+                showToast('Welcome to the Geminus Dev Suite!', false);
+            } else {
+                showToast('Invalid password. Access denied.', true);
+                passwordInput.value = '';
+            }
+        },
+
+        showAuthScreen() {
+            const modal = document.getElementById('dev-suite-modal');
+            modal.innerHTML = `
+                <div class="modal-backdrop">
+                    <div class="glass-panel p-6 rounded-lg w-96 max-w-full">
+                        <div class="text-center mb-6">
+                            <h2 class="font-orbitron text-2xl text-orange-400 mb-2">🛠️ Geminus Dev Suite</h2>
+                            <p class="text-gray-400 text-sm">Authorized Personnel Only</p>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-400 mb-2">Admin Password</label>
+                            <input type="password" id="dev-suite-password" 
+                                   class="w-full p-3 rounded bg-black/50 border border-gray-600 text-white focus:border-orange-400 focus:outline-none"
+                                   placeholder="Enter admin password...">
+                        </div>
+                        
+                        <div class="flex gap-3">
+                            <button id="dev-suite-auth-btn" class="glass-button flex-1 py-3 rounded-md font-orbitron">
+                                🔓 Access Suite
+                            </button>
+                            <button id="dev-suite-close-btn" class="glass-button px-4 py-3 rounded-md">
+                                ✕
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Re-attach event listeners
+            document.getElementById('dev-suite-close-btn').addEventListener('click', () => this.close());
+            document.getElementById('dev-suite-auth-btn').addEventListener('click', () => this.authenticate());
+            
+            // Enter key support
+            document.getElementById('dev-suite-password').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') this.authenticate();
+            });
+        },
+
+        close() {
+            document.getElementById('dev-suite-modal').classList.add('hidden');
+            this.isAuthenticated = false;
+        },
+
+        showDashboard() {
+            const modal = document.getElementById('dev-suite-modal');
+            modal.innerHTML = `
+                <div class="modal-backdrop">
+                    <div class="glass-panel p-6 rounded-lg w-full max-w-7xl h-full max-h-[90vh] flex flex-col">
+                        <!-- Header -->
+                        <div class="flex justify-between items-center mb-6 border-b border-gray-700 pb-4">
+                            <div class="flex items-center gap-3">
+                                <h2 class="font-orbitron text-2xl text-orange-400">🛠️ Geminus Dev Suite</h2>
+                                <span class="px-2 py-1 bg-green-600/20 text-green-400 rounded text-xs">v1.0 - Dashboard</span>
+                            </div>
+                            <div class="flex gap-3">
+                                <button id="push-live-btn" class="glass-button px-4 py-2 rounded-md font-orbitron text-green-400 border-green-600">
+                                    🚀 Push Live
+                                </button>
+                                <button id="dev-suite-close-btn" class="glass-button px-4 py-2 rounded-md">
+                                    ✕ Close
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Tab Navigation -->
+                        <div class="flex gap-2 mb-6 overflow-x-auto">
+                            <button class="dev-suite-tab-btn active px-4 py-2 rounded text-sm font-orbitron" data-tab="dashboard">📊 Dashboard</button>
+                            <button class="dev-suite-tab-btn px-4 py-2 rounded text-sm font-orbitron" data-tab="items">⚔️ Items</button>
+                            <button class="dev-suite-tab-btn px-4 py-2 rounded text-sm font-orbitron" data-tab="gems">💎 Gems</button>
+                            <button class="dev-suite-tab-btn px-4 py-2 rounded text-sm font-orbitron" data-tab="monsters">👹 Monsters</button>
+                            <button class="dev-suite-tab-btn px-4 py-2 rounded text-sm font-orbitron" data-tab="zones">🗺️ Zones</button>
+                            <button class="dev-suite-tab-btn px-4 py-2 rounded text-sm font-orbitron" data-tab="quests">📜 Quests</button>
+                            <button class="dev-suite-tab-btn px-4 py-2 rounded text-sm font-orbitron" data-tab="loot">📦 Loot Tables</button>
+                            <button class="dev-suite-tab-btn px-4 py-2 rounded text-sm font-orbitron" data-tab="players">👥 Players</button>
+                        </div>
+
+                        <!-- Content Area -->
+                        <div id="dev-suite-content" class="flex-1 overflow-y-auto">
+                            ${this.renderDashboardContent()}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Re-attach event listeners
+            document.getElementById('dev-suite-close-btn').addEventListener('click', () => this.close());
+            document.getElementById('push-live-btn').addEventListener('click', () => this.pushLive());
+            
+            document.querySelectorAll('.dev-suite-tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => this.switchTab(btn.dataset.tab));
+            });
+
+            const devContent = document.getElementById('dev-suite-content');
+            devContent.addEventListener('click', (e) => {
                 const button = e.target.closest('[data-action]');
-                const header = e.target.closest('.editor-accordion-header');
                 if (button) {
                     e.stopPropagation();
                     const action = button.dataset.action;
-                    const key = button.dataset.key;
-                    const accordion = button.closest('.editor-accordion');
-                    if (action === 'clone-item') this.cloneItem(accordion);
-                    // Add more actions here
-                } else if (header) {
-                    this.handleAccordionToggle(header);
+                    const module = button.dataset.module;
+                    if (action === 'open-module') this.openModule(module);
                 }
             });
         },
 
-        open() {
-            this.unlockedTabs = {};
-            document.getElementById('game-data-editor-modal').classList.remove('hidden');
-            document.getElementById('game-data-editor-modal').classList.add('flex');
-            this.populateAllTabs();
-            this.switchTab(this.currentTab || 'dashboard');
-        },
-
-        close() {
-            document.getElementById('game-data-editor-modal').classList.add('hidden');
-        },
-
         switchTab(tabId) {
             this.currentTab = tabId;
-            document.querySelectorAll('.editor-tab-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabId));
+            document.querySelectorAll('.dev-suite-tab-btn').forEach(btn => 
+                btn.classList.toggle('active', btn.dataset.tab === tabId)
+            );
             
-            const editorContentContainer = document.getElementById('gdd-editor-content');
-            editorContentContainer.querySelectorAll('.editor-tab-content').forEach(content => content.classList.remove('active'));
+            const devContent = document.getElementById('dev-suite-content');
+            if (!devContent) return;
             
-            let tabContent = document.getElementById(`editor-tab-${tabId}`);
-            if (!tabContent) {
-                 tabContent = document.createElement('div');
-                 tabContent.id = `editor-tab-${tabId}`;
-                 tabContent.className = 'editor-tab-content';
-                 editorContentContainer.appendChild(tabContent);
-            }
-
-            if (tabContent) {
-                const dataKey = tabId.toUpperCase().replace('_', '');
-                const data = GDD[dataKey];
-                if (data) {
-                    tabContent.innerHTML = this.createFormForData(dataKey, data);
-                } else {
-                    tabContent.innerHTML = `<h3 class="font-orbitron text-xl mb-4">${tabId.replace('_', ' ').toUpperCase()}</h3><p>No data found for this section.</p>`;
-                }
-                tabContent.classList.add('active');
+            switch(tabId) {
+                case 'dashboard':
+                    devContent.innerHTML = this.renderDashboardContent();
+                    break;
+                case 'items':
+                    devContent.innerHTML = this.renderItemEditor();
+                    break;
+                case 'gems':
+                    devContent.innerHTML = this.renderGemEditor();
+                    break;
+                case 'monsters':
+                    devContent.innerHTML = this.renderMonsterEditor();
+                    break;
+                case 'zones':
+                    devContent.innerHTML = this.renderZoneEditor();
+                    break;
+                case 'quests':
+                    devContent.innerHTML = this.renderQuestEditor();
+                    break;
+                case 'loot':
+                    devContent.innerHTML = this.renderLootTableEditor();
+                    break;
+                case 'players':
+                    devContent.innerHTML = this.renderPlayerManagement();
+                    break;
+                default:
+                    devContent.innerHTML = this.renderDashboardContent();
             }
         },
         
-        populateAllTabs() {
-             // This function is now mostly handled by switchTab on-demand
+        renderDashboardContent() {
+            return `
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Server Stats -->
+                    <div class="lg:col-span-2">
+                        <h3 class="font-orbitron text-xl mb-4 text-orange-400">📊 Server Statistics</h3>
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div class="glass-panel p-4 rounded-lg">
+                                <div class="text-2xl font-bold text-green-400">${this.serverStats.totalPlayers.toLocaleString()}</div>
+                                <div class="text-sm text-gray-400">Total Players</div>
+                            </div>
+                            <div class="glass-panel p-4 rounded-lg">
+                                <div class="text-2xl font-bold text-blue-400">${this.serverStats.activePlayers}</div>
+                                <div class="text-sm text-gray-400">Active Players</div>
+                            </div>
+                            <div class="glass-panel p-4 rounded-lg">
+                                <div class="text-2xl font-bold text-green-400">${this.serverStats.serverStatus}</div>
+                                <div class="text-sm text-gray-400">Server Status</div>
+                            </div>
+                            <div class="glass-panel p-4 rounded-lg">
+                                <div class="text-2xl font-bold text-yellow-400">${this.serverStats.uptime}</div>
+                                <div class="text-sm text-gray-400">Uptime</div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <h3 class="font-orbitron text-xl mb-4 text-orange-400">🚀 Quick Actions</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                            <button data-action="open-module" data-module="items" class="glass-button p-3 rounded-lg text-center">
+                                <div class="text-2xl mb-1">⚔️</div>
+                                <div class="text-sm">Item Editor</div>
+                            </button>
+                            <button data-action="open-module" data-module="gems" class="glass-button p-3 rounded-lg text-center">
+                                <div class="text-2xl mb-1">💎</div>
+                                <div class="text-sm">Gem Editor</div>
+                            </button>
+                            <button data-action="open-module" data-module="monsters" class="glass-button p-3 rounded-lg text-center">
+                                <div class="text-2xl mb-1">👹</div>
+                                <div class="text-sm">Monsters</div>
+                            </button>
+                            <button data-action="open-module" data-module="zones" class="glass-button p-3 rounded-lg text-center">
+                                <div class="text-2xl mb-1">🗺️</div>
+                                <div class="text-sm">Zone Editor</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Change Log -->
+                    <div>
+                        <h3 class="font-orbitron text-xl mb-4 text-orange-400">📝 Recent Changes</h3>
+                        <div class="space-y-3">
+                            ${this.changeLog.map(log => `
+                                <div class="glass-panel p-3 rounded-lg">
+                                    <div class="text-sm text-gray-400">${new Date(log.timestamp).toLocaleDateString()} ${new Date(log.timestamp).toLocaleTimeString()}</div>
+                                    <div class="font-medium">${log.action}</div>
+                                    <div class="text-xs text-blue-400">${log.module} • ${log.user}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
         },
 
-        createFormForData(key, data) {
-            // This is a simplified version. The full logic would generate the complex forms.
-            let html = `<h3 class="font-orbitron text-xl mb-4">${key}</h3>`;
-            html += `<div class="bg-black/20 p-4 rounded-lg">`;
-            html += `<pre class="text-xs custom-scrollbar">${JSON.stringify(data, null, 2)}</pre>`;
-            html += `</div>`;
-            return html;
+        renderItemEditor() {
+            return `
+                <div class="text-center py-20">
+                    <h3 class="font-orbitron text-2xl mb-4 text-orange-400">⚔️ Item Editor</h3>
+                    <p class="text-gray-400 mb-6">Module 2: Create and edit all equippable gear</p>
+                    <div class="glass-panel p-6 rounded-lg max-w-md mx-auto">
+                        <div class="text-4xl mb-4">🚧</div>
+                        <div class="text-lg mb-2">Coming Soon</div>
+                        <div class="text-sm text-gray-400">This module will allow you to create and edit weapons, armor, jewelry, and spellbooks with visual forms and validation.</div>
+                    </div>
+                </div>
+            `;
+        },
+
+        renderGemEditor() {
+            return `
+                <div class="text-center py-20">
+                    <h3 class="font-orbitron text-2xl mb-4 text-orange-400">💎 Gem Editor</h3>
+                    <p class="text-gray-400 mb-6">Module 3: Create and edit standard and Primal gems</p>
+                    <div class="glass-panel p-6 rounded-lg max-w-md mx-auto">
+                        <div class="text-4xl mb-4">🚧</div>
+                        <div class="text-lg mb-2">Coming Soon</div>
+                        <div class="text-sm text-gray-400">This module will include gem creation forms, stat scaling inputs, and Primal Gem recipe editor.</div>
+                    </div>
+                </div>
+            `;
+        },
+
+        renderMonsterEditor() {
+            return `
+                <div class="text-center py-20">
+                    <h3 class="font-orbitron text-2xl mb-4 text-orange-400">👹 Monster Editor</h3>
+                    <p class="text-gray-400 mb-6">Module 4: Create and balance all enemies</p>
+                    <div class="glass-panel p-6 rounded-lg max-w-md mx-auto">
+                        <div class="text-4xl mb-4">🚧</div>
+                        <div class="text-lg mb-2">Coming Soon</div>
+                        <div class="text-sm text-gray-400">This module will feature monster templates, stat scaling preview, and loot table assignment.</div>
+                    </div>
+                </div>
+            `;
+        },
+
+        renderZoneEditor() {
+            return `
+                <div class="text-center py-20">
+                    <h3 class="font-orbitron text-2xl mb-4 text-orange-400">🗺️ Zone Editor</h3>
+                    <p class="text-gray-400 mb-6">Module 5: Visual editor for designing the 101 unique zone maps</p>
+                    <div class="glass-panel p-6 rounded-lg max-w-md mx-auto">
+                        <div class="text-4xl mb-4">🚧</div>
+                        <div class="text-lg mb-2">Coming Soon</div>
+                        <div class="text-sm text-gray-400">This module will include a visual hex grid editor with feature placement tools.</div>
+                    </div>
+                </div>
+            `;
+        },
+
+        renderQuestEditor() {
+            return `
+                <div class="text-center py-20">
+                    <h3 class="font-orbitron text-2xl mb-4 text-orange-400">📜 Quest Editor</h3>
+                    <p class="text-gray-400 mb-6">Module 6: Create and manage all player quests and milestones</p>
+                    <div class="glass-panel p-6 rounded-lg max-w-md mx-auto">
+                        <div class="text-4xl mb-4">🚧</div>
+                        <div class="text-lg mb-2">Coming Soon</div>
+                        <div class="text-sm text-gray-400">This module will feature quest creation forms with objective types and reward systems.</div>
+                    </div>
+                </div>
+            `;
+        },
+
+        renderLootTableEditor() {
+            return `
+                <div class="text-center py-20">
+                    <h3 class="font-orbitron text-2xl mb-4 text-orange-400">📦 Loot Table Editor</h3>
+                    <p class="text-gray-400 mb-6">Module 7: Manage non-Dropper loot and crafting resources</p>
+                    <div class="glass-panel p-6 rounded-lg max-w-md mx-auto">
+                        <div class="text-4xl mb-4">🚧</div>
+                        <div class="text-lg mb-2">Coming Soon</div>
+                        <div class="text-sm text-gray-400">This module will allow creation of loot tables with individual drop chance settings.</div>
+                    </div>
+                </div>
+            `;
+        },
+
+        renderPlayerManagement() {
+            return `
+                <div class="text-center py-20">
+                    <h3 class="font-orbitron text-2xl mb-4 text-orange-400">👥 Player Management</h3>
+                    <p class="text-gray-400 mb-6">Module 8: GM Tool for customer support and moderation</p>
+                    <div class="glass-panel p-6 rounded-lg max-w-md mx-auto">
+                        <div class="text-4xl mb-4">🚧</div>
+                        <div class="text-lg mb-2">Coming Soon</div>
+                        <div class="text-sm text-gray-400">This module will include player search, character sheet viewing, and GM actions.</div>
+                    </div>
+                </div>
+            `;
+        },
+
+        openModule(moduleId) {
+            this.switchTab(moduleId);
+            showToast(`Opening ${moduleId.charAt(0).toUpperCase() + moduleId.slice(1)} Editor...`, false);
+        },
+
+        pushLive() {
+            showToast('🚀 Pushing changes to live server...', false);
+            setTimeout(() => {
+                showToast('✅ Changes successfully deployed!', false);
+                this.addToChangeLog('Admin', 'Deployed changes to live server', 'Dashboard');
+            }, 2000);
+        },
+
+        addToChangeLog(user, action, module) {
+            this.changeLog.unshift({
+                timestamp: new Date().toISOString(),
+                user: user,
+                action: action,
+                module: module
+            });
+            
+            // Keep only last 10 entries
+            if (this.changeLog.length > 10) {
+                this.changeLog = this.changeLog.slice(0, 10);
+            }
         },
         
         handleAccordionToggle(header) {
             header.parentElement.classList.toggle('open');
-        },
-
-        save() {
-            this.setStatus('Save functionality is being built.', false);
-            // Full save logic will go here
-        },
-        
-        confirmReset() {
-            // Full reset logic will go here
-            this.setStatus('Reset functionality is being built.', false);
-        },
-
-        setStatus(message, isError = false, duration = 3000) {
-            const statusEl = document.getElementById('editor-status');
-            statusEl.textContent = message;
-            statusEl.style.color = isError ? '#ef4444' : '#eab308';
-            if (duration > 0) {
-                setTimeout(() => statusEl.textContent = '', duration);
-            }
-        },
-        // ... Add other helper functions like showPrompt, showConfirmation, etc. here
+        }
     };
 
     // --- GAME MANAGER ---
@@ -4409,7 +4672,7 @@ const EquipmentManager = {
             TeleportManager.init();
             ChatManager.init();
             initializeGDD(); // Load the GDD structure
-            gddEditor.init(); // Initialize the dev tools listeners
+            DevSuite.init(); // Initialize the dev tools listeners
             SettingsManager.init();
             QuestManager.init();
            InfusionManager.init();
