@@ -1,6 +1,6 @@
 
     // --- VERSION STAMP FOR CACHE BUSTING ---
-    console.log('🚨 SCRIPT VERSION: 2025-01-03-17:10 - CLEAN HTML - NO CANVAS ERRORS');
+    console.log('🚨 SCRIPT VERSION: 2025-01-03-17:15 - NULL CHECKS ADDED AS USER SUGGESTED');
     
     // === COMPREHENSIVE CANVAS ERROR PREVENTION ===
     // This system completely prevents all canvas operations to eliminate the error
