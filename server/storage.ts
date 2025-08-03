@@ -1,4 +1,12 @@
 import { type User, type InsertUser, type Character, type InsertCharacter, type Item, type InsertItem } from "@shared/schema";
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
+import * as schema from '../shared/schema';
+
+// Database connection setup for PostgreSQL
+const connectionString = process.env.DATABASE_URL!;
+const client = postgres(connectionString);
+export const db = drizzle(client, { schema });
 
 export interface IStorage {
   // User management

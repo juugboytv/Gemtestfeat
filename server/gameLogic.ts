@@ -4,6 +4,10 @@
  */
 
 import { ZONE_BLUEPRINTS } from '../shared/zoneBlueprints.js';
+import { COMPLETE_ZONE_DATA, getCompleteZoneData } from '../shared/completeZoneData.js';
+import { db } from './storage.js';
+import { zones, monsters } from '../shared/schema.js';
+import { eq } from 'drizzle-orm';
 
 export interface GameState {
   player: {
@@ -50,26 +54,50 @@ export class GameLogicManager {
     return gameState;
   }
 
-  // Initialize all zones from blueprints
+  // Initialize all zones from complete zone data
   private initializeZones(): Record<string, ZoneState> {
-    const zones: Record<string, ZoneState> = {};
+    const zoneStates: Record<string, ZoneState> = {};
     
-    Object.entries(ZONE_BLUEPRINTS).forEach(([zoneId, blueprint]) => {
-      zones[zoneId] = {
-        id: parseInt(zoneId),
-        name: blueprint.name,
-        gridSize: blueprint.gridSize,
-        features: blueprint.features.map(f => ({
+    COMPLETE_ZONE_DATA.forEach(zoneData => {
+      zoneStates[zoneData.zoneId.toString()] = {
+        id: zoneData.zoneId,
+        name: zoneData.name,
+        gridSize: zoneData.gridSize,
+        features: zoneData.features.map(f => ({
           q: f.q,
           r: f.r,
           type: f.type,
           name: f.name
         })),
-        currentMonsters: []
+        currentMonsters: zoneData.monsters.map(m => ({
+          id: m.monsterId,
+          hp: m.health,
+          maxHp: m.health,
+          name: m.name
+        }))
       };
     });
 
-    return zones;
+    return zoneStates;
+  }
+
+  // Get zone data from database
+  async getZoneFromDatabase(zoneId: number) {
+    try {
+      const zone = await db.select().from(zones).where(eq(zones.zoneId, zoneId));
+      const zoneMonsters = await db.select().from(monsters).where(eq(monsters.zoneId, zoneId));
+      
+      if (zone.length > 0) {
+        return {
+          zone: zone[0],
+          monsters: zoneMonsters
+        };
+      }
+      return null;
+    } catch (error) {
+      console.error('Error fetching zone from database:', error);
+      return null;
+    }
   }
 
   // Get player's current game state
@@ -127,17 +155,20 @@ export class GameLogicManager {
     return { success: false, message: "Cannot move outside zone boundaries" };
   }
 
-  // Get available zones for teleportation
-  getAvailableZones(playerId: string): Array<{ id: number; name: string; levelReq: number; unlocked: boolean }> {
-    const gameState = this.gameStates.get(playerId);
-    if (!gameState) return [];
-
-    return Object.entries(gameState.zones).map(([zoneId, zone]) => ({
-      id: zone.id,
-      name: zone.name,
-      levelReq: 1, // All zones are level 1 for now
-      unlocked: true // All zones unlocked for testing
-    }));
+  // Get available zones from database
+  async getAvailableZones(playerId: string): Promise<Array<{ id: number; name: string; levelReq: number; unlocked: boolean }>> {
+    try {
+      const allZones = await db.select().from(zones).orderBy(zones.zoneId);
+      return allZones.map(zone => ({
+        id: zone.zoneId,
+        name: zone.name,
+        levelReq: zone.levelRequirement,
+        unlocked: true // All zones unlocked for testing
+      }));
+    } catch (error) {
+      console.error('Error fetching zones from database:', error);
+      return [];
+    }
   }
 
   // Get current zone data
