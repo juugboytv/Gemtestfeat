@@ -1786,6 +1786,24 @@ const EquipmentManager = {
             };
         },
         
+        // Get zone blueprint data from server
+        async getZoneBlueprintFromServer(zoneId) {
+            try {
+                const response = await fetch(`/api/game/current-zone`);
+                const data = await response.json();
+                
+                if (data.success && data.zone && data.zone.id == zoneId) {
+                    console.log(`Using server zone data for map generation:`, data.zone);
+                    return data.zone;
+                }
+            } catch (error) {
+                console.error('Error fetching zone data from server:', error);
+            }
+            
+            // Fallback to basic blueprint
+            return this.generateBasicBlueprint(zoneId);
+        },
+
         // Get zone blueprint data
         getZoneBlueprint(zoneId) {
             // Use the global zoneBlueprints loaded from shared/zoneBlueprints.ts
@@ -1801,30 +1819,27 @@ const EquipmentManager = {
             return this.generateBasicBlueprint(zoneId);
         },
         
-        // Generate basic blueprint for zones without custom layouts
+        // Generate basic blueprint for zones without custom layouts  
         generateBasicBlueprint(zoneId) {
-            const size = Math.min(10, Math.floor(3 + (zoneId / 25))); // Gradually increase size
+            const size = Math.min(15, Math.floor(3 + (zoneId / 10))); // Gradually increase size up to 15
             const zoneNum = parseInt(zoneId);
             
-            // Create more variety in auto-generated zones
-            const variations = [
-                { sanctuary: {q: 0, r: 0}, teleporter: {q: 2, r: -1}, armory: {q: -1, r: 2}, bank: {q: -2, r: 0} },
-                { sanctuary: {q: -1, r: 1}, teleporter: {q: 1, r: -2}, armory: {q: 2, r: 0}, bank: {q: 0, r: 2} },
-                { sanctuary: {q: 2, r: -1}, teleporter: {q: -2, r: 1}, armory: {q: 0, r: -2}, bank: {q: 1, r: 1} },
-                { sanctuary: {q: -2, r: 2}, teleporter: {q: 2, r: -2}, armory: {q: 0, r: 0}, bank: {q: -1, r: -1} }
+            // Ensure all zones have the 6 core features
+            const coreFeatures = [
+                { type: "Sanctuary", q: 0, r: 0 },
+                { type: "Bank", q: 1, r: -1 },
+                { type: "Arcanum", q: -1, r: 1 },
+                { type: "Armory", q: 1, r: 1 },
+                { type: "AetheriumConduit", q: -1, r: -1 },
+                { type: "Gem Node", q: 2, r: 0 },
+                { type: "Revive Station", q: -2, r: 0 },
+                { type: "Teleporter", q: 0, r: 2 }
             ];
             
-            const variation = variations[zoneNum % variations.length];
-            
             return {
-                name: `Auto Zone ${zoneId}`,
+                name: `Zone ${zoneId}`,
                 gridSize: size,
-                features: [
-                    { type: "Sanctuary", q: variation.sanctuary.q, r: variation.sanctuary.r },
-                    { type: "Teleporter", q: variation.teleporter.q, r: variation.teleporter.r },
-                    { type: "Armory", q: variation.armory.q, r: variation.armory.r },
-                    { type: "AetheriumConduit", q: variation.bank.q, r: variation.bank.r }
-                ]
+                features: coreFeatures
             };
         },
         
@@ -3194,10 +3209,32 @@ const InfusionManager = {
      */
     async function loadGameData() {
         try {
-            // In a real project, you would have a 'data/zones.json' file.
-            // For this simulation, we'll define it here.
-            const zonesData = { "1": { "name": "Crystal Caves (Dwarf)", "levelReq": 1, "biome": "mountain", "gearTier": 1 }, "2": { "name": "Glimmerwood (Elf)", "levelReq": 1, "biome": "forest", "gearTier": 1 }, "3": { "name": "The Shifting Maze (Halfling)", "levelReq": 1, "biome": "plains", "gearTier": 1 }, "4": { "name": "Chromatic Badlands (Human)", "levelReq": 1, "biome": "wastes", "gearTier": 1 }, "5": { "name": "Mana Springs (Gnome)", "levelReq": 1, "biome": "forest", "gearTier": 1 }, "6": { "name": "Blazefire Wastes (Dragonborn/Demon)", "levelReq": 1, "biome": "wastes", "gearTier": 1 }, "7": { "name": "Shadow Mire (Tiefling)", "levelReq": 1, "biome": "swamp", "gearTier": 1 }, "8": { "name": "Whispering Woods (Hobbit)", "levelReq": 1, "biome": "forest", "gearTier": 1 }, "9": { "name": "Ashfall Barrens (Orc)", "levelReq": 1, "biome": "wastes", "gearTier": 1 }, "10": { "name": "Screaming Crags (Troll)", "levelReq": 1, "biome": "mountain", "gearTier": 1 }, "11": { "name": "The Great Vine Labyrinth (Minotaur)", "levelReq": 1, "biome": "jungle", "gearTier": 1 }, "12": { "name": "The Howling Steppes (Centaur)", "levelReq": 1, "biome": "plains", "gearTier": 1 }, "13": { "name": "Cloud Peaks (Griffin/Angel)", "levelReq": 1, "biome": "mountain", "gearTier": 1 }, "14": { "name": "Emberfall Forest (Phoenix)", "levelReq": 1, "biome": "forest", "gearTier": 1 }, "15": { "name": "Aetherial Forests (Unicorn)", "levelReq": 1, "biome": "forest", "gearTier": 1 }, "16": { "name": "Grimwater Swamps (Baba Yaga)", "levelReq": 1, "biome": "swamp", "gearTier": 1 }, "17": { "name": "Gravefrost Tundra (Draugr)", "levelReq": 1, "biome": "tundra", "gearTier": 1 }, "18": { "name": "The Sunken City of Lumina (Mermaid)", "levelReq": 1, "biome": "coastal", "gearTier": 1 }, "19": { "name": "Gloomwood (Vampire)", "levelReq": 1, "biome": "forest", "gearTier": 1 }, "20": { "name": "Corrupted Jungles (Werewolf)", "levelReq": 1, "biome": "jungle", "gearTier": 1 }, "21": { "name": "Echoing Chasms (Banshee)", "levelReq": 1, "biome": "mountain", "gearTier": 1 }, "22": { "name": "Sunken Ruins (Paladin)", "levelReq": 1, "biome": "coastal", "gearTier": 1 }, "23": { "name": "Blazefire Wastes (Demon)", "levelReq": 1, "biome": "wastes", "gearTier": 1 }, "24": { "name": "Cloud Peaks (Angel)", "levelReq": 1, "biome": "mountain", "gearTier": 1 }, "25": { "name": "Echoing Chasms", "levelReq": 100, "biome": "mountain", "gearTier": 3 }, "26": { "name": "Starfall Deserts", "levelReq": 110, "biome": "wastes", "gearTier": 3 }, "27": { "name": "The Weeping Mire", "levelReq": 121, "biome": "swamp", "gearTier": 3 }, "28": { "name": "Frozen Spirelands", "levelReq": 135, "biome": "tundra", "gearTier": 4 }, "29": { "name": "Living Mountain", "levelReq": 149, "biome": "mountain", "gearTier": 4 }, "30": { "name": "Chrono-Distorted Fields", "levelReq": 166, "biome": "plains", "gearTier": 4 }, "31": { "name": "Whisperwind Peaks", "levelReq": 184, "biome": "mountain", "gearTier": 5 }, "32": { "name": "Corrupted Jungles", "levelReq": 205, "biome": "jungle", "gearTier": 5 }, "33": { "name": "Acidic Fens", "levelReq": 227, "biome": "swamp", "gearTier": 5 }, "34": { "name": "Bone Deserts", "levelReq": 253, "biome": "wastes", "gearTier": 6 }, "35": { "name": "The Maw", "levelReq": 281, "biome": "wastes", "gearTier": 6 }, "36": { "name": "Poisonbloom Meadows", "levelReq": 312, "biome": "plains", "gearTier": 6 }, "37": { "name": "Storm-Wrenched Coast", "levelReq": 347, "biome": "coastal", "gearTier": 6 }, "38": { "name": "The Rusting Wastes", "levelReq": 386, "biome": "wastes", "gearTier": 7 }, "39": { "name": "Webbed Caverns", "levelReq": 429, "biome": "mountain", "gearTier": 7 }, "40": { "name": "The Scarred Peaks", "levelReq": 477, "biome": "mountain", "gearTier": 7 }, "41": { "name": "Fungal Undergrowth", "levelReq": 530, "biome": "forest", "gearTier": 7 }, "42": { "name": "Obsidian Flats", "levelReq": 589, "biome": "wastes", "gearTier": 7 }, "43": { "name": "Quicksand Dunes", "levelReq": 655, "biome": "wastes", "gearTier": 7 }, "44": { "name": "Floating Islands", "levelReq": 728, "biome": "mountain", "gearTier": 7 }, "45": { "name": "Glass Sea", "levelReq": 809, "biome": "coastal", "gearTier": 7 }, "46": { "name": "Upside-Down Forest", "levelReq": 899, "biome": "forest", "gearTier": 7 }, "47": { "name": "Singing Sands", "levelReq": 1000, "biome": "wastes", "gearTier": 7 }, "48": { "name": "Aurora Borealis Caverns", "levelReq": 1000, "biome": "tundra", "gearTier": 7 }, "49": { "name": "Gloom-Shrouded Peaks", "levelReq": 1000, "biome": "mountain", "gearTier": 7 }, "50": { "name": "Sunken Spire City", "levelReq": 1000, "biome": "coastal", "gearTier": 7 }, "51": { "name": "Giant Mushroom Forests", "levelReq": 1000, "biome": "forest", "gearTier": 8 }, "52": { "name": "Living Stone Gardens", "levelReq": 9143, "biome": "plains", "gearTier": 8 }, "53": { "name": "The Whispering Wastes", "levelReq": 17286, "biome": "wastes", "gearTier": 8 }, "54": { "name": "Mirage Deserts", "levelReq": 25429, "biome": "wastes", "gearTier": 8 }, "55": { "name": "Gravity Wells", "levelReq": 33572, "biome": "mountain", "gearTier": 9 }, "56": { "name": "Chromatic Reefs", "levelReq": 41715, "biome": "coastal", "gearTier": 9 }, "57": { "name": "The Endless Bridge", "levelReq": 49858, "biome": "plains", "gearTier": 9 }, "58": { "name": "Sky-Whale Graveyard", "levelReq": 58001, "biome": "mountain", "gearTier": 9 }, "59": { "name": "The Weaving Caves", "levelReq": 66144, "biome": "mountain", "gearTier": 10 }, "60": { "name": "Echoing Valley of the Giants", "levelReq": 74287, "biome": "plains", "gearTier": 10 }, "61": { "name": "The Glimmering Shore", "levelReq": 82430, "biome": "coastal", "gearTier": 10 }, "62": { "name": "The Whispering Canyon", "levelReq": 90573, "biome": "mountain", "gearTier": 10 }, "63": { "name": "Floating River", "levelReq": 98716, "biome": "coastal", "gearTier": 11 }, "64": { "name": "The Cloud Sea", "levelReq": 106859, "biome": "mountain", "gearTier": 11 }, "65": { "name": "Obsidian Monolith Plains", "levelReq": 115002, "biome": "plains", "gearTier": 11 }, "66": { "name": "The Bloodfang Jungle", "levelReq": 123145, "biome": "jungle", "gearTier": 11 }, "67": { "name": "Sunstone Deserts", "levelReq": 131288, "biome": "wastes", "gearTier": 12 }, "68": { "name": "The Whispering Gardens", "levelReq": 139431, "biome": "forest", "gearTier": 12 }, "69": { "name": "Glass Peaks", "levelReq": 147574, "biome": "mountain", "gearTier": 12 }, "70": { "name": "Phantom Forests", "levelReq": 155717, "biome": "forest", "gearTier": 13 }, "71": { "name": "The Shrouded Isles", "levelReq": 163860, "biome": "coastal", "gearTier": 13 }, "72": { "name": "Gravity-Defying Rapids", "levelReq": 172003, "biome": "coastal", "gearTier": 13 }, "73": { "name": "The Azure Depths", "levelReq": 180146, "biome": "coastal", "gearTier": 14 }, "74": { "name": "Crystalline Spires", "levelReq": 188289, "biome": "mountain", "gearTier": 14 }, "75": { "name": "The Void Scar", "levelReq": 196432, "biome": "wastes", "gearTier": 14 }, "76": { "name": "Living Labyrinth", "levelReq": 204575, "biome": "jungle", "gearTier": 15 }, "77": { "name": "The Silent Sands", "levelReq": 212718, "biome": "wastes", "gearTier": 15 }, "78": { "name": "Acoustic Caves", "levelReq": 220861, "biome": "mountain", "gearTier": 15 }, "79": { "name": "The Glittering Grottos", "levelReq": 229004, "biome": "mountain", "gearTier": 16 }, "80": { "name": "Timeworn Badlands", "levelReq": 237147, "biome": "wastes", "gearTier": 16 }, "81": { "name": "The Canopy Kingdom", "levelReq": 245290, "biome": "jungle", "gearTier": 16 }, "82": { "name": "The Sunken Library", "levelReq": 253433, "biome": "coastal", "gearTier": 16 }, "83": { "name": "Chromatic Geysers", "levelReq": 261576, "biome": "plains", "gearTier": 17 }, "84": { "name": "The Whispering City", "levelReq": 269719, "biome": "plains", "gearTier": 17 }, "85": { "name": "The Labyrinthine Mangroves", "levelReq": 277862, "biome": "swamp", "gearTier": 17 }, "86": { "name": "The Frozen Heart of the World", "levelReq": 286005, "biome": "tundra", "gearTier": 17 }, "87": { "name": "Gelatinous Jungles", "levelReq": 294148, "biome": "jungle", "gearTier": 18 }, "88": { "name": "The Petrified Ocean", "levelReq": 302291, "biome": "coastal", "gearTier": 18 }, "89": { "name": "The Symphony Springs", "levelReq": 310434, "biome": "plains", "gearTier": 18 }, "90": { "name": "The Whispering Cliffs", "levelReq": 318577, "biome": "mountain", "gearTier": 18 }, "91": { "name": "The Bioluminescent Bog", "levelReq": 326720, "biome": "swamp", "gearTier": 19 }, "92": { "name": "The Stone Giant's Graveyard", "levelReq": 334863, "biome": "plains", "gearTier": 19 }, "93": { "name": "The Maze of Roots", "levelReq": 343006, "biome": "jungle", "gearTier": 19 }, "94": { "name": "The Endless Plains of Glass", "levelReq": 351149, "biome": "plains", "gearTier": 19 }, "95": { "name": "The Whispering Temple Ruins", "levelReq": 359292, "biome": "jungle", "gearTier": 19 }, "96": { "name": "The Crystal Ocean", "levelReq": 367435, "biome": "coastal", "gearTier": 19 }, "97": { "name": "The Sunken Palace of the Sea King", "levelReq": 375578, "biome": "coastal", "gearTier": 19 }, "98": { "name": "The Land of Shifting Colors", "levelReq": 383721, "biome": "plains", "gearTier": 19 }, "99": { "name": "The Cloud Forest of the Sky Serpents", "levelReq": 391864, "biome": "forest", "gearTier": 19 }, "100": { "name": "The Singing Rivers", "levelReq": 400000, "biome": "plains", "gearTier": 19 }, "101": { "name": "The Echoing Gorge of Lost Souls", "levelReq": 500000, "biome": "mountain", "gearTier": 20 } };
-            AllZones = zonesData;
+            // Fetch zones from server API instead of using static data
+            try {
+                const response = await fetch('/api/game/zones');
+                const data = await response.json();
+                
+                if (data.success && data.zones) {
+                    // Convert server zone data format to expected AllZones format
+                    AllZones = {};
+                    data.zones.forEach(zone => {
+                        AllZones[zone.id] = {
+                            name: zone.name,
+                            levelReq: zone.levelReq,
+                            biome: "mountain", // Default biome for compatibility
+                            gearTier: Math.ceil(zone.levelReq / 50) || 1 // Calculate gear tier based on level
+                        };
+                    });
+                    console.log("Using server-side zone data:", data.zones);
+                } else {
+                    console.warn("Failed to load server zone data, using fallback");
+                    // Fallback to empty zones object
+                    AllZones = {};
+                }
+            } catch (error) {
+                console.error("Error fetching zone data from server:", error);
+                AllZones = {};
+            }
             console.log("Zone data successfully loaded.");
             // In the future, you can add fetches for items.json, monsters.json, etc. here.
         } catch (error) {
