@@ -1908,11 +1908,20 @@ const EquipmentManager = {
                 
                 // Check if there's a blueprint for this zone and use its name instead
                 const blueprint = WorldMapManager.getZoneBlueprint(zone.id);
-                let displayName;
-                if (parseInt(zone.id) <= 5 && blueprint) {
+                let displayName = zone.name;  // Default to original name
+                
+                // For zones 1-5, force use of blueprint names
+                if (parseInt(zone.id) <= 5) {
+                    const blueprintNames = {
+                        '1': 'Crystal Caves',
+                        '2': 'Whispering Woods', 
+                        '3': 'Ember Peaks',
+                        '4': 'Frost Hollow',
+                        '5': 'Shadowmere Swamp'
+                    };
+                    displayName = blueprintNames[zone.id] || zone.name;
+                } else if (blueprint) {
                     displayName = blueprint.name;
-                } else {
-                    displayName = blueprint ? blueprint.name : zone.name;
                 }
                 
                 return `
@@ -1945,11 +1954,19 @@ const EquipmentManager = {
             const blueprint = WorldMapManager.getZoneBlueprint(zoneId);
             
             // Force use blueprint names for first 5 zones
-            let zoneName;
-            if (parseInt(zoneId) <= 5 && blueprint) {
+            let zoneName = zone.name;  // Default to original name
+            
+            if (parseInt(zoneId) <= 5) {
+                const blueprintNames = {
+                    '1': 'Crystal Caves',
+                    '2': 'Whispering Woods', 
+                    '3': 'Ember Peaks',
+                    '4': 'Frost Hollow',
+                    '5': 'Shadowmere Swamp'
+                };
+                zoneName = blueprintNames[zoneId] || zone.name;
+            } else if (blueprint) {
                 zoneName = blueprint.name;
-            } else {
-                zoneName = blueprint ? blueprint.name : zone.name;
             }
             
             const gridInfo = blueprint ? ` (${blueprint.gridSize}x${blueprint.gridSize})` : '';
