@@ -4,10 +4,6 @@
  */
 
 import { ZONE_BLUEPRINTS } from '../shared/zoneBlueprints.js';
-import { COMPLETE_ZONE_DATA, getCompleteZoneData } from '../shared/completeZoneData.js';
-import { db } from './storage.js';
-import { zones, monsters } from '../shared/schema.js';
-import { eq } from 'drizzle-orm';
 
 export interface GameState {
   player: {
@@ -54,50 +50,26 @@ export class GameLogicManager {
     return gameState;
   }
 
-  // Initialize all zones from complete zone data
+  // Initialize all zones from blueprints
   private initializeZones(): Record<string, ZoneState> {
-    const zoneStates: Record<string, ZoneState> = {};
+    const zones: Record<string, ZoneState> = {};
     
-    COMPLETE_ZONE_DATA.forEach(zoneData => {
-      zoneStates[zoneData.zoneId.toString()] = {
-        id: zoneData.zoneId,
-        name: zoneData.name,
-        gridSize: zoneData.gridSize,
-        features: zoneData.features.map(f => ({
+    Object.entries(ZONE_BLUEPRINTS).forEach(([zoneId, blueprint]) => {
+      zones[zoneId] = {
+        id: parseInt(zoneId),
+        name: blueprint.name,
+        gridSize: blueprint.gridSize,
+        features: blueprint.features.map(f => ({
           q: f.q,
           r: f.r,
           type: f.type,
           name: f.name
         })),
-        currentMonsters: zoneData.monsters.map(m => ({
-          id: m.monsterId,
-          hp: m.health,
-          maxHp: m.health,
-          name: m.name
-        }))
+        currentMonsters: []
       };
     });
 
-    return zoneStates;
-  }
-
-  // Get zone data from database
-  async getZoneFromDatabase(zoneId: number) {
-    try {
-      const zone = await db.select().from(zones).where(eq(zones.zoneId, zoneId));
-      const zoneMonsters = await db.select().from(monsters).where(eq(monsters.zoneId, zoneId));
-      
-      if (zone.length > 0) {
-        return {
-          zone: zone[0],
-          monsters: zoneMonsters
-        };
-      }
-      return null;
-    } catch (error) {
-      console.error('Error fetching zone from database:', error);
-      return null;
-    }
+    return zones;
   }
 
   // Get player's current game state
@@ -105,42 +77,21 @@ export class GameLogicManager {
     return this.gameStates.get(playerId) || null;
   }
 
-  // Handle zone teleportation (prioritize database data)
-  async teleportToZone(playerId: string, zoneId: number): Promise<{ success: boolean; message: string; zoneData?: ZoneState }> {
+  // Handle zone teleportation
+  teleportToZone(playerId: string, zoneId: number): { success: boolean; message: string; zoneData?: ZoneState } {
     const gameState = this.gameStates.get(playerId);
     if (!gameState) {
       return { success: false, message: "Player not found" };
     }
 
-    // Get fresh zone data from database
-    const dbZoneData = await this.getZoneFromDatabase(zoneId);
-    if (!dbZoneData) {
-      return { success: false, message: "Zone not found in database" };
+    const targetZone = gameState.zones[zoneId.toString()];
+    if (!targetZone) {
+      return { success: false, message: "Zone not found" };
     }
-
-    // Convert database zone data to ZoneState format with all 6 buildings
-    const targetZone: ZoneState = {
-      id: dbZoneData.zone.zoneId,
-      name: dbZoneData.zone.name,
-      gridSize: dbZoneData.zone.gridSize,
-      features: dbZoneData.zone.features as Array<{ q: number; r: number; type: string; name?: string }>,
-      currentMonsters: dbZoneData.monsters.map(m => ({
-        id: m.monsterId,
-        hp: m.health,
-        maxHp: m.health,
-        name: m.name
-      }))
-    };
 
     // Update player's current zone and reset position
     gameState.player.currentZoneId = zoneId;
     gameState.player.position = { q: 0, r: 0 };
-    
-    // Update memory cache with fresh database data
-    gameState.zones[zoneId.toString()] = targetZone;
-
-    console.log(`Teleport: Zone ${zoneId} has ${targetZone.features.length} features:`, 
-                targetZone.features.map(f => f.type).join(', '));
 
     return {
       success: true,
@@ -176,53 +127,25 @@ export class GameLogicManager {
     return { success: false, message: "Cannot move outside zone boundaries" };
   }
 
-  // Get available zones from database
-  async getAvailableZones(playerId: string): Promise<Array<{ id: number; name: string; levelReq: number; unlocked: boolean }>> {
-    try {
-      const allZones = await db.select().from(zones).orderBy(zones.zoneId);
-      return allZones.map(zone => ({
-        id: zone.zoneId,
-        name: zone.name,
-        levelReq: zone.levelRequirement,
-        unlocked: true // All zones unlocked for testing
-      }));
-    } catch (error) {
-      console.error('Error fetching zones from database:', error);
-      return [];
-    }
+  // Get available zones for teleportation
+  getAvailableZones(playerId: string): Array<{ id: number; name: string; levelReq: number; unlocked: boolean }> {
+    const gameState = this.gameStates.get(playerId);
+    if (!gameState) return [];
+
+    return Object.entries(gameState.zones).map(([zoneId, zone]) => ({
+      id: zone.id,
+      name: zone.name,
+      levelReq: 1, // All zones are level 1 for now
+      unlocked: true // All zones unlocked for testing
+    }));
   }
 
-  // Get current zone data (prioritize database over memory)
-  async getCurrentZone(playerId: string): Promise<ZoneState | null> {
+  // Get current zone data
+  getCurrentZone(playerId: string): ZoneState | null {
     const gameState = this.gameStates.get(playerId);
     if (!gameState) return null;
 
-    const currentZoneId = gameState.player.currentZoneId;
-    
-    // Try to get fresh data from database first
-    const dbZoneData = await this.getZoneFromDatabase(currentZoneId);
-    if (dbZoneData) {
-      // Convert database zone data to ZoneState format
-      const zoneState: ZoneState = {
-        id: dbZoneData.zone.zoneId,
-        name: dbZoneData.zone.name,
-        gridSize: dbZoneData.zone.gridSize,
-        features: dbZoneData.zone.features as Array<{ q: number; r: number; type: string; name?: string }>,
-        currentMonsters: dbZoneData.monsters.map(m => ({
-          id: m.monsterId,
-          hp: m.health,
-          maxHp: m.health,
-          name: m.name
-        }))
-      };
-      
-      // Update memory cache
-      gameState.zones[currentZoneId.toString()] = zoneState;
-      return zoneState;
-    }
-
-    // Fallback to memory cache
-    return gameState.zones[currentZoneId.toString()] || null;
+    return gameState.zones[gameState.player.currentZoneId.toString()] || null;
   }
 }
 

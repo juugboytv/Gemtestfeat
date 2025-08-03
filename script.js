@@ -1,54 +1,4 @@
 
-    // --- VERSION STAMP FOR CACHE BUSTING ---
-    console.log('🚨 SCRIPT VERSION: 2025-01-03-17:15 - NULL CHECKS ADDED AS USER SUGGESTED');
-    
-    // === COMPREHENSIVE CANVAS ERROR PREVENTION ===
-    // This system completely prevents all canvas operations to eliminate the error
-    
-    // Override HTMLCanvasElement constructor to disable canvas creation
-    if (typeof HTMLCanvasElement !== 'undefined') {
-        // Override getContext to always return null
-        HTMLCanvasElement.prototype.getContext = function() {
-            console.log('Canvas context blocked - using canvas-free zone system');
-            return null;
-        };
-        
-        // Override width/height setters to prevent errors
-        Object.defineProperty(HTMLCanvasElement.prototype, 'width', {
-            set: function() { console.log('Canvas width setter blocked'); },
-            get: function() { return 0; }
-        });
-        Object.defineProperty(HTMLCanvasElement.prototype, 'height', {
-            set: function() { console.log('Canvas height setter blocked'); },
-            get: function() { return 0; }
-        });
-    }
-
-    // Global error suppression for any remaining canvas errors
-    window.addEventListener('error', function(e) {
-        if (e.message && (
-            e.message.includes('ctx') || 
-            e.message.includes('canvas') || 
-            e.message.includes('clearRect') ||
-            e.message.includes('getContext')
-        )) {
-            console.log('Canvas error suppressed:', e.message);
-            e.preventDefault();
-            e.stopImmediatePropagation();
-            return false;
-        }
-    });
-
-    // Prevent unhandled promise rejections related to canvas
-    window.addEventListener('unhandledrejection', function(e) {
-        if (e.reason && e.reason.message && e.reason.message.includes('canvas')) {
-            console.log('Canvas promise rejection suppressed');
-            e.preventDefault();
-        }
-    });
-
-    console.log('🔒 Canvas completely disabled - zone system uses HTML/CSS display');
-    
     // --- App State & Config ---
     let state = {
         player: {}, 
@@ -98,11 +48,34 @@
     console.log(`Game Log: ${message}`);
 }
 
-    // --- Background Animations DISABLED (SMOKE CANVAS CAUSING CANVAS ERRORS) ---
-    console.log('Smoke canvas animation disabled to prevent canvas context errors');
-    // const smokeCanvas = document.getElementById('smoke-canvas');
-    // const smokeCtx = smokeCanvas.getContext('2d'); // THIS WAS CAUSING THE ERROR
-    // ALL SMOKE ANIMATION CODE DISABLED
+    // --- Background Animations ---
+    const smokeCanvas = document.getElementById('smoke-canvas');
+    const smokeCtx = smokeCanvas.getContext('2d');
+    let smokeParticles = [];
+    const resizeSmokeCanvas = () => {
+        smokeCanvas.width = window.innerWidth;
+        smokeCanvas.height = window.innerHeight;
+        smokeParticles = Array.from({ length: 75 }, () => ({
+            x: Math.random() * smokeCanvas.width, y: Math.random() * smokeCanvas.height,
+            size: Math.random() * 150 + 50,
+            speedX: Math.random() * 0.4 - 0.2, speedY: Math.random() * 0.4 - 0.2,
+            color: `rgba(249, 115, 22, ${Math.random() * 0.07})`
+        }));
+    };
+    const animateSmoke = () => {
+        smokeCtx.clearRect(0, 0, smokeCanvas.width, smokeCanvas.height);
+        smokeParticles.forEach(p => {
+            p.x += p.speedX; p.y += p.speedY;
+            if (p.x < -p.size) p.x = smokeCanvas.width + p.size; if (p.x > smokeCanvas.width + p.size) p.x = -p.size;
+            if (p.y < -p.size) p.y = smokeCanvas.height + p.size; if (p.y > smokeCanvas.height + p.size) p.y = -p.size;
+            smokeCtx.fillStyle = p.color; smokeCtx.beginPath(); smokeCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            smokeCtx.filter = 'blur(60px)'; smokeCtx.fill();
+        });
+        requestAnimationFrame(animateSmoke);
+    };
+    window.addEventListener('resize', resizeSmokeCanvas);
+    resizeSmokeCanvas();
+    animateSmoke();
 
     // --- NEW: SHARED UTILITIES ---
 
@@ -1603,12 +1576,7 @@ const EquipmentManager = {
                 logToGame("You have been defeated! You are returned to the sanctuary.", 'system'); 
                 ProfileManager.healPlayer(); 
                 WorldMapManager.playerPos = { q: 0, r: 0 }; 
-                // Only draw if WorldMapManager is properly initialized
-                if (WorldMapManager.canvasReady && WorldMapManager.ctx && WorldMapManager.isInitialized) {
-                    WorldMapManager.draw(); 
-                } else {
-                    console.log('Skipping draw in combat - WorldMapManager not ready');
-                }
+                WorldMapManager.draw(); 
                 WorldMapManager.updateInteractButton(); 
                 this.endCombat(); 
             }
@@ -1657,7 +1625,6 @@ const EquipmentManager = {
 
       const WorldMapManager = { 
         isInitialized: false, 
-        canvasReady: false,
         grid: new Map(), 
         playerPos: { q: 0, r: 0 }, 
         hexSize: 18, 
@@ -1667,14 +1634,11 @@ const EquipmentManager = {
         init() { 
             if (this.isInitialized) return; 
             this.isInitialized = true; 
-            
-            // CANVAS COMPLETELY DISABLED - Using canvas-free zone display system
-            console.log('WorldMapManager initialized in canvas-free mode');
-            this.ctx = null;
-            this.canvasReady = false;
-            
-            // Skip all canvas operations and use canvas-free zone display instead
-            console.log('Canvas operations disabled - zone display handled by canvas-free system');
+            ui.miniMapCanvas.width = ui.miniMapContainer.clientWidth * 2; 
+            ui.miniMapCanvas.height = ui.miniMapContainer.clientHeight * 2; 
+            ui.miniMapCanvas.style.width = `${ui.miniMapContainer.clientWidth}px`; 
+            ui.miniMapCanvas.style.height = `${ui.miniMapContainer.clientHeight}px`; 
+            this.ctx = ui.miniMapCanvas.getContext('2d'); 
             
             // Load blueprint for current zone (if any) or default to zone 1
             const startingZone = state.game.currentZoneTier || 1;
@@ -1687,118 +1651,12 @@ const EquipmentManager = {
                 console.log('WARNING: Zone blueprints not loaded yet');
             }
             
-            // NOTE: Grid generation is now handled externally with server data
-            // this.generateGrid(); - REMOVED: Now called from main() with server zone data
+            this.loadZoneBlueprint(startingZone);
             this.updateInteractButton(); 
-            // Drawing is also handled externally after grid generation
+            this.draw(); 
         }, 
         
-        // Enhanced server zone data loader
-        async loadServerZoneData(zoneId = null) {
-            zoneId = zoneId || this.currentZoneId || 1;
-            
-            try {
-                console.log(`🌐 Loading server zone data for zone ${zoneId}...`);
-                const response = await fetch(`/api/game/current-zone?zoneId=${zoneId}&q=${this.playerPos.q}&r=${this.playerPos.r}`);
-                
-                if (!response.ok) {
-                    throw new Error(`Server response not ok: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                if (data.success && data.gameState && data.gameState.currentZone) {
-                    console.log('✅ Server zone data loaded successfully:', data.gameState.currentZone.name);
-                    this.serverZoneData = data.gameState.currentZone;
-                    this.currentZoneId = zoneId;
-                    
-                    // Generate grid with server data
-                    this.generateGrid(data.gameState.currentZone);
-                    return data.gameState.currentZone;
-                } else {
-                    throw new Error('Invalid server response structure');
-                }
-            } catch (error) {
-                console.log('Server zone loading failed, using fallback:', error.message);
-                // Fallback to blueprint system
-                return this.loadFallbackZone(zoneId);
-            }
-        },
-        
-        // Fallback zone loading using blueprint system
-        loadFallbackZone(zoneId) {
-            console.log(`Loading fallback zone data for zone ${zoneId}`);
-            const blueprint = this.getZoneBlueprint(zoneId);
-            if (blueprint) {
-                this.generateGrid(blueprint);
-                return blueprint;
-            }
-            return null;
-        },
-
-        // Generate grid from server zone data (ENHANCED WITH SERVER INTEGRATION)
-        generateGrid(zoneData = null) {
-            console.log('🔥 GRID GENERATION STARTING - generateGrid called with zone data:', zoneData);
-            
-            // Use provided zone data (server or fallback)
-            if (zoneData && zoneData.features) {
-                console.log('🚀 CONFIRMED: Using zone data for map generation:', zoneData);
-                
-                // Clear existing grid
-                this.grid.clear();
-                
-                // Generate hexagonal grid based on zone data
-                const gridSize = zoneData.gridSize || 4;
-                for (let q = -gridSize; q <= gridSize; q++) {
-                    for (let r = -gridSize; r <= gridSize; r++) {
-                        const s = -q - r;
-                        if (s >= -gridSize && s <= gridSize) {
-                            // Default all hexes to Monster Zones
-                            this.grid.set(`${q},${r}`, { 
-                                q, r, s, 
-                                feature: { name: 'Monster Zone', icon: '◻️' } 
-                            });
-                        }
-                    }
-                }
-                
-                // Apply features from zone data
-                console.log('🔧 FEATURE APPLICATION: Applying zone features:', zoneData.features.length, 'features');
-                console.log('🔧 GRID INFO: Grid size after generation:', this.grid.size, 'hexes');
-                
-                zoneData.features.forEach(feature => {
-                    const key = `${feature.q},${feature.r}`;
-                    console.log(`Applying feature ${feature.type} at key "${key}"`);
-                    
-                    if (this.grid.has(key)) {
-                        const featureInfo = this.getFeatureInfo(feature.type);
-                        console.log(`🔍 FEATURE: ${feature.type} -> ${featureInfo.name} (${featureInfo.icon})`);
-                        this.grid.get(key).feature = {
-                            name: feature.name || featureInfo.name,
-                            icon: featureInfo.icon,
-                            type: feature.type
-                        };
-                        console.log(`✅ APPLIED: ${feature.type} at (${feature.q},${feature.r}) = ${featureInfo.icon}`);
-                    } else {
-                        console.log(`❌ COORDINATE OUT OF BOUNDS: "${key}" not in ${gridSize}x${gridSize} grid`);
-                    }
-                });
-                
-                console.log(`Generated zone grid: ${zoneData.name} (${gridSize}x${gridSize})`, zoneData.features);
-                showToast(`Zone Layout: ${zoneData.name} (${gridSize}x${gridSize} grid)`, false);
-                
-                // Update zone info display
-                this.updateZoneInfoDisplay(zoneData);
-                
-                // CANVAS DRAW OPERATIONS COMPLETELY DISABLED
-                console.log('Canvas drawing disabled - using canvas-free zone system');
-                return;
-            }
-            
-            // Fallback to blueprint system if no server data
-            this.loadZoneBlueprint(this.currentZoneId);
-        },
-
-        // Load zone blueprint dynamically (FALLBACK METHOD)
+        // Load zone blueprint dynamically
         loadZoneBlueprint(zoneId) {
             this.currentZoneId = zoneId;
             const blueprint = this.getZoneBlueprint(zoneId);
@@ -1938,7 +1796,6 @@ const EquipmentManager = {
                 'Arcanum': { name: 'Magic/Accessories Shop', icon: '🔮' },
                 'AetheriumConduit': { name: 'Bank', icon: '🏧' },
                 'Teleporter': { name: 'Teleport Zone', icon: '🌀' },
-                'GemCrucible': { name: 'Gem Crucible', icon: '💎' },
                 'Monster Zone': { name: 'Monster Zone', icon: '◻️' },
                 'Resource Node': { name: 'Resource Node', icon: '⛏️' },
                 'Boss Arena': { name: 'Boss Arena', icon: '👑' }
@@ -1961,43 +1818,45 @@ const EquipmentManager = {
             this.grid.get('-1,1').feature = { name: 'Magic/Accessories Shop', icon: '🔮' }; 
             this.grid.get('2,0').feature = { name: 'Bank', icon: '🏧' }; 
             this.grid.get('-2,0').feature = { name: 'Sanctuary', icon: '🆘' }; 
-            this.grid.get('0,2').feature = { name: 'Teleport Zone', icon: '🌀' };
-            this.grid.get('-1,2').feature = { name: 'Gem Crucible', icon: '💎' }; 
-        }, movePlayer(dq, dr) { const newQ = this.playerPos.q + dq; const newR = this.playerPos.r + dr; if (this.grid.has(`${newQ},${newR}`)) { this.playerPos.q = newQ; this.playerPos.r = newR; 
-            // CANVAS DRAW OPERATIONS DISABLED
-            console.log('Canvas draw operations disabled in movePlayer'); 
-            if (false) { // CANVAS DRAWING COMPLETELY DISABLED
-                this.draw(); 
-            } else {
-                console.log('Skipping draw in movePlayer - context not ready');
-            }
-            this.updateInteractButton(); const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); if (currentHex && currentHex.feature && currentHex.feature.name === 'Monster Zone') { CombatManager.populateMonsterList(state.game.currentZoneTier); } else { CombatManager.clearMonsterList(); } } }, updateInteractButton() { const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); const interactKey = document.getElementById('key-interact'); if (currentHex && currentHex.feature && currentHex.feature.name !== 'Monster Zone') { interactKey.textContent = `Enter`; interactKey.style.fontSize = '14px'; } else { interactKey.textContent = 'Interact'; interactKey.style.fontSize = '16px'; } }, handleInteraction() { const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); if (currentHex && currentHex.feature) { if (currentHex.feature.name === 'Weapons/Combat Shop') { ShopManager.openShop('armory'); } else if (currentHex.feature.name === 'Magic/Accessories Shop') { ShopManager.openShop('magic'); } else if (currentHex.feature.name === 'Bank') { BankManager.openBank(); } else if (currentHex.feature.name === 'Sanctuary') { ProfileManager.healPlayer(); } else if (currentHex.feature.name === 'Teleport Zone') { TeleportManager.showModal(); } else if (currentHex.feature.name === 'Gem Crucible') { GemCrucibleManager.openGemCrucible(); } } }, draw() { 
-            // ALL CANVAS OPERATIONS DISABLED
-            console.log('Canvas drawing completely disabled');
-            return; 
+            this.grid.get('0,2').feature = { name: 'Teleport Zone', icon: '🌀' }; 
+        }, movePlayer(dq, dr) { const newQ = this.playerPos.q + dq; const newR = this.playerPos.r + dr; if (this.grid.has(`${newQ},${newR}`)) { this.playerPos.q = newQ; this.playerPos.r = newR; this.draw(); this.updateInteractButton(); const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); if (currentHex && currentHex.feature && currentHex.feature.name === 'Monster Zone') { CombatManager.populateMonsterList(state.game.currentZoneTier); } else { CombatManager.clearMonsterList(); } } }, updateInteractButton() { const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); const interactKey = document.getElementById('key-interact'); if (currentHex && currentHex.feature && currentHex.feature.name !== 'Monster Zone') { interactKey.textContent = `Enter`; interactKey.style.fontSize = '14px'; } else { interactKey.textContent = 'Interact'; interactKey.style.fontSize = '16px'; } }, handleInteraction() { const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); if (currentHex && currentHex.feature) { if (currentHex.feature.name === 'Weapons/Combat Shop') { ShopManager.openShop('armory'); } else if (currentHex.feature.name === 'Magic/Accessories Shop') { ShopManager.openShop('magic'); } else if (currentHex.feature.name === 'Bank') { BankManager.openBank(); } else if (currentHex.feature.name === 'Sanctuary') { ProfileManager.healPlayer(); } else if (currentHex.feature.name === 'Teleport Zone') { TeleportManager.showModal(); } } }, draw() { const canvas = ui.miniMapCanvas; this.ctx.clearRect(0, 0, canvas.width, canvas.height); const centerX = canvas.width / 2; const centerY = canvas.height / 2; this.grid.forEach(hex => { const relQ = hex.q - this.playerPos.q; const relR = hex.r - this.playerPos.r; const {x, y} = HexUtils.hexToPixel(relQ, relR, this.hexSize); this.drawHex(centerX + x, centerY + y, this.hexSize, hex.feature); }); this.drawPlayer(centerX, centerY); }, drawHex(cx, cy, size, feature) { 
+            this.ctx.beginPath(); 
+            for (let i = 0; i < 6; i++) { 
+                const angle = 2 * Math.PI / 6 * (i + 0.5); 
+                const x = cx + size * Math.cos(angle); 
+                const y = cy + size * Math.sin(angle); 
+                if (i === 0) this.ctx.moveTo(x, y); 
+                else this.ctx.lineTo(x, y); 
+            } 
+            this.ctx.closePath(); 
             
-            const canvas = ui.miniMapCanvas;
+            // Different hex colors based on current zone for visual variety
+            const zoneColors = [
+                'rgba(10, 10, 10, 0.5)',     // Default
+                'rgba(0, 50, 100, 0.5)',     // Zone 1: Blue (Crystal Caves)
+                'rgba(0, 100, 50, 0.5)',     // Zone 2: Green (Whispering Woods)  
+                'rgba(100, 30, 0, 0.5)',     // Zone 3: Red (Ember Peaks)
+                'rgba(50, 100, 200, 0.5)',   // Zone 4: Light Blue (Frost Hollow)
+                'rgba(50, 50, 100, 0.5)'     // Zone 5: Purple (Shadowmere Swamp)
+            ];
             
-            // ALL CANVAS OPERATIONS COMPLETELY REMOVED
-            console.log('Canvas drawing completely disabled - using canvas-free zone display');
-            return; 
+            const colorIndex = Math.min(this.currentZoneId || 0, zoneColors.length - 1);
+            this.ctx.fillStyle = zoneColors[colorIndex];
+            this.ctx.fill(); 
+            this.ctx.strokeStyle = 'rgba(249, 115, 22, 0.3)'; 
+            this.ctx.lineWidth = 1.5; 
+            this.ctx.stroke(); 
             
-            // ALL CANVAS GRID DRAWING DISABLED
-            return; 
-            
-            // ALL CANVAS DRAWING DISABLED
-            return;
-        }, drawHex(cx, cy, size, feature) { 
-            // ALL CANVAS DRAWING DISABLED
-            return;
-        }, drawPlayer(cx, cy) { 
-            // ALL CANVAS DRAWING DISABLED
-            return;
-        } };
+            if (feature) { 
+                this.ctx.font = `${size * 1.5}px sans-serif`; 
+                this.ctx.textAlign = 'center'; 
+                this.ctx.textBaseline = 'middle'; 
+                this.ctx.fillStyle = 'white';
+                this.ctx.fillText(feature.icon, cx, cy); 
+            } 
+        }, drawPlayer(cx, cy) { this.ctx.font = `${this.hexSize * 1.5}px sans-serif`; this.ctx.textAlign = 'center'; this.ctx.textBaseline = 'middle'; this.ctx.fillText('🟠', cx, cy); } };
     const BankManager = { isInitialized: false, init() { if (this.isInitialized) return; this.isInitialized = true; }, openBank() { this.renderBankUI(); }, renderBankUI() { const contentHTML = ` <div id="bank-content" class="p-4 text-center"> <div class="grid grid-cols-2 gap-4 mb-4 text-lg"> <div> <div class="text-sm text-gray-400 font-orbitron">Your Gold</div> <div id="bank-player-gold" class="font-bold text-yellow-400 font-orbitron">${state.player.gold.toLocaleString()}</div> </div> <div> <div class="text-sm text-gray-400 font-orbitron">Banked Gold</div> <div id="bank-vault-gold" class="font-bold text-yellow-400 font-orbitron">${state.player.bankGold.toLocaleString()}</div> </div> </div> <input type="number" id="bank-amount-input" class="w-full p-2 rounded text-lg text-black bg-gray-200" placeholder="Enter amount..."> <div class="grid grid-cols-2 gap-2 mt-4"> <button id="bank-deposit-btn" class="glass-button py-2 rounded-md">Deposit</button> <button id="bank-withdraw-btn" class="glass-button py-2 rounded-md">Withdraw</button> </div> </div> `; ModalManager.show('Bank Vault', contentHTML, { onContentReady: (contentDiv) => { contentDiv.querySelector('#bank-deposit-btn').addEventListener('click', () => this.handleTransaction('deposit')); contentDiv.querySelector('#bank-withdraw-btn').addEventListener('click', () => this.handleTransaction('withdraw')); } }); }, handleTransaction(type) { const input = document.getElementById('bank-amount-input'); const amount = parseInt(input.value); if (isNaN(amount) || amount <= 0) { showToast("Please enter a valid amount.", true); return; } if (type === 'deposit') { if (amount > state.player.gold) { showToast("You don't have enough gold to deposit.", true); return; } state.player.gold -= amount; state.player.bankGold += amount; showToast(`Deposited ${amount.toLocaleString()} gold.`); } else if (type === 'withdraw') { if (amount > state.player.bankGold) { showToast("You don't have enough gold in the bank.", true); return; } state.player.bankGold -= amount; state.player.gold += amount; showToast(`Withdrew ${amount.toLocaleString()} gold.`); } input.value = ''; ProfileManager.updateAllProfileUI(); document.getElementById('bank-player-gold').textContent = state.player.gold.toLocaleString(); document.getElementById('bank-vault-gold').textContent = state.player.bankGold.toLocaleString(); } };
     const ShopManager = { isInitialized: false, init() { if (this.isInitialized) return; this.isInitialized = true; }, openShop(shopType) { const contentHTML = ` <div class="p-4 text-center"> <h3 class="font-orbitron text-lg mb-2">Welcome to the ${shopType} Shop!</h3> <p class="text-gray-400">Shop functionality is not yet implemented.</p> <div class="mt-4"> <div class="shop-item-row"> <span>Item Name</span> <span>Description</span> <span>Price</span> </div> <div class="shop-item-row"> <span>Placeholder Item</span> <span>A nice placeholder.</span> <span class="text-yellow-400">100g</span> </div> </div> </div> `; ModalManager.show(`${shopType.charAt(0).toUpperCase() + shopType.slice(1)} Shop`, contentHTML); } };
-
-    const GemCrucibleManager = { isInitialized: false, init() { if (this.isInitialized) return; this.isInitialized = true; }, openGemCrucible() { this.renderGemCrucibleUI(); }, renderGemCrucibleUI() { const contentHTML = ` <div id="gem-crucible-content" class="p-4 text-center"> <div class="mb-4"> <h3 class="font-orbitron text-lg mb-2">💎 Gem Crucible 💎</h3> <p class="text-gray-400 mb-4">Enhance and manage your precious gems here.</p> </div> <div class="grid grid-cols-2 gap-4 mb-4"> <div class="gem-crucible-section"> <h4 class="font-orbitron text-sm text-gray-300 mb-2">Gem Inventory</h4> <div class="gem-list-container bg-black/20 p-2 rounded min-h-[100px]"> <p class="text-gray-500 text-xs">Your gems will appear here</p> </div> </div> <div class="gem-crucible-section"> <h4 class="font-orbitron text-sm text-gray-300 mb-2">Enhancement Options</h4> <div class="enhancement-options bg-black/20 p-2 rounded min-h-[100px]"> <p class="text-gray-500 text-xs">Gem enhancement coming soon</p> </div> </div> </div> <div class="text-xs text-gray-400"> <p>Interact with socketed items in the Infusion tab to manage gems.</p> </div> </div> `; ModalManager.show('Gem Crucible', contentHTML); } };
     
     const TeleportManager = {
         isInitialized: false,
@@ -2069,24 +1928,11 @@ const EquipmentManager = {
 
             state.game.currentZoneTier = parseInt(zoneId);
             
-            // Load new zone data from server (prioritize server over blueprint)
-            WorldMapManager.currentZoneId = parseInt(zoneId);
-            WorldMapManager.playerPos = { q: 0, r: 0 }; // Reset position
-            
-            // Load server zone data if available
-            if (WorldMapManager.loadServerZoneData) {
-                WorldMapManager.loadServerZoneData(parseInt(zoneId)).then(() => {
-                    // Force refresh zone displays
-                    if (typeof updateZoneHexDisplay === 'function') {
-                        updateZoneHexDisplay();
-                    }
-                });
-            } else {
-                // Fallback to blueprint system
-                WorldMapManager.loadZoneBlueprint(parseInt(zoneId));
-                WorldMapManager.draw();
-            }
-            
+            // Load new zone blueprint and reset player position
+            WorldMapManager.currentZoneId = parseInt(zoneId);  // Update current zone
+            WorldMapManager.loadZoneBlueprint(parseInt(zoneId));
+            WorldMapManager.playerPos = { q: 0, r: 0 };
+            WorldMapManager.draw();
             WorldMapManager.updateInteractButton();
             
             const landingHex = WorldMapManager.grid.get(`${WorldMapManager.playerPos.q},${WorldMapManager.playerPos.r}`);
@@ -2637,11 +2483,9 @@ const EquipmentManager = {
             StatsManager.init();
             CombatManager.init();
             EquipmentManager.init();
-            // WorldMapManager.init(); // DISABLED - Canvas operations cause 'ctx.clearRect' errors
-            console.log('WorldMapManager.init() disabled - using canvas-free zone system');
+            WorldMapManager.init();
             ShopManager.init();
             BankManager.init();
-            GemCrucibleManager.init();
             TeleportManager.init();
             ChatManager.init();
             initializeGDD(); // Load the GDD structure
@@ -3260,294 +3104,4 @@ const InfusionManager = {
     }
 
     document.addEventListener('DOMContentLoaded', main);
-    
-    // Phase 1: Add navigation button functionality
-    document.addEventListener('DOMContentLoaded', () => {
-        const navButtons = {
-            'nav-north': () => WorldMapManager.movePlayer(0, -1),
-            'nav-south': () => WorldMapManager.movePlayer(0, 1),
-            'nav-west': () => WorldMapManager.movePlayer(-1, 0),
-            'nav-east': () => WorldMapManager.movePlayer(1, 0)
-        };
-        
-        Object.entries(navButtons).forEach(([id, action]) => {
-            const button = document.getElementById(id);
-            if (button) {
-                button.addEventListener('click', action);
-            }
-        });
-        
-        // Enhanced zone and location management
-        const updateZoneDisplay = async () => {
-            try {
-                // Get current zone data from server
-                const response = await fetch('/api/game/current-zone');
-                if (!response.ok) throw new Error('Failed to fetch zone data');
-                
-                const data = await response.json();
-                if (data.success && data.gameState) {
-                    const { player, currentZone } = data.gameState;
-                    
-                    // Update location display
-                    const locationDiv = document.getElementById('current-location');
-                    if (locationDiv) {
-                        const currentFeature = currentZone.features.find(f => 
-                            f.q === player.position.q && f.r === player.position.r
-                        );
-                        
-                        if (currentFeature) {
-                            locationDiv.textContent = `${getFeatureIcon(currentFeature.type)} ${currentFeature.name}`;
-                        } else {
-                            locationDiv.textContent = `Monster Zone (${player.position.q}, ${player.position.r})`;
-                        }
-                    }
-                    
-                    // Update zone display in mini-map area
-                    updateMiniMapZoneInfo(currentZone);
-                }
-            } catch (error) {
-                console.log('Zone display update using client fallback');
-                // Fallback to existing client logic
-                const locationDiv = document.getElementById('current-location');
-                if (locationDiv && WorldMapManager.grid) {
-                    const pos = WorldMapManager.playerPos;
-                    const currentHex = WorldMapManager.grid.get(`${pos.q},${pos.r}`);
-                    if (currentHex && currentHex.feature) {
-                        locationDiv.textContent = `${currentHex.feature.icon} ${currentHex.feature.name}`;
-                    } else {
-                        locationDiv.textContent = `Monster Zone (${pos.q}, ${pos.r})`;
-                    }
-                }
-            }
-        };
-        
-        // Helper function for feature icons
-        const getFeatureIcon = (featureType) => {
-            const icons = {
-                'Sanctuary': '🆘',
-                'Armory': '⚔️', 
-                'Arcanum': '🔮',
-                'AetheriumConduit': '🏧',
-                'Teleporter': '🌀',
-                'GemCrucible': '💎',
-                'Monster Zone': '👹'
-            };
-            return icons[featureType] || '◻️';
-        };
-        
-        // Update mini-map area with zone info
-        const updateMiniMapZoneInfo = (zoneData) => {
-            const miniMapContainer = document.getElementById('mini-map-container');
-            if (miniMapContainer) {
-                // Add zone info display
-                let zoneInfoDiv = document.getElementById('zone-info-display');
-                if (!zoneInfoDiv) {
-                    zoneInfoDiv = document.createElement('div');
-                    zoneInfoDiv.id = 'zone-info-display';
-                    zoneInfoDiv.className = 'absolute -bottom-8 left-0 right-0 text-xs text-center text-orange-400';
-                    miniMapContainer.appendChild(zoneInfoDiv);
-                }
-                zoneInfoDiv.textContent = zoneData.name;
-            }
-        };
-        
-        // Enhanced navigation with server sync
-        const enhancedNavButtons = {
-            'nav-north': async () => {
-                try {
-                    const response = await fetch('/api/game/move', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ dq: 0, dr: -1 })
-                    });
-                    if (response.ok) {
-                        if (WorldMapManager && WorldMapManager.movePlayer) {
-                            WorldMapManager.movePlayer(0, -1);
-                        }
-                        updateZoneDisplay();
-                    }
-                } catch (error) {
-                    // Fallback to client-side movement
-                    if (WorldMapManager && WorldMapManager.movePlayer) {
-                        WorldMapManager.movePlayer(0, -1);
-                    }
-                }
-            },
-            'nav-south': async () => {
-                try {
-                    const response = await fetch('/api/game/move', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ dq: 0, dr: 1 })
-                    });
-                    if (response.ok) {
-                        if (WorldMapManager && WorldMapManager.movePlayer) {
-                            WorldMapManager.movePlayer(0, 1);
-                        }
-                        updateZoneDisplay();
-                    }
-                } catch (error) {
-                    if (WorldMapManager && WorldMapManager.movePlayer) {
-                        WorldMapManager.movePlayer(0, 1);
-                    }
-                }
-            },
-            'nav-west': async () => {
-                try {
-                    const response = await fetch('/api/game/move', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ dq: -1, dr: 0 })
-                    });
-                    if (response.ok) {
-                        if (WorldMapManager && WorldMapManager.movePlayer) {
-                            WorldMapManager.movePlayer(-1, 0);
-                        }
-                        updateZoneDisplay();
-                    }
-                } catch (error) {
-                    if (WorldMapManager && WorldMapManager.movePlayer) {
-                        WorldMapManager.movePlayer(-1, 0);
-                    }
-                }
-            },
-            'nav-east': async () => {
-                try {
-                    const response = await fetch('/api/game/move', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ dq: 1, dr: 0 })
-                    });
-                    if (response.ok) {
-                        if (WorldMapManager && WorldMapManager.movePlayer) {
-                            WorldMapManager.movePlayer(1, 0);
-                        }
-                        updateZoneDisplay();
-                    }
-                } catch (error) {
-                    if (WorldMapManager && WorldMapManager.movePlayer) {
-                        WorldMapManager.movePlayer(1, 0);
-                    }
-                }
-            }
-        };
-        
-        // Replace original nav buttons with enhanced versions
-        Object.entries(enhancedNavButtons).forEach(([id, action]) => {
-            const button = document.getElementById(id);
-            if (button) {
-                // Remove old listeners
-                button.replaceWith(button.cloneNode(true));
-                // Add new enhanced listener
-                document.getElementById(id).addEventListener('click', action);
-            }
-        });
-        
-        // Initialize canvas-free zone display system
-        const initCanvasFreeZoneDisplay = () => {
-            // Disable canvas rendering to prevent errors
-            if (WorldMapManager && WorldMapManager.init) {
-                // Override canvas methods to prevent errors
-                WorldMapManager.canvasReady = false;
-                WorldMapManager.ctx = null;
-            }
-            
-            // Initialize building click handlers
-            document.querySelectorAll('.building-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const buildingType = e.target.getAttribute('data-building');
-                    console.log(`Clicked on ${buildingType} building`);
-                    
-                    // Navigate to building location
-                    navigateToBuilding(buildingType);
-                });
-            });
-        };
-        
-        // Navigate to specific building function
-        const navigateToBuilding = async (buildingType) => {
-            try {
-                const response = await fetch('/api/game/current-zone');
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.success && data.gameState && data.gameState.currentZone) {
-                        const building = data.gameState.currentZone.features.find(f => f.type === buildingType);
-                        if (building) {
-                            // Update player position to building location
-                            if (WorldMapManager && WorldMapManager.playerPos) {
-                                WorldMapManager.playerPos.q = building.q;
-                                WorldMapManager.playerPos.r = building.r;
-                            }
-                            
-                            // Update location display
-                            updateLocationDisplay(building);
-                            showToast(`Moved to ${getFeatureIcon(buildingType)} ${building.name || buildingType}`, false);
-                        }
-                    }
-                }
-            } catch (error) {
-                console.log('Direct building navigation failed, using manual method');
-                showToast(`Navigate to ${buildingType} manually using arrow buttons`, false);
-            }
-        };
-        
-        // Update location display helper
-        const updateLocationDisplay = (feature) => {
-            const locationDiv = document.getElementById('current-location');
-            if (locationDiv && feature) {
-                locationDiv.textContent = `${getFeatureIcon(feature.type)} ${feature.name || feature.type}`;
-            }
-        };
-        
-        // Update zone hex display 
-        const updateZoneHexDisplay = async () => {
-            try {
-                const response = await fetch('/api/game/current-zone');
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.success && data.gameState && data.gameState.currentZone) {
-                        const zone = data.gameState.currentZone;
-                        
-                        // Update zone info
-                        const zoneInfoDiv = document.getElementById('zone-info-display');
-                        if (zoneInfoDiv) {
-                            zoneInfoDiv.textContent = zone.name;
-                        }
-                        
-                        // Update hex display
-                        const hexDisplay = document.getElementById('zone-hex-display');
-                        if (hexDisplay && zone.features) {
-                            const buildingCount = zone.features.filter(f => f.type !== 'Monster Zone').length;
-                            hexDisplay.innerHTML = zone.features.slice(0, 16).map(feature => {
-                                const icon = getFeatureIcon(feature.type);
-                                const isBuilding = feature.type !== 'Monster Zone';
-                                return `<div class="hex-cell ${isBuilding ? 'text-orange-400' : 'text-gray-600'}" title="${feature.name || feature.type}">${icon}</div>`;
-                            }).join('');
-                            
-                            // Update building count
-                            const buildingCountDiv = document.querySelector('#zone-buildings-display .text-gray-400');
-                            if (buildingCountDiv) {
-                                buildingCountDiv.textContent = `Zone Buildings (${buildingCount}/6)`;
-                            }
-                        }
-                        
-                        console.log(`Zone display updated: ${zone.name} with ${zone.features.length} features`);
-                    }
-                }
-            } catch (error) {
-                console.log('Zone hex display update failed, using fallback');
-            }
-        };
-        
-        // Initialize canvas-free system
-        initCanvasFreeZoneDisplay();
-        
-        // Update zone display every 3 seconds and on load
-        updateZoneDisplay();
-        updateZoneHexDisplay();
-        setInterval(() => {
-            updateZoneDisplay();
-            updateZoneHexDisplay();
-        }, 3000);
-    });
 

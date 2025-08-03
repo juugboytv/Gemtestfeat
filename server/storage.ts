@@ -1,13 +1,4 @@
-import { type User, type InsertUser, type Character, type InsertCharacter, type Zone, type InsertZone } from "@shared/schema";
-import { drizzle } from 'drizzle-orm/postgres-js';
-import { eq } from 'drizzle-orm';
-import postgres from 'postgres';
-import * as schema from '../shared/schema';
-
-// Database connection setup for PostgreSQL
-const connectionString = process.env.DATABASE_URL!;
-const client = postgres(connectionString);
-export const db = drizzle(client, { schema });
+import { type User, type InsertUser, type Character, type InsertCharacter, type Item, type InsertItem } from "@shared/schema";
 
 export interface IStorage {
   // User management
@@ -21,19 +12,18 @@ export interface IStorage {
   createCharacter(character: InsertCharacter): Promise<Character>;
   updateCharacter(id: number, updates: Partial<Character>): Promise<Character | undefined>;
   
-  // Item management - simplified for now
-  // getItem(id: number): Promise<any>;
-  // createItem(item: any): Promise<any>;
-  
-  // Zone management
-  getAllZones(): Promise<Zone[]>;
-  getZone(id: number): Promise<Zone | undefined>;
+  // Item management
+  getItem(id: number): Promise<Item | undefined>;
+  getItemsByCharacterId(characterId: number): Promise<Item[]>;
+  createItem(item: InsertItem): Promise<Item>;
+  updateItem(id: number, updates: Partial<Item>): Promise<Item | undefined>;
+  deleteItem(id: number): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private characters: Map<number, Character>;
-  private zones: Map<number, Zone>;
+  private items: Map<number, Item>;
   private nextUserId: number = 1;
   private nextCharacterId: number = 1;
   private nextItemId: number = 1;
@@ -41,7 +31,7 @@ export class MemStorage implements IStorage {
   constructor() {
     this.users = new Map();
     this.characters = new Map();
-    this.zones = new Map();
+    this.items = new Map();
   }
 
   // User methods
@@ -59,9 +49,7 @@ export class MemStorage implements IStorage {
     const id = this.nextUserId++;
     const user: User = { 
       id, 
-      username: insertUser.username,
-      passwordHash: insertUser.passwordHash,
-      email: insertUser.email || null,
+      ...insertUser,
       createdAt: new Date(),
       lastLogin: null
     };
@@ -84,29 +72,7 @@ export class MemStorage implements IStorage {
     const id = this.nextCharacterId++;
     const character: Character = {
       id,
-      userId: insertCharacter.userId,
-      name: insertCharacter.name,
-      race: insertCharacter.race,
-      level: insertCharacter.level || 1,
-      experience: insertCharacter.experience || 0,
-      currentZone: insertCharacter.currentZone || 1,
-      health: insertCharacter.health || 100,
-      maxHealth: insertCharacter.maxHealth || 100,
-      attack: insertCharacter.attack || 10,
-      defense: insertCharacter.defense || 10,
-      gold: insertCharacter.gold || 100,
-      bankGold: insertCharacter.bankGold || 0,
-      equippedWeapon: insertCharacter.equippedWeapon || null,
-      equippedArmor: insertCharacter.equippedArmor || null,
-      equippedShield: insertCharacter.equippedShield || null,
-      equippedHelmet: insertCharacter.equippedHelmet || null,
-      equippedBoots: insertCharacter.equippedBoots || null,
-      equippedGloves: insertCharacter.equippedGloves || null,
-      equippedRing: insertCharacter.equippedRing || null,
-      equippedAmulet: insertCharacter.equippedAmulet || null,
-      combatTarget: insertCharacter.combatTarget || null,
-      lastCombatAction: insertCharacter.lastCombatAction || null,
-      autoFightEnabled: insertCharacter.autoFightEnabled || false,
+      ...insertCharacter,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -127,26 +93,39 @@ export class MemStorage implements IStorage {
     return updatedCharacter;
   }
 
-  // Item methods removed for now - focus on zone functionality
-
-  // Zone methods - use database for production
-  async getAllZones(): Promise<Zone[]> {
-    if (process.env.NODE_ENV === 'development') {
-      // In development, fetch from database
-      return await db.select().from(schema.zones);
-    }
-    // Fallback to memory storage (should not be used in production)
-    return Array.from(this.zones.values());
+  // Item methods
+  async getItem(id: number): Promise<Item | undefined> {
+    return this.items.get(id);
   }
 
-  async getZone(id: number): Promise<Zone | undefined> {
-    if (process.env.NODE_ENV === 'development') {
-      // In development, fetch from database
-      const result = await db.select().from(schema.zones).where(eq(schema.zones.zoneId, id)).limit(1);
-      return result[0];
-    }
-    // Fallback to memory storage
-    return this.zones.get(id);
+  async getItemsByCharacterId(characterId: number): Promise<Item[]> {
+    return Array.from(this.items.values()).filter(
+      (item) => item.characterId === characterId,
+    );
+  }
+
+  async createItem(insertItem: InsertItem): Promise<Item> {
+    const id = this.nextItemId++;
+    const item: Item = {
+      id,
+      ...insertItem,
+      createdAt: new Date(),
+    };
+    this.items.set(id, item);
+    return item;
+  }
+
+  async updateItem(id: number, updates: Partial<Item>): Promise<Item | undefined> {
+    const item = this.items.get(id);
+    if (!item) return undefined;
+    
+    const updatedItem: Item = { ...item, ...updates };
+    this.items.set(id, updatedItem);
+    return updatedItem;
+  }
+
+  async deleteItem(id: number): Promise<boolean> {
+    return this.items.delete(id);
   }
 }
 
