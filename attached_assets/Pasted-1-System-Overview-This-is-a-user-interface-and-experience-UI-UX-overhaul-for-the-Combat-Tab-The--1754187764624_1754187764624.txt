@@ -1,0 +1,22 @@
+1. System Overview
+This is a user interface and experience (UI/UX) overhaul for the Combat Tab. The primary goal is to redesign the layout to be more compact and efficient, allowing players to see all critical combat information and access all actions without needing to enter "Focus Mode."
+2. The Problem
+As seen in the provided screenshots, the current layout has several inefficiencies:
+ * The monster's name and health bar take up significant vertical space in the middle of the panel.
+ * The "Engage" and "Attack" buttons are very large, further consuming valuable screen real estate.
+ * This forces players to scroll or use Focus Mode to see everything, which is not ideal for quick, repetitive actions like combat.
+3. The Solution: A Unified Combat Dashboard
+We will consolidate all combat information and actions into a more streamlined layout.
+ * Monster Info Integration:
+   * The monster's name, health bar, and health text will be moved from the main content area and integrated directly into the combat-info-panel at the top of the tab.
+   * This will create a single, unified dashboard where the player can see their own stats and the enemy's stats side-by-side.
+ * Combat Button Redesign:
+   * The "Engage," "Attack," and "Cast" buttons will be made significantly smaller and more compact.
+   * They will be arranged in a horizontal row at the bottom of the tab, similar to the chat channel buttons, rather than stacked vertically.
+ * Layout Reorganization:
+   * The monster selection dropdown will remain as the primary interactive element in the main content area.
+   * The large, empty space previously occupied by the monster info and oversized buttons will be eliminated, resulting in a much cleaner and more compact tab that fits perfectly in the default, non-focused view.
+4. Rationale
+ * Improved Usability: Players can engage in combat without their view being cluttered or requiring extra clicks to enter Focus Mode.
+ * Enhanced Information Flow: Placing player and monster stats together at the top allows for quicker comparison and decision-making during a fight.
+ * Aesthetic Consistency: The new, smaller buttons will match the style of other UI elements, creating a more cohesive and professional look.
