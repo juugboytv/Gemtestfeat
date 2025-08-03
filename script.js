@@ -1942,6 +1942,16 @@ const EquipmentManager = {
                 console.log('=== END DEBUG ===');
             };
             
+            // Simple emoji test function
+            window.testNewEmojis = () => {
+                console.log('=== EMOJI TEST ===');
+                console.log('Testing new emojis in console:');
+                console.log('Bank emoji: 🏦');
+                console.log('Revive helmet emoji: ⛑️');
+                console.log('Other emojis: ⚔️🔮🌀');
+                console.log('=== END EMOJI TEST ===');
+            };
+            
             // Fix async zone loading in force change
             window.forceZoneChangeAsync = async (zoneId) => {
                 console.log(`Forcing zone change to ${zoneId}`);
@@ -2241,10 +2251,10 @@ const EquipmentManager = {
                                displayChar === '🏧' || displayChar === '🆘' || // Keep old emojis for compatibility
                                /[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/u.test(displayChar);
                 
-                console.log(`Is emoji: ${isEmoji} for character: "${displayChar}"`)
-                
-                // IMMEDIATE DEBUG - Log every render call to console
-                console.log(`RENDERING: "${displayChar}" (emoji: ${isEmoji}) at canvas position (${cx}, ${cy}) - Cache Refresh`);
+                // Only log if it's a bank or revive station to reduce console spam
+                if (displayChar === '🏦' || displayChar === '⛑️') {
+                    console.log(`NEW EMOJI RENDERING: "${displayChar}" at (${cx}, ${cy})`);
+                }
                 
                 if (isEmoji) {
                     // For emojis, use larger size and comprehensive emoji font fallback
