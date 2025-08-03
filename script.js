@@ -2124,37 +2124,37 @@ const EquipmentManager = {
                 // Handle both server data format (feature.type) and legacy format (feature.name/feature.icon)
                 const featureType = feature.type || feature.name || 'Unknown';
                 
-                // Direct mapping without relying on getFeatureInfo to avoid any lookup issues
+                // Use working emojis directly instead of text fallbacks
                 let displayChar = '?';
                 let displayColor = '#F44336';
                 
                 switch (featureType) {
                     case 'Bank':
-                        displayChar = '$';
+                        displayChar = '🏧';
                         displayColor = '#FFC107';
                         break;
                     case 'Armory':
-                        displayChar = 'W';
+                        displayChar = '⚔️';
                         displayColor = '#F44336';
                         break;
                     case 'Arcanum':
-                        displayChar = 'M';
+                        displayChar = '🔮';
                         displayColor = '#9C27B0';
                         break;
                     case 'Revive Station':
-                        displayChar = '+';
+                        displayChar = '🆘';
                         displayColor = '#4CAF50';
                         break;
                     case 'Gem Crucible':
-                        displayChar = 'G';
+                        displayChar = 'G';  // Keep as text since 💎 is problematic
                         displayColor = '#00BCD4';
                         break;
                     case 'Teleporter':
-                        displayChar = 'T';
+                        displayChar = '🌀';
                         displayColor = '#2196F3';
                         break;
                     case 'Sanctuary':
-                        displayChar = 'H';
+                        displayChar = 'H';  // Keep as text since sanctuary emoji is problematic
                         displayColor = '#FFEB3B';
                         break;
                     case 'Monster Zone':
