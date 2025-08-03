@@ -1673,6 +1673,9 @@ const EquipmentManager = {
             console.log(`Using blueprint for zone ${zoneId}: ${blueprint.name}, grid size: ${blueprint.gridSize}`);
             console.log('Blueprint features:', blueprint.features);
             
+            // Add visual debugging - log grid generation
+            console.log(`Generating ${blueprint.gridSize}x${blueprint.gridSize} grid for ${blueprint.name}`);
+            
             // Clear existing grid
             this.grid.clear();
             
@@ -1705,6 +1708,7 @@ const EquipmentManager = {
             });
             
             console.log(`Loaded zone blueprint: ${blueprint.name} (Zone ${zoneId}) - Grid Size: ${gridSize}`, blueprint.features);
+            console.log(`Grid generated with ${this.grid.size} hexes total`);
             showToast(`Zone Layout: ${blueprint.name} (${gridSize}x${gridSize} grid)`, false);
             
                 // Add global test functions for debugging
@@ -1743,10 +1747,15 @@ const EquipmentManager = {
         // Get zone blueprint data
         getZoneBlueprint(zoneId) {
             // Use the global zoneBlueprints loaded from shared/zoneBlueprints.ts
-            if (window.zoneBlueprints && window.zoneBlueprints[String(zoneId)]) {
-                return window.zoneBlueprints[String(zoneId)];
+            const zoneKey = String(zoneId);
+            console.log(`Looking for blueprint for zone ${zoneId}...`);
+            
+            if (window.zoneBlueprints && window.zoneBlueprints[zoneKey]) {
+                console.log(`Found blueprint for zone ${zoneId}:`, window.zoneBlueprints[zoneKey].name);
+                return window.zoneBlueprints[zoneKey];
             }
             
+            console.log(`No blueprint found for zone ${zoneId}, generating basic blueprint`);
             return this.generateBasicBlueprint(zoneId);
         },
         
