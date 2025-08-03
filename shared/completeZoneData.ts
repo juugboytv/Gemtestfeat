@@ -165,7 +165,7 @@ export const COMPLETE_ZONE_DATA: CompleteZone[] = [
     name: 'Echoing Chasms',
     description: 'Deep canyons where every sound returns as a haunting echo.',
     gridSize: 7,
-    levelRequirement: 25,
+    levelRequirement: 100, // Zone 25 requires level 100
     theme: 'chasm',
     features: [
       { type: 'Sanctuary', q: 5, r: -2 },
@@ -239,22 +239,44 @@ export const COMPLETE_ZONE_DATA: CompleteZone[] = [
     ]
   },
 
-  // Generate remaining zones 26-100 with appropriate progression
+  // Generate remaining zones 26-100 with GDD-compliant level requirements
   ...Array.from({ length: 75 }, (_, i) => {
     const zoneId = i + 26; // Zones 26-100
-    const baseLevel = zoneId;
+    
+    // GDD-compliant level requirements with specific key zones
+    let levelRequirement;
+    switch(zoneId) {
+      case 25: levelRequirement = 100; break; // Echoing Chasms
+      case 34: levelRequirement = 253; break; // Bone Deserts  
+      case 51: levelRequirement = 1000; break; // Giant Mushroom Forests
+      case 59: levelRequirement = 6143; break; // The Weaving Caves
+      case 66: levelRequirement = 13636; break; // The Bloodfang Jungle
+      case 72: levelRequirement = 35452; break; // Gravity-Defying Rapids
+      case 79: levelRequirement = 83333; break; // The Glittering Grottos
+      case 87: levelRequirement = 172222; break; // Gelatinous Jungles
+      case 101: levelRequirement = 400000; break; // The Echoing Gorge of Lost Souls
+      default:
+        // Progressive scaling between key zones
+        if (zoneId <= 33) levelRequirement = 100 + ((zoneId - 25) * 20);
+        else if (zoneId <= 50) levelRequirement = 253 + Math.floor((zoneId - 34) * 50);
+        else if (zoneId <= 65) levelRequirement = 1000 + Math.floor((zoneId - 51) * 400);
+        else if (zoneId <= 78) levelRequirement = 13636 + Math.floor((zoneId - 66) * 2000);
+        else if (zoneId <= 86) levelRequirement = 35452 + Math.floor((zoneId - 72) * 8000);
+        else levelRequirement = 83333 + Math.floor((zoneId - 79) * 15000);
+    }
+    
     const gridSize = Math.min(10, 4 + Math.floor(zoneId / 15)); // Progressive grid size increase
     
     return {
       zoneId,
       name: `Zone ${zoneId}: Advanced Realm`,
-      description: `A level ${baseLevel} zone with challenging monsters and rewards.`,
+      description: `A level ${levelRequirement} zone with challenging monsters and rewards.`,
       gridSize,
-      levelRequirement: zoneId, // Zone level requirement matches zone number for zones 26+
+      levelRequirement, // Exponential level requirements matching GDD
       theme: `advanced_${zoneId % 10}`,
       features: generateZoneFeatures(zoneId, gridSize),
       monsters: Array.from({ length: 11 }, (_, j) => {
-        const monsterLevel = baseLevel + j;
+        const monsterLevel = 25 + j; // Base monster level starts at 25
         const isBonus = j === 10;
         const baseHP = Math.floor(25 * Math.pow(1.15, monsterLevel - 1));
         const baseATK = Math.floor(10 * Math.pow(1.12, monsterLevel - 1));
