@@ -2565,6 +2565,38 @@ const EquipmentManager = {
         subTypeSelect.innerHTML = finalOptions.map(s => `<option value="${s}">${s}</option>`).join('');
     },
 
+    // Generate tier/grade text overlay for items and gems
+    getItemTierText(item) {
+        if (!item) return '';
+        
+        // Handle gems with abbreviation + grade (e.g., "WST1", "WST2")
+        if (item.grade && item.id) {
+            const gemData = GameData.Gems[item.id];
+            if (gemData && gemData.abbreviation) {
+                return `${gemData.abbreviation}${item.grade}`;
+            }
+        }
+        
+        // Handle regular items with tier system
+        if (item.tier) {
+            // Dropper items: T1-T20
+            if (item.type === 'Dropper' || !item.type) {
+                return `T${item.tier}`;
+            }
+            // Shadow items: T1-T20  
+            else if (item.type === 'Shadow') {
+                return `T${item.tier}`;
+            }
+            // Echo items: T1-T10
+            else if (item.type === 'Echo') {
+                return `T${item.tier}`;
+            }
+        }
+        
+        // Fallback for any items without proper type/tier
+        return item.tier ? `T${item.tier}` : '';
+    },
+
     renderInventoryBags() {
         const equippedIds = Object.values(state.player.equipment).filter(Boolean);
         let unequippedItems = state.player.inventory.filter(item => !equippedIds.includes(item.instanceId));
@@ -2634,7 +2666,7 @@ const EquipmentManager = {
                             <div class="inventory-slot" data-instance-id="${item.instanceId}">
                                 ${gemDotsHTML}
                                 <img src="${base.imageUrl}" onerror="this.onerror=null;this.src='https://placehold.co/60x60/1f2937/ffffff?text=ERR';">
-                                <span class="item-label" style="${itemStyle}">T${item.tier}</span>
+                                <span class="item-label" style="${itemStyle}">${this.getItemTierText(item)}</span>
                             </div>`;
                         grid.innerHTML += itemHTML;
                     }
@@ -2741,7 +2773,7 @@ const EquipmentManager = {
                     item.socketedGems.forEach(gemInfo => {
                         if (gemInfo) {
                             const gemData = GameData.Gems[gemInfo.id];
-                            gemListHTML += `<div>${gemData.abbreviation}${gemInfo.grade}</div>`;
+                            gemListHTML += `<div>${this.getItemTierText(gemInfo)}</div>`;
                         }
                     });
                     gemListHTML += `</div>`;
@@ -2752,7 +2784,7 @@ const EquipmentManager = {
                     ${gemDotsHTML}
                     ${gemListHTML}
                     <img src="${base.imageUrl}" class="h-12 w-12 object-contain" onerror="this.onerror=null;this.src='https://placehold.co/48x48/1f2937/ffffff?text=ERR';">
-                    <span class="item-label" style="color: ${color};">T${item.tier}</span>`;
+                    <span class="item-label" style="color: ${color};">${this.getItemTierText(item)}</span>`;
             }
     
             return `
@@ -2780,7 +2812,7 @@ const EquipmentManager = {
         const socketsHTML = Array(base.sockets).fill(0).map((_, i) => { 
             const gemInfo = item.socketedGems[i]; 
             const gemData = gemInfo ? GameData.Gems[gemInfo.id] : null; 
-            return ` <div class="gem-socket ${gemInfo ? 'has-gem' : ''}" data-socket-index="${i}" data-gem-id="${gemInfo ? gemInfo.id : ''}"> ${gemData ? `<img src="${gemData.imageUrl}" class="w-10 h-10" onerror="this.onerror=null;this.src='https://placehold.co/40x40/1f2937/ffffff?text=ERR';"><span class="item-label">${gemData.abbreviation}${gemInfo.grade}</span>` : ''} </div>`; 
+            return ` <div class="gem-socket ${gemInfo ? 'has-gem' : ''}" data-socket-index="${i}" data-gem-id="${gemInfo ? gemInfo.id : ''}"> ${gemData ? `<img src="${gemData.imageUrl}" class="w-10 h-10" onerror="this.onerror=null;this.src='https://placehold.co/40x40/1f2937/ffffff?text=ERR';"><span class="item-label">${this.getItemTierText(gemInfo)}</span>` : ''} </div>`; 
         }).join(''); 
         content.innerHTML = ` <div class="text-center mb-4"> <h3 class="font-orbitron">${base.name}</h3> <div class="flex justify-center items-center gap-4 mt-2">${socketsHTML}</div> </div> `; 
     },
@@ -2790,7 +2822,7 @@ const EquipmentManager = {
         if (!grid || !state.player.gems) return; 
         grid.innerHTML = state.player.gems.map(gemInfo => { 
             const gem = GameData.Gems[gemInfo.id]; 
-            return ` <div class="gem-item ${gemInfo.id === state.ui.selectedGemId ? 'selected' : ''}" data-gem-id="${gemInfo.id}"> <img src="${gem.imageUrl}" class="w-10 h-10" onerror="this.onerror=null;this.src='https://placehold.co/40x40/1f2937/ffffff?text=ERR';"> <span class="item-label">${gem.abbreviation}${gemInfo.grade}</span> </div>`; 
+            return ` <div class="gem-item ${gemInfo.id === state.ui.selectedGemId ? 'selected' : ''}" data-gem-id="${gemInfo.id}"> <img src="${gem.imageUrl}" class="w-10 h-10" onerror="this.onerror=null;this.src='https://placehold.co/40x40/1f2937/ffffff?text=ERR';"> <span class="item-label">${this.getItemTierText(gemInfo)}</span> </div>`; 
         }).join(''); 
     },
 
@@ -2841,7 +2873,7 @@ const EquipmentManager = {
                         const effectText = this.getGemEffectValueText(gemInfo, gemData);
                         gemListHTML += `
                             <div class="item-gem-entry">
-                                <span class="item-gem-name">${gemData.abbreviation}${gemInfo.grade}</span>
+                                <span class="item-gem-name">${this.getItemTierText(gemInfo)}</span>
                                 <span class="item-gem-effect">${effectText}</span>
                             </div>`;
                     }

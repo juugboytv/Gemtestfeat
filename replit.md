@@ -53,10 +53,16 @@ The game uses minimal external dependencies to maintain the original architectur
 
 ## Recent Changes
 
-**January 2025 - Echo Items GitHub Integration**
+**January 2025 - Echo Items GitHub Integration & Dynamic Text Overlay System**
 - Updated all Echo Items to use GitHub image URLs instead of object storage paths
 - Integrated complete set of Echo item images: weapons, armor, spells, jewelry, shields
 - Added new Echo armor pieces: helmet, leggings, chest armor to complete the equipment set
+- Implemented dynamic text overlay system for all item types:
+  - **Dropper Items**: T1-T20 tier labels using same base images
+  - **Shadow Items**: T1-T20 tier labels using same base images  
+  - **Echo Items**: T1-T10 tier labels using same base images
+  - **Gem System**: Abbreviation + grade labels (WST1, WST2, etc.) using same base images
+- Created unified `getItemTierText()` function for consistent tier/grade display across all game interfaces
 - Enhanced Echo Items system with proper GitHub asset management for consistent visual presentation
 - Updated Arrow item in starting inventory to use correct dropper item image URL
 
