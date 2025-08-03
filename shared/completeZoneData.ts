@@ -51,13 +51,14 @@ const STARTER_ZONE_MONSTERS: CompleteMonster[] = [
 
 // Generate complete building set for each zone (ALL 6 essential buildings)
 function generateZoneFeatures(zoneId: number, gridSize: number): ZoneFeature[] {
+  // ALWAYS include ALL 6 essential buildings in EVERY zone
   const features: ZoneFeature[] = [
     { type: 'Sanctuary', q: 0, r: 0 },
     { type: 'Armory', q: -2, r: 1 },
     { type: 'Arcanum', q: 2, r: -1 },
     { type: 'AetheriumConduit', q: 1, r: 2 },
     { type: 'Teleporter', q: -1, r: -2 },
-    { type: 'GemCrucible', q: -1, r: 2 },
+    { type: 'GemCrucible', q: 2, r: 1 },
   ];
   
   // Fill remaining hexes with Monster Zones
@@ -120,6 +121,7 @@ export const COMPLETE_ZONE_DATA: CompleteZone[] = [
       { type: 'Arcanum', q: 2, r: 1 },
       { type: 'AetheriumConduit', q: -1, r: 2 },
       { type: 'Teleporter', q: 3, r: -1 },
+      { type: 'GemCrucible', q: 2, r: -2 },
       { type: 'Monster Zone', q: -1, r: -2 },
       { type: 'Monster Zone', q: 1, r: 1 },
       { type: 'Monster Zone', q: 2, r: -2 },
@@ -131,7 +133,7 @@ export const COMPLETE_ZONE_DATA: CompleteZone[] = [
     monsters: STARTER_ZONE_MONSTERS.map(m => ({ ...m, monsterId: `Z02-${m.monsterId}` }))
   },
 
-  // Complete all 24 starter zones
+  // Complete all 24 starter zones - ALL level 1 until player reaches level 100
   ...Array.from({ length: 22 }, (_, i) => {
     const zoneId = i + 3; // Zones 3-24
     const zoneNames = [
@@ -150,7 +152,7 @@ export const COMPLETE_ZONE_DATA: CompleteZone[] = [
       name: zoneNames[i],
       description: `A challenging ${zoneNames[i].toLowerCase()} zone for adventurers.`,
       gridSize: 4 + (zoneId % 3), // Vary grid sizes 4-6
-      levelRequirement: 1,
+      levelRequirement: 1, // ALL starter zones are level 1
       theme: `starter_${zoneId}`,
       features: generateZoneFeatures(zoneId, 4 + (zoneId % 3)),
       monsters: STARTER_ZONE_MONSTERS.map(m => ({ ...m, monsterId: `Z${zoneId.toString().padStart(2, '0')}-${m.monsterId}` }))
@@ -171,6 +173,7 @@ export const COMPLETE_ZONE_DATA: CompleteZone[] = [
       { type: 'Arcanum', q: 2, r: 2 },
       { type: 'AetheriumConduit', q: -4, r: 1 },
       { type: 'Teleporter', q: 0, r: -5 },
+      { type: 'GemCrucible', q: -2, r: -3 },
       { type: 'Monster Zone', q: -2, r: 3 },
       { type: 'Monster Zone', q: 2, r: -3 },
       { type: 'Monster Zone', q: -1, r: -2 },
@@ -247,7 +250,7 @@ export const COMPLETE_ZONE_DATA: CompleteZone[] = [
       name: `Zone ${zoneId}: Advanced Realm`,
       description: `A level ${baseLevel} zone with challenging monsters and rewards.`,
       gridSize,
-      levelRequirement: baseLevel,
+      levelRequirement: zoneId, // Zone level requirement matches zone number
       theme: `advanced_${zoneId % 10}`,
       features: generateZoneFeatures(zoneId, gridSize),
       monsters: Array.from({ length: 11 }, (_, j) => {
