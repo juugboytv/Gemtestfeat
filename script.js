@@ -1691,9 +1691,11 @@ const EquipmentManager = {
                 console.log('WARNING: Zone blueprints not loaded yet');
             }
             
-            this.loadZoneBlueprint(startingZone);
-            this.updateInteractButton(); 
-            this.draw(); 
+            // Use async initialization
+            this.loadZoneBlueprint(startingZone).then(() => {
+                this.updateInteractButton(); 
+                this.draw();
+            }); 
         }, 
         
         // Load zone blueprint dynamically
@@ -1736,16 +1738,23 @@ const EquipmentManager = {
                 }
             }
             
-            // Place features from blueprint
-            blueprint.features.forEach(feature => {
+            // Place features from blueprint with detailed logging
+            console.log(`Placing ${blueprint.features.length} features on grid...`);
+            blueprint.features.forEach((feature, index) => {
                 const key = `${feature.q},${feature.r}`;
+                console.log(`Feature ${index + 1}: ${feature.type} at (${feature.q}, ${feature.r}) - key: "${key}"`);
+                
                 if (this.grid.has(key)) {
                     const featureInfo = this.getFeatureInfo(feature.type);
+                    console.log(`  → Placing ${feature.type} with icon ${featureInfo.icon}`);
                     this.grid.get(key).feature = {
                         name: feature.name || featureInfo.name,
                         icon: featureInfo.icon,
                         type: feature.type
                     };
+                } else {
+                    console.log(`  → WARNING: Grid position ${key} does not exist! (Feature: ${feature.type})`);
+                    console.log(`  → Available grid keys: ${Array.from(this.grid.keys()).slice(0, 10).join(', ')}...`);
                 }
             });
             
@@ -1777,6 +1786,30 @@ const EquipmentManager = {
                 // Get blueprint info for toast
                 const blueprint = this.getZoneBlueprint(zoneId);
                 const zoneName = blueprint ? blueprint.name : `Zone ${zoneId}`;
+                const gridInfo = blueprint ? ` (${blueprint.gridSize}x${blueprint.gridSize})` : '';
+                
+                showToast(`Force changed to ${zoneName}${gridInfo}`, false);
+                
+                // Also update the zone display
+                ProfileManager.updateAllProfileUI();
+            };
+            
+            // Fix async zone loading in force change
+            window.forceZoneChangeAsync = async (zoneId) => {
+                console.log(`Forcing zone change to ${zoneId}`);
+                
+                // Update game state
+                state.game.currentZoneTier = parseInt(zoneId);
+                
+                // Load new blueprint (await the async call)
+                await this.loadZoneBlueprint(zoneId);
+                this.playerPos = { q: 0, r: 0 };
+                this.draw();
+                this.updateInteractButton();
+                
+                // Get blueprint info for toast
+                const blueprint = await this.getZoneBlueprint(zoneId);
+                const zoneName = blueprint ? (blueprint.name || `Zone ${zoneId}`) : `Zone ${zoneId}`;
                 const gridInfo = blueprint ? ` (${blueprint.gridSize}x${blueprint.gridSize})` : '';
                 
                 showToast(`Force changed to ${zoneName}${gridInfo}`, false);
@@ -2069,16 +2102,16 @@ const EquipmentManager = {
                     </li>`;
             }).join('');
         },
-        handleTeleport(zoneId) {
+        async handleTeleport(zoneId) {
             if (!zoneId) return;
             const zone = AllZones[zoneId];
             if (!zone) return;
 
             state.game.currentZoneTier = parseInt(zoneId);
             
-            // Load new zone blueprint and reset player position
+            // Load new zone blueprint and reset player position (with proper async handling)
             WorldMapManager.currentZoneId = parseInt(zoneId);  // Update current zone
-            WorldMapManager.loadZoneBlueprint(parseInt(zoneId));
+            await WorldMapManager.loadZoneBlueprint(parseInt(zoneId));
             WorldMapManager.playerPos = { q: 0, r: 0 };
             WorldMapManager.draw();
             WorldMapManager.updateInteractButton();
@@ -2090,7 +2123,8 @@ const EquipmentManager = {
                 CombatManager.clearMonsterList();
             }
             
-            const blueprint = WorldMapManager.getZoneBlueprint(zoneId);
+            // Get blueprint for display (also async)
+            const blueprint = await WorldMapManager.getZoneBlueprint(zoneId);
             
             // Force use blueprint names for first 5 zones
             let zoneName = zone.name;  // Default to original name
