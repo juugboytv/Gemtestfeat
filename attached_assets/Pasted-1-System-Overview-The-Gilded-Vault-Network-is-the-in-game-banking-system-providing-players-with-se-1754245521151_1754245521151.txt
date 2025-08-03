@@ -1,0 +1,27 @@
+1. System Overview
+The Gilded Vault Network is the in-game banking system, providing players with secure storage for their gold and advanced financial tools. The system is centered around a main bank hub, remote access points (ATMs), and two key items: the Vault Sigil (a debit card equivalent) and the Merchant's Writ (a credit card equivalent).
+2. Thematic Naming
+| Real-World Term | Geminus Term | Rationale |
+|---|---|---|
+| Bank | The Grand Vault | An official, imposing name for the central banking institution. |
+| ATM | Aetherium Conduit | A magical-sounding name for the remote access points on the map. |
+| Debit Card | Vault Sigil | A magical charm or token that is attuned to the player's personal vault. |
+| Credit Card | Merchant's Writ | An official IOU or line of credit granted by a powerful merchant guild. |
+3. The Vault Sigil (Debit System)
+This is the player's primary tool for interacting with their bank account.
+ * How to Obtain: Players receive their Vault Sigil after completing an introductory quest at the Grand Vault in the main city.
+ * Functionality:
+   * Standard Banking: Players can visit the Grand Vault in person to deposit and withdraw gold.
+   * Remote Access: By interacting with an Aetherium Conduit anywhere in the world, players can use their Vault Sigil to open their bank UI remotely and perform deposits and withdrawals.
+ * Upgrades: The Grand Vault will offer upgrades to the player's vault, increasing the maximum amount of gold they can store.
+4. The Merchant's Writ (Credit System)
+This is an optional, high-risk, high-reward financial tool for established players.
+ * How to Obtain: Becomes available after reaching a certain level (e.g., Level 50) and achieving a positive reputation with the Merchant's Guild.
+ * Functionality:
+   * The Merchant's Writ grants the player a line of credit, allowing them to borrow gold when they are out of funds.
+   * The credit limit scales with the player's level and reputation.
+ * The Catch (Interest & Consequences):
+   * Any borrowed gold is subject to a high interest rate (e.g., 20%) that accrues over time.
+   * If the debt is not repaid within a certain period, the player will be hit with a "Deadbeat" debuff, which could temporarily reduce their gold find, prevent them from using shops, or even place a bounty on their head for other players to collect.
+ * Strategic Use: The Merchant's Writ is a strategic tool for emergencies—allowing a player to afford a critical item or a high-tier unsocketing fee—but it comes with significant risk if mismanaged.
+
