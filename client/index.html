@@ -3781,7 +3781,10 @@ const WorldMapManager = {
                     // Update client state from server response
                     state.game.currentZoneTier = parseInt(zoneId);
                     WorldMapManager.playerPos = { q: 0, r: 0 };
-                    await WorldMapManager.generateGrid(); // Regenerate grid with new zone data
+                    
+                    // CRITICAL FIX: Pass server zone data to generateGrid
+                    console.log('Server teleport response:', result);
+                    await WorldMapManager.generateGrid(result.zoneData); // Pass server zone data
                     WorldMapManager.draw();
                     WorldMapManager.updateInteractButton();
                     
@@ -5820,7 +5823,7 @@ const InfusionManager = {
 
     async function main() {
         // Initialize server-side game API first
-        await window.gameAPI.init();
+        const serverGameState = await window.gameAPI.init();
         
         await loadGameData(); // Ensure data is loaded before the game starts
         CreationManager.init();
@@ -5830,6 +5833,27 @@ const InfusionManager = {
             if (typeof UICustomization !== 'undefined') UICustomization.init();
             if (typeof UIManager !== 'undefined') UIManager.init();
             if (typeof DevSuite !== 'undefined') DevSuite.init();
+            
+            // CRITICAL FIX: Pass server zone data to WorldMapManager initialization
+            if (serverGameState && serverGameState.gameState && serverGameState.gameState.currentZone) {
+                console.log('Initializing WorldMapManager with server zone data:', serverGameState.gameState.currentZone);
+                WorldMapManager.generateGrid(serverGameState.gameState.currentZone);
+                // Only draw if canvas context is available
+                if (WorldMapManager.ctx) {
+                    WorldMapManager.draw();
+                } else {
+                    console.log('Canvas context not ready, deferring draw');
+                    setTimeout(() => WorldMapManager.draw(), 50);
+                }
+            } else {
+                console.log('No server zone data available, using fallback initialization');
+                WorldMapManager.generateGrid(); // Fallback to blueprint system
+                if (WorldMapManager.ctx) {
+                    WorldMapManager.draw();
+                } else {
+                    setTimeout(() => WorldMapManager.draw(), 50);
+                }
+            }
             
             // Update zone teleport list to use server data if available
             TeleportManager.populateZoneList();
