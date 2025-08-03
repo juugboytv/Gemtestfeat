@@ -1727,6 +1727,13 @@ const EquipmentManager = {
                 
                 console.log(`Generated server-based grid: ${serverZoneData.name} (${gridSize}x${gridSize})`, serverZoneData.features);
                 showToast(`Zone Layout: ${serverZoneData.name} (${gridSize}x${gridSize} grid)`, false);
+                
+                // Attempt to draw only if context is ready
+                if (this.ctx && ui.miniMapCanvas) {
+                    this.draw();
+                } else {
+                    console.log('Canvas not ready for initial draw, will draw when ready');
+                }
                 return;
             }
             
@@ -1899,7 +1906,14 @@ const EquipmentManager = {
             this.grid.get('-2,0').feature = { name: 'Sanctuary', icon: '🆘' }; 
             this.grid.get('0,2').feature = { name: 'Teleport Zone', icon: '🌀' };
             this.grid.get('-1,2').feature = { name: 'Gem Crucible', icon: '💎' }; 
-        }, movePlayer(dq, dr) { const newQ = this.playerPos.q + dq; const newR = this.playerPos.r + dr; if (this.grid.has(`${newQ},${newR}`)) { this.playerPos.q = newQ; this.playerPos.r = newR; this.draw(); this.updateInteractButton(); const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); if (currentHex && currentHex.feature && currentHex.feature.name === 'Monster Zone') { CombatManager.populateMonsterList(state.game.currentZoneTier); } else { CombatManager.clearMonsterList(); } } }, updateInteractButton() { const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); const interactKey = document.getElementById('key-interact'); if (currentHex && currentHex.feature && currentHex.feature.name !== 'Monster Zone') { interactKey.textContent = `Enter`; interactKey.style.fontSize = '14px'; } else { interactKey.textContent = 'Interact'; interactKey.style.fontSize = '16px'; } }, handleInteraction() { const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); if (currentHex && currentHex.feature) { if (currentHex.feature.name === 'Weapons/Combat Shop') { ShopManager.openShop('armory'); } else if (currentHex.feature.name === 'Magic/Accessories Shop') { ShopManager.openShop('magic'); } else if (currentHex.feature.name === 'Bank') { BankManager.openBank(); } else if (currentHex.feature.name === 'Sanctuary') { ProfileManager.healPlayer(); } else if (currentHex.feature.name === 'Teleport Zone') { TeleportManager.showModal(); } else if (currentHex.feature.name === 'Gem Crucible') { GemCrucibleManager.openGemCrucible(); } } }, draw() { 
+        }, movePlayer(dq, dr) { const newQ = this.playerPos.q + dq; const newR = this.playerPos.r + dr; if (this.grid.has(`${newQ},${newR}`)) { this.playerPos.q = newQ; this.playerPos.r = newR; 
+            // Only draw if context is ready
+            if (this.ctx && ui.miniMapCanvas) {
+                this.draw(); 
+            } else {
+                console.log('Skipping draw in movePlayer - context not ready');
+            }
+            this.updateInteractButton(); const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); if (currentHex && currentHex.feature && currentHex.feature.name === 'Monster Zone') { CombatManager.populateMonsterList(state.game.currentZoneTier); } else { CombatManager.clearMonsterList(); } } }, updateInteractButton() { const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); const interactKey = document.getElementById('key-interact'); if (currentHex && currentHex.feature && currentHex.feature.name !== 'Monster Zone') { interactKey.textContent = `Enter`; interactKey.style.fontSize = '14px'; } else { interactKey.textContent = 'Interact'; interactKey.style.fontSize = '16px'; } }, handleInteraction() { const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); if (currentHex && currentHex.feature) { if (currentHex.feature.name === 'Weapons/Combat Shop') { ShopManager.openShop('armory'); } else if (currentHex.feature.name === 'Magic/Accessories Shop') { ShopManager.openShop('magic'); } else if (currentHex.feature.name === 'Bank') { BankManager.openBank(); } else if (currentHex.feature.name === 'Sanctuary') { ProfileManager.healPlayer(); } else if (currentHex.feature.name === 'Teleport Zone') { TeleportManager.showModal(); } else if (currentHex.feature.name === 'Gem Crucible') { GemCrucibleManager.openGemCrucible(); } } }, draw() { 
             // Safety check for canvas context
             if (!this.ctx || !ui.miniMapCanvas) { 
                 console.error('Canvas context or canvas not ready, deferring draw'); 
