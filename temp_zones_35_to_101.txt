@@ -1,0 +1,87 @@
+  "35": {
+    name: "The Maw",
+    gridSize: 5,
+    description: "Advanced zone requiring level 253.",
+    difficulty: 35,
+    levelRequirement: 253,
+    features: [
+      { type: "Sanctuary", q: 0, r: 0 },
+      { type: "Bank", q: -1, r: -1 },
+      { type: "Arcanum", q: 1, r: -1 },
+      { type: "Armory", q: -1, r: 1 },
+      { type: "AetheriumConduit", q: 1, r: 1 },
+      { type: "Gem Node", q: 0, r: 2 },
+      { type: "Monster Zone", q: -2, r: 0 },
+      { type: "Monster Zone", q: 0, r: -2 },
+      { type: "Monster Zone", q: 2, r: -2 },
+      { type: "Monster Zone", q: -2, r: 2 },
+      { type: "Boss Arena", q: 2, r: 0, name: "Boss Chamber" },
+      { type: "Resource Node", q: -1, r: 2, name: "Rare Resource" }
+    ]
+  },
+
+  "36": {
+    name: "Poisonbloom Meadows",
+    gridSize: 5,
+    description: "Advanced zone requiring level 253.",
+    difficulty: 36,
+    levelRequirement: 253,
+    features: [
+      { type: "Sanctuary", q: 0, r: 0 },
+      { type: "Bank", q: -1, r: -1 },
+      { type: "Arcanum", q: 1, r: -1 },
+      { type: "Armory", q: -1, r: 1 },
+      { type: "AetheriumConduit", q: 1, r: 1 },
+      { type: "Gem Node", q: 0, r: 2 },
+      { type: "Monster Zone", q: -2, r: 0 },
+      { type: "Monster Zone", q: 0, r: -2 },
+      { type: "Monster Zone", q: 2, r: -2 },
+      { type: "Monster Zone", q: -2, r: 2 },
+      { type: "Boss Arena", q: 2, r: 0, name: "Boss Chamber" },
+      { type: "Resource Node", q: -1, r: 2, name: "Rare Resource" }
+    ]
+  },
+
+  "37": {
+    name: "Storm-Wrenched Coast",
+    gridSize: 5,
+    description: "Advanced zone requiring level 253.",
+    difficulty: 37,
+    levelRequirement: 253,
+    features: [
+      { type: "Sanctuary", q: 0, r: 0 },
+      { type: "Bank", q: -1, r: -1 },
+      { type: "Arcanum", q: 1, r: -1 },
+      { type: "Armory", q: -1, r: 1 },
+      { type: "AetheriumConduit", q: 1, r: 1 },
+      { type: "Gem Node", q: 0, r: 2 },
+      { type: "Monster Zone", q: -2, r: 0 },
+      { type: "Monster Zone", q: 0, r: -2 },
+      { type: "Monster Zone", q: 2, r: -2 },
+      { type: "Monster Zone", q: -2, r: 2 },
+      { type: "Boss Arena", q: 2, r: 0, name: "Boss Chamber" },
+      { type: "Resource Node", q: -1, r: 2, name: "Rare Resource" }
+    ]
+  },
+
+  "101": {
+    name: "The Echoing Gorge of Lost Souls",
+    gridSize: 12,
+    description: "Advanced zone requiring level 400000.",
+    difficulty: 101,
+    levelRequirement: 400000,
+    features: [
+      { type: "Sanctuary", q: 0, r: 0 },
+      { type: "Bank", q: -1, r: -1 },
+      { type: "Arcanum", q: 1, r: -1 },
+      { type: "Armory", q: -1, r: 1 },
+      { type: "AetheriumConduit", q: 1, r: 1 },
+      { type: "Gem Node", q: 0, r: 2 },
+      { type: "Monster Zone", q: -2, r: 0 },
+      { type: "Monster Zone", q: 0, r: -2 },
+      { type: "Monster Zone", q: 2, r: -2 },
+      { type: "Monster Zone", q: -2, r: 2 },
+      { type: "Boss Arena", q: 2, r: 0, name: "Boss Chamber" },
+      { type: "Resource Node", q: -1, r: 2, name: "Rare Resource" }
+    ]
+  }

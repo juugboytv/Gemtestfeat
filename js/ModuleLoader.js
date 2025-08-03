@@ -39,6 +39,8 @@ class ModuleLoader {
             { id: 'quickStart', path: 'js/templates/QuickStart.js', dependencies: ['featureTemplate'] },
             { id: 'databaseHelper', path: 'js/templates/DatabaseHelper.js', dependencies: [] },
             { id: 'demoSystem', path: 'js/demo/DemoSystem.js', dependencies: ['quickStart', 'databaseHelper', 'apiPatterns'] },
+            { id: 'zoneDataProcessor', path: 'js/tools/ZoneDataProcessor.js', dependencies: [] },
+            { id: 'completeZoneGenerator', path: 'js/tools/CompleteZoneGenerator.js', dependencies: [] },
 
             // Additional modules will be added here as we extract them
         ];

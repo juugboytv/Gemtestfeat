@@ -394,16 +394,64 @@ export const ZONE_BLUEPRINTS: Record<string, ZoneBlueprint> = {
     levelRequirement: 253,
     features: [
       { type: "Sanctuary", q: 0, r: 0 },
-      { type: "AetheriumConduit", q: -1, r: -1 },
+      { type: "Bank", q: -1, r: -1 },
       { type: "Arcanum", q: 1, r: -1 },
-      { type: "Bank", q: -1, r: 1 },
-      { type: "Armory", q: 1, r: 1 },
+      { type: "Armory", q: -1, r: 1 },
+      { type: "AetheriumConduit", q: 1, r: 1 },
       { type: "Gem Node", q: 0, r: 2 },
-      { type: "Teleporter", q: 2, r: 0 },
       { type: "Monster Zone", q: -2, r: 0 },
       { type: "Monster Zone", q: 0, r: -2 },
-      { type: "Boss Arena", q: 1, r: 1, name: "Boss Chamber" },
+      { type: "Monster Zone", q: 2, r: -2 },
+      { type: "Monster Zone", q: -2, r: 2 },
+      { type: "Boss Arena", q: 2, r: 0, name: "Boss Chamber" },
       { type: "Resource Node", q: -1, r: 2, name: "Rare Resource" }
+    ]
+  },
+
+  "35": {
+    name: "The Maw",
+    gridSize: 5,
+    description: "A vast consuming void that devours all in its path. Level 253 required.",
+    difficulty: 35,
+    levelRequirement: 253,
+    features: [
+      { type: "Sanctuary", q: 0, r: 0 },
+      { type: "Bank", q: -1, r: -1 },
+      { type: "Arcanum", q: 1, r: -1 },
+      { type: "Armory", q: -1, r: 1 },
+      { type: "AetheriumConduit", q: 1, r: 1 },
+      { type: "Gem Node", q: 0, r: 2 },
+      { type: "Monster Zone", q: -2, r: 0 },
+      { type: "Monster Zone", q: 0, r: -2 },
+      { type: "Monster Zone", q: 2, r: -2 },
+      { type: "Monster Zone", q: -2, r: 2 },
+      { type: "Boss Arena", q: 2, r: 0, name: "Boss Chamber" },
+      { type: "Resource Node", q: -1, r: 2, name: "Rare Resource" }
+    ]
+  },
+
+  "101": {
+    name: "The Echoing Gorge of Lost Souls",
+    gridSize: 12,
+    description: "The ultimate challenge where lost souls echo eternally. Level 400000 required.",
+    difficulty: 101,
+    levelRequirement: 400000,
+    features: [
+      { type: "Sanctuary", q: 0, r: 0 },
+      { type: "Bank", q: -1, r: -1 },
+      { type: "Arcanum", q: 1, r: -1 },
+      { type: "Armory", q: -1, r: 1 },
+      { type: "AetheriumConduit", q: 1, r: 1 },
+      { type: "Gem Node", q: 0, r: 2 },
+      { type: "Monster Zone", q: -2, r: 0 },
+      { type: "Monster Zone", q: 0, r: -2 },
+      { type: "Monster Zone", q: 2, r: -2 },
+      { type: "Monster Zone", q: -2, r: 2 },
+      { type: "Monster Zone", q: 3, r: -1 },
+      { type: "Monster Zone", q: -3, r: 1 },
+      { type: "Boss Arena", q: 2, r: 0, name: "Soul Chamber" },
+      { type: "Resource Node", q: -1, r: 2, name: "Soul Fragment" },
+      { type: "Resource Node", q: 1, r: -2, name: "Echo Crystal" }
     ]
   },
 

@@ -1,174 +1,33 @@
 # Overview
-
-Geminus is a browser-based dark fantasy RPG featuring a complete 3,861-line original codebase migrated from Google Gemini Canvas. The game includes sophisticated tabbed interfaces (Equipment, Infusion, Inventory, Stats, Combat, Quest, Settings), hexagonal world map navigation, and enhanced real-time combat animations. Players can explore zones, engage in dynamic combat with visual effects, level up their characters, and customize their gameplay experience with particle effects and animated feedback systems.
+Geminus is a browser-based dark fantasy RPG featuring a complete original codebase. It includes sophisticated tabbed interfaces (Equipment, Infusion, Inventory, Stats, Combat, Quest, Settings), hexagonal world map navigation, and enhanced real-time combat animations. Players can explore zones, engage in dynamic combat with visual effects, level up characters, and customize gameplay with particle effects and animated feedback systems. The business vision is to provide a rich, engaging RPG experience directly in the browser, leveraging a unique code migration from Google Gemini Canvas.
 
 # User Preferences
-
 Preferred communication style: Simple, everyday language.
 
 # System Architecture
 
-## Frontend Architecture
-The client serves the original HTML/JavaScript game file through Vite for development integration. The game features a dark fantasy molten core theme with orange/red glow effects and sophisticated visual systems:
+## Frontend
+The client serves the original HTML/JavaScript game file through Vite. The game features a dark fantasy molten core theme with orange/red glow effects and sophisticated visual systems including a complete tab system, hexagonal world map with zone navigation and teleportation, real-time combat animations (CSS keyframe animations, particle effects, damage numbers, screen shake), modal systems (zone teleportation, item actions, bank, shop), advanced combat mechanics (critical hits, animated health bars), and toast notifications for user feedback. UI customization is available via five professional themes, drag-and-drop tab reordering, and persistent settings.
 
-- **Complete Tab System**: Equipment, Infusion, Inventory, Stats, Combat, Quest, Settings tabs
-- **Hexagonal World Map**: Player movement with zone navigation and teleportation
-- **Real-Time Combat Animations**: CSS keyframe animations, particle effects, damage numbers, screen shake
-- **Modal Systems**: Zone teleportation, item actions, bank interface, shop systems
-- **Advanced Combat**: Critical hits (10% chance, 2x damage), animated health bars, visual feedback
-- **Toast Notifications**: User feedback system with success/error states
+## Backend
+The server uses Express.js with Vite integration to serve the original HTML game file, focusing on static file serving and development integration with hot module replacement and live reloading. The architecture preserves the exact functionality from the Google Gemini Canvas migration. A server-side architecture for dynamic zone layouts and features has been implemented using an axial coordinate system for unique zone layouts and supporting API integration for zone data and teleportation.
 
-## Backend Architecture
-The server uses Express.js with Vite integration to serve the original HTML game file. The architecture includes:
-
-- **Static File Serving**: Serves the complete original 3,861-line game through Vite
-- **Development Integration**: Hot module replacement and live reloading during development
-- **Original Game Preservation**: Maintains exact functionality from Google Gemini Canvas migration
-
-## Data Storage Solutions
-The application uses a dual-storage approach:
-
-- **Development**: In-memory storage with a simple interface for CRUD operations
-- **Production**: PostgreSQL database with Drizzle ORM for type-safe database queries
-- **Local Storage**: Browser localStorage for game save states and user preferences
-- **Database Schema**: Defined in shared TypeScript files using Zod for validation
+## Data Storage
+The application uses a dual-storage approach: in-memory storage for development and PostgreSQL with Drizzle ORM for production, ensuring type-safe database queries. Browser localStorage is used for game save states and user preferences. The database schema is defined in shared TypeScript files using Zod for validation, including comprehensive schemas for user, character, item, and combat logging systems.
 
 ## Game State Management
-Game state is managed through the original JavaScript architecture with enhanced animations:
+Game state is managed through the original JavaScript architecture, enhanced with advanced state management systems. This includes centralized state for player data, equipment, inventory, combat status, and zone navigation. Persistence is handled via browser localStorage for saves and preferences, with server synchronization. The combat system features real-time animations with particle effects, damage numbers, and critical hits. An animation engine utilizes CSS keyframes, particle systems, screen shake, and health bar animations, providing visual feedback for various game events. A modular JavaScript architecture has been implemented for better code organization, with dedicated modules for game state, UI elements, hexagonal grid mathematics, background animations, and API communication.
 
-- **Centralized State**: Player data, equipment, inventory, combat status, zone navigation
-- **Local Persistence**: Browser localStorage for game saves and user preferences
-- **Combat System**: Real-time animations with particle effects, damage numbers, critical hits
-- **Animation Engine**: CSS keyframes, particle systems, screen shake, health bar animations
-- **Visual Feedback**: Attack flashes, damage shakes, enemy defeat sequences, spell casting effects
+## Game Systems & Features
+- **Zone System**: Dynamic zone blueprint system with unique layouts, zone-specific themes, and features like Sanctuary, Armory, Arcanum, AetheriumConduit, Teleporter, Monster Zones, and Resource Nodes. Includes implementation of 77 new zones with monster systems and scaling grid sizes.
+- **Item System**: Three-tier item system (Dropper, Shadow, Echo items) with 20 gear tiers, a Gem System, dual-weapon support, smart drop logic, and mathematical balancing based on GDD exponential formulas. Integrated with GitHub for image assets.
+- **Combat System**: Real-time combat animations with CSS keyframes, particle effects, floating damage numbers, enhanced health bars, and screen shake. Includes a 10% critical hit chance with 2x damage.
+- **Dev Suite**: A comprehensive Dev Suite Module 1: Dashboard, acting as a central hub for server stats, navigation, and change logs, with admin password protection and database-driven tools for live content management.
 
-## External Dependencies
-
-The game uses minimal external dependencies to maintain the original architecture:
-
-- **Tailwind CSS**: Loaded via CDN for styling consistency with original design
-- **Google Fonts**: Inter and Orbitron fonts for typography
-- **Express.js**: Backend server for development environment
-- **Vite**: Development server integration with hot module replacement
-
-## Recent Changes
-
-**August 2025 - Phase 3 Architectural Refactoring: Rapid Feature Development Framework**
-- Implemented comprehensive FeatureTemplate.js system for generating complete game features in minutes
-- Created QuickStart.js with preset templates for combat, quest, inventory, social systems, and UI panels
-- Built DatabaseHelper.js providing automatic schema generation, API routes, and storage interfaces for PostgreSQL integration
-- Developed DemoSystem.js showcasing 85-95% reduction in development time with live demonstrations
-- Established standardized feature creation workflow: template generation → database setup → API integration → UI deployment
-- Created rapid prototyping commands enabling one-line feature creation with full database and API integration
-- Built comprehensive testing framework with automatic validation and integration checks
-- Implemented documentation auto-generation for all created features with usage examples and integration guides
-- Achieved sub-minute feature creation vs previous 2-4 hour manual development cycles
-- Maintained identical visual experience while providing professional-grade development acceleration tools
-
-**August 2025 - Phase 2 Architectural Refactoring: Advanced State Management System**
-- Implemented comprehensive StateManager.js with centralized state management, reactive updates, and automatic persistence
-- Created DataService.js for centralized API communication with caching, retry logic, and offline queue management
-- Built EventBus.js providing decoupled communication between modules with middleware support and pattern matching
-- Developed APIPatterns.js establishing consistent interfaces for common game operations with validation and rollback
-- Added LegacyBridge.js maintaining seamless backward compatibility during transition from monolithic to modular architecture
-- Integrated reactive event system enabling modules to communicate without direct dependencies
-- Established robust error handling and recovery patterns for reliable game state management
-- Created automatic save/load system with localStorage persistence and server synchronization
-- Maintained exact same player experience while dramatically improving code organization and maintainability
-- Reduced complexity for adding new features from hours to minutes with standardized patterns and consistent APIs
-
-**August 2025 - Phase 1 Architectural Refactoring: Modular Code Organization**
-- Implemented comprehensive modular JavaScript architecture while maintaining identical visual experience
-- Created organized utility modules: GameState.js (centralized state management), UIElements.js (DOM element handling), HexUtils.js (hexagonal grid mathematics)
-- Built service layer: BackgroundAnimations.js (particle effects management), GameAPI.js (centralized server communication)
-- Developed TabManager.js for organized tab navigation and UI management
-- Implemented ModuleLoader.js with dependency management and proper loading order
-- Added backward compatibility system to ensure seamless integration with existing 3,107-line monolithic script.js
-- Established foundation for faster feature development - new systems can now be added as organized modules instead of editing massive single file
-- Maintained exact same player experience: all visuals, interactions, and functionality remain identical
-- Reduced development complexity for future features from hours to minutes through better code organization
-
-**January 2025 - Echo Items GitHub Integration & Dynamic Text Overlay System**
-- Updated all Echo Items to use GitHub image URLs instead of object storage paths
-- Integrated complete set of Echo item images: weapons, armor, spells, jewelry, shields
-- Added new Echo armor pieces: helmet, leggings, chest armor to complete the equipment set
-- Implemented dynamic text overlay system for all item types:
-  - **Dropper Items**: T1-T20 tier labels using same base images
-  - **Shadow Items**: T1-T20 tier labels using same base images  
-  - **Echo Items**: T1-T20 tier labels using same base images (10 actual tiers map to T1-T10)
-  - **Gem System**: Abbreviation + grade labels (WST1, WST2, etc.) using same base images
-- Created unified `getItemTierText()` function for consistent tier/grade display across all game interfaces
-- Enhanced Echo Items system with proper GitHub asset management for consistent visual presentation
-- Updated Arrow item in starting inventory to use correct dropper item image URL
-
-**January 2025 - UI Customization System Implementation**
-- Implemented complete UI customization system with five professional themes
-- Added drag-and-drop tab reordering functionality using HTML5 Drag and Drop API
-- Created persistent settings system using browser localStorage for theme and tab preferences
-- Built comprehensive theme system: Molten Core (default), Aetherial Shard (crystalline cyan), Frostbite (ice blue), Arcane Violet (magical purple), Verdant Growth (forest green)
-- Enhanced Settings tab interface with visual theme descriptions and tab layout controls
-- Integrated automatic settings persistence and restoration on game load
-- Added visual feedback for tab dragging with opacity and rotation effects
-- Implemented CSS custom properties dynamic updating for instant theme switching
-
-**January 2025 - Inventory Management UI Fixes**
-- Fixed focus button disappearing issue by implementing fixed CSS positioning in bottom-right corner
-- Added "Gem Pouch" category to both EquipmentManager and InfusionManager inventory dropdowns
-- Resolved architecture confusion between root index.html and client/index.html serving
-- Updated inventory naming from "Bag of Gear" to "Armory" for consistency
-- Enhanced inventory filtering system with proper category support for all item types
-
-**January 2025 - Dynamic Zone Blueprint System FULLY OPERATIONAL**
-- ✅ **Server-Side Architecture Migration**: Successfully migrated from client-only to Express.js server architecture
-- ✅ **Dynamic Zone Layouts**: Implemented unique zone layouts for all zones using axial coordinate system
-- ✅ **Zone Blueprint System**: Server-side zone data with gridSize, features array, and (Q,R) coordinates
-- ✅ **WorldMapManager Overhaul**: Complete refactor to use server zone data for dynamic map generation
-- ✅ **Zone-Specific Themes**: Different hex colors per zone (Blue for Crystal Caves, Green for Elvenwood, etc.)
-- ✅ **Feature Mapping System**: Sanctuary, Armory, Arcanum, AetheriumConduit, Teleporter, Monster Zones, Resource Nodes
-- ✅ **Canvas Error Resolution**: Fixed null context errors with proper DOM readiness checks and safety guards
-- ✅ **API Integration**: Complete client-server communication for zone data and teleportation
-- ✅ **Real-World Testing**: Confirmed working with Crystal Caves (4x4, Crystal Deposits), Elvenwood (5x5, Moonwell Springs), Shifting Maze (4x4, Boss Arena)
-- ✅ **Quest System Fixes**: Resolved DOM initialization errors with comprehensive readiness checks
-- ✅ **Standardized Starter Zone Features**: All 24 starter zones now include: Bank (🏧), Arcanum (🔮), Armory (⚔️), AetheriumConduit (🌀), Sanctuary (🆘), Gem Node (💎)
-- ✅ **TypeScript Error Resolution**: Fixed all type errors and duplicate zone definitions in zone blueprint system
-- Foundation established for Gemini Crucible, Gilded Vault, and Death Penalty systems with server-controlled game state
-
-**January 2025 - Geminus Dev Suite Implementation (Module 1: Dashboard)**
-- Completed comprehensive Dev Suite with Module 1: Dashboard
-- Module 1: Dashboard - Central hub with server stats, quick navigation, and change logs
-- Admin password protection with visual interface design following core game aesthetics
-- Database-driven tools for live game content management
-- Error prevention with strict validation systems and event delegation
-- Foundation for 8 modules: Dashboard, Item Editor, Gem Editor, Monster Editor, Zone Editor, Quest Editor, Loot Table Editor, Player Management
-
-**January 2025 - Complete Three-Tier Item System Implementation**
-- Implemented comprehensive PostgreSQL database schema with separate tables for all three item types
-- Created complete **Dropper Items** system: 20 gear tiers (Crude to Ascended) for store-bought equipment including Steel Arrow weapon
-- Built **Shadow Items** system: T1-T20 tiers with GitHub image integration and equipment-based drop logic
-- Developed **Echo Items** system: Unique resonance-based progression with 10 tiers and GitHub image integration
-- Added **Gem System**: T1-T9 grades with Fighter/Caster/Utility/Farming categories and zone-based drops
-- Implemented **Dual-Weapon Support**: Bow+Arrow system with weapon1/weapon2 slots
-- Created **Smart Drop Logic**: Shadow items drop based on equipped gear tiers, Echo items require resonance
-- Integrated **Mathematical Balance**: All progression follows GDD exponential formulas with perfect scaling
-- Established **Visual Asset System**: GitHub URLs for Shadow items, object storage for Echo items
-- Built **Equipment Requirements**: Level, stat, and resonance requirements for all item types
-
-**January 2025 - Database Integration and GDD Mathematical Balancing Implementation**
-- Implemented complete PostgreSQL database schema with user, character, item, and combat logging systems
-- Created comprehensive GDD mathematical balancing system with 400,000 level cap support
-- Added 20 gear tiers (Crude to Ascended) with exponential stat scaling and rarity progression
-- Integrated zone-based monster scaling with proper level ranges and unlock requirements
-- Built game state management system bridging original HTML game with new backend architecture
-- Implemented experience requirements with exponential growth and logarithmic dampening for high levels
-- Added equipment stat calculation system based on gear tier, level, and equipment type
-- Created combat damage calculation with critical hit system and variance mechanics
-- Established zone unlock requirements and travel restrictions based on player level
-
-**January 2025 - Real-Time Combat Animations Implementation**
-- Added comprehensive CSS keyframe animations for combat actions
-- Implemented particle effects system (fire, magic, blood particles)
-- Created floating damage number animations with color coding
-- Enhanced health bar animations with critical health warnings
-- Added screen shake effects for critical hits and dramatic moments
-- Integrated 10% critical hit chance with 2x damage multiplier
-- Upgraded combat interface with animation containers and visual feedback
+# External Dependencies
+- **Tailwind CSS**: Loaded via CDN for styling consistency.
+- **Google Fonts**: Inter and Orbitron fonts for typography.
+- **Express.js**: Backend server for development environment and API.
+- **Vite**: Development server integration with hot module replacement.
+- **PostgreSQL**: Production database for persistent data storage.
+- **Drizzle ORM**: ORM for type-safe database queries with PostgreSQL.
