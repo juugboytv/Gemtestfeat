@@ -1,0 +1,82 @@
+1. System Overview & Core Philosophy
+The Geminus Dev Suite is a set of integrated, web-based tools designed to give non-coding developers full control over all in-game content. The suite will be accessible through a special "Dev Tools" button in the Settings tab, protected by an admin password.
+Core Principles:
+ * Visual & Intuitive: All editors will be visual, using dropdown menus, sliders, and clickable interfaces instead of raw data entry wherever possible.
+ * Data-Driven: The tools will directly edit the game's central database (e.g., MongoDB). Changes made in the Dev Suite will be reflected in the live game after a server reboot or a "hot-load" command.
+ * Error Prevention: The tools will use strict validation to prevent invalid data. For example, a designer won't be able to assign a "Sword" to a "Helmet" slot.
+2. The To-Do List: Dev Suite Modules
+Module 1: The Dashboard
+The central hub of the Dev Suite.
+ * Features:
+   * Quick stats: Total players, active players, server status.
+   * Shortcuts to all other editor modules.
+   * A "Push Live" button to apply changes to the game server.
+   * A log of recent changes made by the dev team.
+Module 2: Item Editor
+For creating and editing all equippable gear (weapons, armor, jewelry, spellbooks).
+ * Features:
+   * A list of all existing items, searchable and filterable.
+   * A "Create New Item" form with the following fields:
+     * Item Name: Text field.
+     * Item Type: Dropdown menu (Helmet, Chest Plate, Sword, etc.).
+     * Archetype: Dropdown menu (Armor, Weaponry, Jewelry, Magic).
+     * Required Stat: Dropdown menu (STR, DEX, VIT, NTL, WIS).
+     * Base Price: Number field for shop cost calculation.
+     * Image URL: Text field with an image preview.
+   * An "Edit Item" view that loads an item's data into the form.
+Module 3: Gem Editor
+For creating and editing all standard and Primal gems.
+ * Features:
+   * A list of all existing gems.
+   * A "Create New Gem" form with fields for:
+     * Gem Name: Text field.
+     * Gem Effect: A dropdown of all possible effects (e.g., "Increase Strength," "Steal Health").
+     * Stat Scaling: Nine input fields (Grade 1-9) to define the exact bonus percentage for each grade.
+     * Image URL: Text field with an image preview.
+   * A dedicated Primal Gem Recipe Editor where a dev can select two ingredient gems to create a new Primal Gem recipe.
+Module 4: Monster Editor
+For creating and balancing all enemies.
+ * Features:
+   * A list of all monster templates.
+   * A "Create New Monster" form with fields for:
+     * Monster Name: Text field.
+     * Base Stats: Input fields for baseHp, baseAC, baseAttack, baseXP, and baseGold.
+     * Stat Scaling Preview: A calculator that shows what the monster's final stats will be at a given gearTier.
+     * Loot Table Assignment: A dropdown to assign a pre-made loot table (see Module 7).
+     * Image/Sprite URL: Text field with a preview.
+Module 5: Zone Editor
+A visual editor for designing the 101 unique zone maps.
+ * Features:
+   * A dropdown menu to select one of the 101 zones to edit.
+   * A visual, clickable hex grid that represents the zone map.
+   * Map Properties Panel:
+     * gridSize: A slider to control the map's radius.
+     * Zone Trait: A dropdown to assign a trait (Balanced, EXP Zone, Gold Zone, etc.).
+     * Max Gem Grade: A dropdown to set the highest grade of gem that can drop here.
+   * Feature Palette: A list of placeable features (Sanctuary, Armory, Teleporter, etc.). The dev clicks a feature, then clicks a hex on the grid to place it.
+Module 6: Quest Editor
+For creating and managing all player quests and milestones.
+ * Features:
+   * A list of all existing quests.
+   * A "Create New Quest" form with fields for:
+     * Quest Name & Description: Text areas.
+     * Level Requirement: Number field.
+     * Objective Type: Dropdown (Hunt, Collect, etc.).
+     * Objective Target: A text field or a dropdown to select a specific monster or item.
+     * Rewards: Input fields for XP and Gold. An "Add Item Reward" button that opens an item picker to select a specific piece of gear.
+Module 7: Loot Table Editor
+A dedicated tool for managing non-Dropper loot (like crafting resources).
+ * Features:
+   * A list of all loot tables (e.g., "Boar Loot," "Dragon Boss Loot").
+   * A "Create New Loot Table" tool.
+   * An interface to add items or resources to a table and set their individual drop chances (e.g., "Boar Tusk: 25%," "Thick Hide: 10%").
+Module 8: Player Management (GM Tool)
+For customer support and game moderation.
+ * Features:
+   * A search bar to find a player by name.
+   * A read-only view of a player's character sheet, inventory, bank, and current location.
+   * GM Actions: Secure, logged actions for customer support.
+     * Grant Gold/XP.
+     * Give a specific item (for restoring lost items).
+     * Temporarily ban or mute a player.
+
