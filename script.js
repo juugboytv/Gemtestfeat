@@ -1,6 +1,6 @@
 
     // --- VERSION STAMP FOR CACHE BUSTING ---
-    console.log('🚨 SCRIPT VERSION: 2025-01-03-17:00 - SMOKE CANVAS ANIMATION DISABLED');
+    console.log('🚨 SCRIPT VERSION: 2025-01-03-17:05 - LEGACY WORLDMAPMANAGER REMOVED');
     
     // === COMPREHENSIVE CANVAS ERROR PREVENTION ===
     // This system completely prevents all canvas operations to eliminate the error
