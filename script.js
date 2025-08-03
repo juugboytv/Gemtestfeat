@@ -1714,52 +1714,12 @@ const EquipmentManager = {
         
         // Get zone blueprint data
         getZoneBlueprint(zoneId) {
-            const blueprints = {
-                "1": {
-                    name: "Crystal Caves",
-                    gridSize: 4,
-                    features: [
-                        { type: "Sanctuary", q: -2, r: 0 },
-                        { type: "Armory", q: 1, r: -1 },
-                        { type: "Arcanum", q: 1, r: 1 },
-                        { type: "AetheriumConduit", q: 2, r: 0 },
-                        { type: "Teleporter", q: 0, r: 2 }
-                    ]
-                },
-                "2": {
-                    name: "Whispering Woods",
-                    gridSize: 5,
-                    features: [
-                        { type: "Sanctuary", q: 0, r: 0 },
-                        { type: "Armory", q: -2, r: 2 },
-                        { type: "Arcanum", q: 2, r: -3 },
-                        { type: "Teleporter", q: 3, r: -1 },
-                        { type: "AetheriumConduit", q: -3, r: 3 }
-                    ]
-                },
-                "3": {
-                    name: "Ember Peaks", 
-                    gridSize: 6,
-                    features: [
-                        { type: "Sanctuary", q: -1, r: -1 },
-                        { type: "Arcanum", q: 2, r: -1 },
-                        { type: "AetheriumConduit", q: 0, r: 2 },
-                        { type: "Teleporter", q: -2, r: 2 },
-                        { type: "Boss Arena", q: 1, r: 1, name: "Magma Lord's Chamber" }
-                    ]
-                },
-                "25": {
-                    name: "Echoing Chasms",
-                    gridSize: 7,
-                    features: [
-                        { type: "Sanctuary", q: 5, r: -2 },
-                        { type: "AetheriumConduit", q: -4, r: 1 },
-                        { type: "Teleporter", q: 0, r: -5 }
-                    ]
-                }
-            };
+            // Use the global zoneBlueprints loaded from shared/zoneBlueprints.ts
+            if (window.zoneBlueprints && window.zoneBlueprints[String(zoneId)]) {
+                return window.zoneBlueprints[String(zoneId)];
+            }
             
-            return blueprints[String(zoneId)] || this.generateBasicBlueprint(zoneId);
+            return this.generateBasicBlueprint(zoneId);
         },
         
         // Generate basic blueprint for zones without custom layouts
