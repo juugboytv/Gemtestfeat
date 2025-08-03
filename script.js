@@ -2243,8 +2243,9 @@ const EquipmentManager = {
                                /[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/u.test(displayChar);
                 
                 // Log emoji rendering for Bank and Revive Station
-                if (displayChar === '🏦' || displayChar === '⛑️') {
-                    console.log(`RENDERING EMOJI: "${displayChar}" (${displayChar.charCodeAt(0)}) at (${cx}, ${cy})`);
+                if (displayChar === '💰' || displayChar === '🏥') {
+                    console.log(`RENDERING EMOJI: "${displayChar}" (char code: ${displayChar.charCodeAt(0)}) at (${cx}, ${cy})`);
+                    console.log(`Canvas context:`, this.ctx);
                 }
                 
                 if (isEmoji) {
