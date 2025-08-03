@@ -50,6 +50,17 @@
         }
     }
     
+    @keyframes pulse-border-cyan {
+        0%, 100% {
+            border-color: rgba(34, 211, 238, 0.4);
+            box-shadow: 0 0 15px rgba(34, 211, 238, 0.2), 0 4px 30px rgba(0, 0, 0, 0.6);
+        }
+        50% {
+            border-color: rgba(103, 232, 249, 0.7);
+            box-shadow: 0 0 25px rgba(103, 232, 249, 0.3), 0 4px 30px rgba(0, 0, 0, 0.6);
+        }
+    }
+    
     @keyframes pulse-main-tab-glow {
         0%, 100% {
             border-bottom-color: var(--highlight-orange);
@@ -3713,20 +3724,20 @@ const EquipmentManager = {
                 },
                 backgroundColor: '#121212'
             },
-            'geminus-magi-tech': {
-                name: 'Geminus Magi-Tech',
-                description: 'A dark, futuristic, cyber-mystical UI with glowing neon highlights',
+            'aetherial-shard': {
+                name: 'Aetherial Shard',
+                description: 'A crystalline cyber-mystical theme with frosted glass effects',
                 colors: {
-                    '--highlight-orange': '#00ffff',
-                    '--glow-red': '#00cccc',
-                    '--text-primary': '#e0ffff',
-                    '--text-secondary': '#80cccc',
-                    '--panel-bg': 'rgba(10, 20, 30, 0.85)',
-                    '--input-bg': 'rgba(0, 30, 40, 0.6)',
-                    '--border-color-main': 'rgba(0, 255, 255, 0.4)',
-                    '--border-color-pulse': 'rgba(0, 204, 204, 0.7)'
+                    '--highlight-orange': '#22d3ee',
+                    '--glow-red': '#67e8f9',
+                    '--text-primary': '#f0f0f0',
+                    '--text-secondary': '#a0a0a0',
+                    '--panel-bg': 'rgba(30, 35, 45, 0.65)',
+                    '--input-bg': 'rgba(0, 0, 0, 0.4)',
+                    '--border-color-main': 'rgba(34, 211, 238, 0.4)',
+                    '--border-color-pulse': 'rgba(103, 232, 249, 0.7)'
                 },
-                backgroundColor: '#0a1420'
+                backgroundColor: '#121212'
             },
             'frostbite': {
                 name: 'Frostbite',
@@ -3820,6 +3831,26 @@ const EquipmentManager = {
             
             // Change background color
             document.body.style.backgroundColor = theme.backgroundColor;
+            
+            // Update glass panel animations based on theme
+            if (themeKey === 'aetherial-shard') {
+                // Apply cyan-specific animation and glass effects
+                const glassPanels = document.querySelectorAll('.glass-panel');
+                glassPanels.forEach(panel => {
+                    panel.style.animation = 'pulse-border-cyan 5s ease-in-out infinite';
+                    panel.style.backgroundImage = `
+                        linear-gradient(${theme.colors['--panel-bg']}, ${theme.colors['--panel-bg']}),
+                        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%23ffffff' fill-opacity='0.02' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'%3E%3C/path%3E%3C/svg%3E")
+                    `;
+                });
+            } else {
+                // Reset to default animation for other themes
+                const glassPanels = document.querySelectorAll('.glass-panel');
+                glassPanels.forEach(panel => {
+                    panel.style.animation = 'pulse-border 4s ease-in-out infinite';
+                    panel.style.backgroundImage = '';
+                });
+            }
             
             this.currentTheme = themeKey;
             this.updateThemeDisplay();
