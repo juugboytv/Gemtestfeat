@@ -1405,6 +1405,7 @@
                 { id: 'base_shield_1', name: 'Heater Shield', type: 'Weapon', subType: 'Shield', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/IMG_1408.png', proportion: 1.0, sockets: 2 },
                 { id: 'base_coh_1', name: 'Caster Off-Hand', type: 'Weapon', subType: 'Caster Off-Hand', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/IMG_1409.png', proportion: 1.0, sockets: 2 },
                 { id: 'base_bow_1', name: 'Longbow', type: 'Weapon', subType: 'Bow', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/IMG_1410.png', proportion: 1.0, sockets: 2 },
+                { id: 'base_arrow_1', name: 'Steel Arrow', type: 'Weapon', subType: 'Arrow', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/Echo%20arrow.PNG', proportion: 1.0, sockets: 2 },
                 { id: 'base_axe_1', name: 'Battle Axe', type: 'Weapon', subType: 'Axe', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/IMG_1411.png', proportion: 1.0, sockets: 2 },
                 { id: 'base_sword_1', name: 'Knightly Sword', type: 'Weapon', subType: 'Sword', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/Weapons/IMG_1412.png', proportion: 1.0, sockets: 2 },
                 { id: 'base_dagger_1', name: 'Rondel Dagger', type: 'Weapon', subType: 'Dagger', imageUrl: 'https://raw.githubusercontent.com/juugboytv/Geminus/refs/heads/Weapons/IMG_1413.png', proportion: 1.0, sockets: 2 },
@@ -3839,38 +3840,38 @@ const EquipmentManager = {
                 const glassPanels = document.querySelectorAll('.glass-panel');
                 glassPanels.forEach(panel => {
                     panel.style.animation = 'pulse-border-cyan 5s ease-in-out infinite';
-                    panel.style.background = 'rgba(255, 255, 255, 0.1)';
-                    panel.style.backdropFilter = 'blur(20px)';
-                    panel.style.webkitBackdropFilter = 'blur(20px)';
-                    panel.style.border = '1px solid rgba(255, 255, 255, 0.2)';
-                    panel.style.boxShadow = '0 8px 32px 0 rgba(31, 38, 135, 0.37)';
+                    panel.style.background = 'rgba(255, 255, 255, 0.05)';
+                    panel.style.backdropFilter = 'blur(30px)';
+                    panel.style.webkitBackdropFilter = 'blur(30px)';
+                    panel.style.border = '1px solid rgba(34, 211, 238, 0.2)';
+                    panel.style.boxShadow = '0 8px 32px 0 rgba(34, 211, 238, 0.1)';
                 });
                 
                 // Apply glassmorphism to buttons
-                const glassButtons = document.querySelectorAll('.glass-button');
+                const glassButtons = document.querySelectorAll('.glass-button, button');
                 glassButtons.forEach(button => {
-                    button.style.background = 'rgba(255, 255, 255, 0.05)';
-                    button.style.border = '1px solid rgba(34, 211, 238, 0.25)';
-                    button.style.backdropFilter = 'blur(10px)';
-                    button.style.webkitBackdropFilter = 'blur(10px)';
+                    button.style.background = 'rgba(255, 255, 255, 0.03)';
+                    button.style.border = '1px solid rgba(34, 211, 238, 0.2)';
+                    button.style.backdropFilter = 'blur(15px)';
+                    button.style.webkitBackdropFilter = 'blur(15px)';
                 });
                 
                 // Apply glassmorphism to inputs
                 const inputs = document.querySelectorAll('input, textarea, select');
                 inputs.forEach(input => {
-                    input.style.background = 'rgba(255, 255, 255, 0.05)';
-                    input.style.border = '1px solid rgba(34, 211, 238, 0.25)';
-                    input.style.backdropFilter = 'blur(10px)';
-                    input.style.webkitBackdropFilter = 'blur(10px)';
+                    input.style.background = 'rgba(255, 255, 255, 0.03)';
+                    input.style.border = '1px solid rgba(34, 211, 238, 0.2)';
+                    input.style.backdropFilter = 'blur(15px)';
+                    input.style.webkitBackdropFilter = 'blur(15px)';
                 });
                 
                 // Apply glassmorphism to tab buttons
                 const tabButtons = document.querySelectorAll('.main-tab-button');
                 tabButtons.forEach(button => {
-                    button.style.background = 'rgba(255, 255, 255, 0.05)';
-                    button.style.backdropFilter = 'blur(10px)';
-                    button.style.webkitBackdropFilter = 'blur(10px)';
-                    button.style.border = 'none';
+                    button.style.background = 'rgba(255, 255, 255, 0.03)';
+                    button.style.backdropFilter = 'blur(15px)';
+                    button.style.webkitBackdropFilter = 'blur(15px)';
+                    button.style.border = '1px solid rgba(34, 211, 238, 0.1)';
                     button.style.borderBottom = '3px solid transparent';
                 });
                 
