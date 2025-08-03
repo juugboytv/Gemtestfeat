@@ -18,6 +18,7 @@ export interface ZoneBlueprint {
   terrain?: string; // Future expansion for terrain types
   description?: string;
   difficulty?: number; // Zone difficulty level
+  levelRequirement?: number; // Level required to access zone
 }
 
 // Standardized starter zone features: All 24 starter zones have these core features
