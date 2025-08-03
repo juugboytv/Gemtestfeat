@@ -1702,12 +1702,7 @@ const EquipmentManager = {
         async loadZoneBlueprint(zoneId) {
             this.currentZoneId = zoneId;
             
-            // Use server-provided zone data if available
-            if (state.currentZone && state.currentZone.features) {
-                console.log(`Using server zone data for map generation:`, state.currentZone);
-                this.populateGridFromServerData(state.currentZone);
-                return;
-            }
+            // Server data is now handled through the blueprint system
             
             // Fallback to blueprint system if server data not available
             const blueprint = await this.getZoneBlueprint(zoneId);
@@ -1771,54 +1766,7 @@ const EquipmentManager = {
             
             // Force redraw after loading blueprint
             this.draw();
-        },
-        
-        // New method to populate grid from server-provided zone data
-        populateGridFromServerData(zoneData) {
-            console.log(`Populating grid from server data for zone ${zoneData.id}:`, zoneData);
-            
-            // Clear existing grid
-            this.grid.clear();
-            
-            // Generate hexagonal grid based on server-provided size
-            const gridSize = zoneData.gridSize;
-            for (let q = -gridSize; q <= gridSize; q++) {
-                for (let r = -gridSize; r <= gridSize; r++) {
-                    const s = -q - r;
-                    if (s >= -gridSize && s <= gridSize) {
-                        // Default all hexes to Monster Zones
-                        this.grid.set(`${q},${r}`, { 
-                            q, r, s, 
-                            feature: { name: 'Monster Zone', icon: '◻️' } 
-                        });
-                    }
-                }
-            }
-            
-            // Place features from server data
-            console.log(`Placing ${zoneData.features.length} server features on grid...`);
-            zoneData.features.forEach((feature, index) => {
-                const key = `${feature.q},${feature.r}`;
-                console.log(`Server Feature ${index + 1}: ${feature.type} at (${feature.q}, ${feature.r})`);
-                
-                if (this.grid.has(key)) {
-                    console.log(`  → Placing server feature ${feature.type} with proper structure`);
-                    this.grid.get(key).feature = {
-                        type: feature.type,  // This is what drawHex looks for
-                        name: feature.type,
-                        q: feature.q,
-                        r: feature.r
-                    };
-                } else {
-                    console.log(`  → WARNING: Grid position ${key} does not exist for server feature: ${feature.type}`);
-                }
-            });
-            
-            console.log(`Server zone grid populated: ${zoneData.name} (${gridSize}x${gridSize}) with ${zoneData.features.length} features`);
-            showToast(`Zone Layout: ${zoneData.name} (${gridSize}x${gridSize} server grid)`, false);
-            
-            // Force redraw after loading server data
-            this.draw();
+
             
             // Add global test functions for debugging
             window.testZoneBlueprints = () => {
@@ -1952,8 +1900,23 @@ const EquipmentManager = {
                 const data = await response.json();
                 
                 if (data.success && data.zone && data.zone.id == zoneId) {
-                    console.log(`Using server zone data for map generation:`, data.zone);
-                    return data.zone;
+                    console.log(`✓ Server zone data received for zone ${zoneId}:`, data.zone);
+                    
+                    // Convert server zone format to blueprint format that loadZoneBlueprint expects
+                    const serverZone = data.zone;
+                    const blueprint = {
+                        name: serverZone.name || `Zone ${zoneId}`,
+                        gridSize: serverZone.gridSize,
+                        features: serverZone.features.map(feature => ({
+                            type: feature.type,
+                            q: feature.q,
+                            r: feature.r,
+                            name: feature.type  // Add name for compatibility
+                        }))
+                    };
+                    
+                    console.log(`✓ Converted server data to blueprint format:`, blueprint);
+                    return blueprint;
                 }
             } catch (error) {
                 console.error('Error fetching zone data from server:', error);
