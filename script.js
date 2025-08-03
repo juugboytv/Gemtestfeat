@@ -1655,16 +1655,13 @@ const EquipmentManager = {
             ui.miniMapCanvas.style.width = `${ui.miniMapContainer.clientWidth}px`; 
             ui.miniMapCanvas.style.height = `${ui.miniMapContainer.clientHeight}px`; 
             
-            // Get context with comprehensive error handling
+            // CANVAS DISABLED: Using canvas-free zone display system
             try {
-                this.ctx = ui.miniMapCanvas.getContext('2d');
-                if (!this.ctx || typeof this.ctx.clearRect !== 'function') {
-                    console.error('Failed to get valid canvas 2d context!');
-                    return;
-                }
-                
-                // Test the context immediately
-                this.ctx.clearRect(0, 0, 1, 1);
+                // Disable canvas to prevent errors - using canvas-free zone display instead
+                console.log('Canvas disabled - using canvas-free zone display system');
+                this.ctx = null;
+                this.canvasReady = false;
+                return; // Exit early to prevent any canvas operations
                 
                 // Set font for emoji support
                 this.ctx.font = '16px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
@@ -2159,11 +2156,24 @@ const EquipmentManager = {
 
             state.game.currentZoneTier = parseInt(zoneId);
             
-            // Load new zone blueprint and reset player position
-            WorldMapManager.currentZoneId = parseInt(zoneId);  // Update current zone
-            WorldMapManager.loadZoneBlueprint(parseInt(zoneId));
-            WorldMapManager.playerPos = { q: 0, r: 0 };
-            WorldMapManager.draw();
+            // Load new zone data from server (prioritize server over blueprint)
+            WorldMapManager.currentZoneId = parseInt(zoneId);
+            WorldMapManager.playerPos = { q: 0, r: 0 }; // Reset position
+            
+            // Load server zone data if available
+            if (WorldMapManager.loadServerZoneData) {
+                WorldMapManager.loadServerZoneData(parseInt(zoneId)).then(() => {
+                    // Force refresh zone displays
+                    if (typeof updateZoneHexDisplay === 'function') {
+                        updateZoneHexDisplay();
+                    }
+                });
+            } else {
+                // Fallback to blueprint system
+                WorldMapManager.loadZoneBlueprint(parseInt(zoneId));
+                WorldMapManager.draw();
+            }
+            
             WorldMapManager.updateInteractButton();
             
             const landingHex = WorldMapManager.grid.get(`${WorldMapManager.playerPos.q},${WorldMapManager.playerPos.r}`);
@@ -3519,8 +3529,111 @@ const InfusionManager = {
             }
         });
         
+        // Initialize canvas-free zone display system
+        const initCanvasFreeZoneDisplay = () => {
+            // Disable canvas rendering to prevent errors
+            if (WorldMapManager && WorldMapManager.init) {
+                // Override canvas methods to prevent errors
+                WorldMapManager.canvasReady = false;
+                WorldMapManager.ctx = null;
+            }
+            
+            // Initialize building click handlers
+            document.querySelectorAll('.building-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const buildingType = e.target.getAttribute('data-building');
+                    console.log(`Clicked on ${buildingType} building`);
+                    
+                    // Navigate to building location
+                    navigateToBuilding(buildingType);
+                });
+            });
+        };
+        
+        // Navigate to specific building function
+        const navigateToBuilding = async (buildingType) => {
+            try {
+                const response = await fetch('/api/game/current-zone');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.gameState && data.gameState.currentZone) {
+                        const building = data.gameState.currentZone.features.find(f => f.type === buildingType);
+                        if (building) {
+                            // Update player position to building location
+                            if (WorldMapManager && WorldMapManager.playerPos) {
+                                WorldMapManager.playerPos.q = building.q;
+                                WorldMapManager.playerPos.r = building.r;
+                            }
+                            
+                            // Update location display
+                            updateLocationDisplay(building);
+                            showToast(`Moved to ${getFeatureIcon(buildingType)} ${building.name || buildingType}`, false);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.log('Direct building navigation failed, using manual method');
+                showToast(`Navigate to ${buildingType} manually using arrow buttons`, false);
+            }
+        };
+        
+        // Update location display helper
+        const updateLocationDisplay = (feature) => {
+            const locationDiv = document.getElementById('current-location');
+            if (locationDiv && feature) {
+                locationDiv.textContent = `${getFeatureIcon(feature.type)} ${feature.name || feature.type}`;
+            }
+        };
+        
+        // Update zone hex display 
+        const updateZoneHexDisplay = async () => {
+            try {
+                const response = await fetch('/api/game/current-zone');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.gameState && data.gameState.currentZone) {
+                        const zone = data.gameState.currentZone;
+                        
+                        // Update zone info
+                        const zoneInfoDiv = document.getElementById('zone-info-display');
+                        if (zoneInfoDiv) {
+                            zoneInfoDiv.textContent = zone.name;
+                        }
+                        
+                        // Update hex display
+                        const hexDisplay = document.getElementById('zone-hex-display');
+                        if (hexDisplay && zone.features) {
+                            const buildingCount = zone.features.filter(f => f.type !== 'Monster Zone').length;
+                            hexDisplay.innerHTML = zone.features.slice(0, 16).map(feature => {
+                                const icon = getFeatureIcon(feature.type);
+                                const isBuilding = feature.type !== 'Monster Zone';
+                                return `<div class="hex-cell ${isBuilding ? 'text-orange-400' : 'text-gray-600'}" title="${feature.name || feature.type}">${icon}</div>`;
+                            }).join('');
+                            
+                            // Update building count
+                            const buildingCountDiv = document.querySelector('#zone-buildings-display .text-gray-400');
+                            if (buildingCountDiv) {
+                                buildingCountDiv.textContent = `Zone Buildings (${buildingCount}/6)`;
+                            }
+                        }
+                        
+                        console.log(`Zone display updated: ${zone.name} with ${zone.features.length} features`);
+                    }
+                }
+            } catch (error) {
+                console.log('Zone hex display update failed, using fallback');
+            }
+        };
+        
+        // Initialize canvas-free system
+        initCanvasFreeZoneDisplay();
+        
         // Update zone display every 3 seconds and on load
         updateZoneDisplay();
-        setInterval(updateZoneDisplay, 3000);
+        updateZoneHexDisplay();
+        setInterval(() => {
+            updateZoneDisplay();
+            updateZoneHexDisplay();
+        }, 3000);
     });
 
