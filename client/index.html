@@ -3516,12 +3516,26 @@ const WorldMapManager = {
     
     init() {
         if (this.isInitialized) return;
+        
+        // Ensure canvas elements exist before initialization
+        if (!ui.miniMapCanvas || !ui.miniMapContainer) {
+            console.warn('Canvas elements not ready, deferring WorldMapManager initialization');
+            setTimeout(() => this.init(), 100);
+            return;
+        }
+        
         this.isInitialized = true;
         ui.miniMapCanvas.width = ui.miniMapContainer.clientWidth * 2;
         ui.miniMapCanvas.height = ui.miniMapContainer.clientHeight * 2;
         ui.miniMapCanvas.style.width = `${ui.miniMapContainer.clientWidth}px`;
         ui.miniMapCanvas.style.height = `${ui.miniMapContainer.clientHeight}px`;
         this.ctx = ui.miniMapCanvas.getContext('2d');
+        
+        if (!this.ctx) {
+            console.error('Failed to get 2D context from canvas');
+            return;
+        }
+        
         this.generateGrid();
         this.updateInteractButton();
         this.draw();
@@ -3656,6 +3670,12 @@ const WorldMapManager = {
     },
     
     draw() {
+        // Safety check to prevent null context errors
+        if (!this.ctx || !ui.miniMapCanvas) {
+            console.warn('Canvas context not available for drawing');
+            return;
+        }
+        
         const canvas = ui.miniMapCanvas;
         this.ctx.clearRect(0, 0, canvas.width, canvas.height);
         const centerX = canvas.width / 2;
@@ -3670,6 +3690,8 @@ const WorldMapManager = {
     },
     
     drawHex(cx, cy, size, feature) {
+        if (!this.ctx) return; // Safety check
+        
         this.ctx.beginPath();
         for (let i = 0; i < 6; i++) {
             const angle = 2 * Math.PI / 6 * (i + 0.5);
@@ -3693,6 +3715,8 @@ const WorldMapManager = {
     },
     
     drawPlayer(cx, cy) {
+        if (!this.ctx) return; // Safety check
+        
         this.ctx.font = `${this.hexSize * 1.5}px sans-serif`;
         this.ctx.textAlign = 'center';
         this.ctx.textBaseline = 'middle';
