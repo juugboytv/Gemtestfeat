@@ -95,74 +95,72 @@ export class GameLogicManager {
     return { q: 0, r: 0 };
   }
 
-  // Generate unique layout for each zone
+  // Generate structured layout for each zone with consistent patterns
   private generateUniqueZoneLayout(zoneId: number): { gridSize: number; features: Array<{ q: number; r: number; type: string; name?: string }> } {
-    // Determine grid size with more variety
+    // Determine grid size and color based on 5-zone repeating pattern
     let gridSize: number;
+    let zoneColor: string;
     
-    if (zoneId <= 24) {
-      // Starter zones: Mix of 3x3 to 5x5
-      const starterSizes = [3, 4, 4, 5, 3, 4, 5, 4, 3, 5, 4, 3, 5, 4, 3, 4, 5, 3, 4, 5, 3, 4, 4, 5];
-      gridSize = starterSizes[zoneId - 1] || 4;
-    } else if (zoneId <= 33) {
-      // Level 100 zones: 5x5 to 6x6
-      gridSize = 5 + (zoneId % 2);
-    } else if (zoneId <= 50) {
-      // Level 253 zones: 6x6 to 7x7
-      gridSize = 6 + (zoneId % 2);
-    } else if (zoneId <= 58) {
-      // Level 1000 zones: 7x7 to 8x8
-      gridSize = 7 + (zoneId % 2);
-    } else if (zoneId <= 66) {
-      // Level 6143 zones: 8x8 to 9x9
-      gridSize = 8 + (zoneId % 2);
-    } else if (zoneId <= 73) {
-      // Level 13636 zones: 9x9 to 10x10
-      gridSize = 9 + (zoneId % 2);
-    } else if (zoneId <= 78) {
-      // Level 35452 zones: 10x10 to 11x11
-      gridSize = 10 + (zoneId % 2);
-    } else if (zoneId <= 81) {
-      // Level 83333 zones: 11x11 to 12x12
-      gridSize = 11 + (zoneId % 2);
-    } else if (zoneId <= 100) {
-      // Level 172222 zones: Mix of large sizes 10x10 to 13x13
-      const largeSizes = [10, 11, 12, 13];
-      gridSize = largeSizes[zoneId % 4];
-    } else {
-      // Zone 101: Massive 15x15
-      gridSize = 15;
+    const patternIndex = ((zoneId - 1) % 5) + 1; // Gets 1-5 pattern that repeats
+    
+    switch (patternIndex) {
+      case 1: // Red zones (1, 6, 11, 16... etc)
+        gridSize = 4;
+        zoneColor = 'red';
+        break;
+      case 2: // Blue zones (2, 7, 12, 17... etc)
+        gridSize = 5;
+        zoneColor = 'blue';
+        break;
+      case 3: // Green zones (3, 8, 13, 18... etc)
+        gridSize = 6;
+        zoneColor = 'green';
+        break;
+      case 4: // Yellow zones (4, 9, 14, 19... etc)
+        gridSize = 7;
+        zoneColor = 'yellow';
+        break;
+      case 5: // Purple zones (5, 10, 15, 20... etc)
+        gridSize = 8;
+        zoneColor = 'purple';
+        break;
+      default:
+        gridSize = 4;
+        zoneColor = 'red';
     }
-
-    // Track used coordinates to ensure no overlaps
-    const usedCoordinates = new Set<string>();
+    
+    // Fixed feature positions that scale with grid size for consistent layouts
     const features: Array<{ q: number; r: number; type: string; name?: string }> = [];
-
-    // Always place Sanctuary at center
-    features.push({ type: "Sanctuary", q: 0, r: 0 });
-    usedCoordinates.add("0,0");
-
-    // CRITICAL: ALL zones must have EXACTLY these 6 core features (🏧⚔️🔮🆘💎🌀)
-    const coreFeatureTypes = [
-      "Bank",              // 🏧 ATM
-      "Armory",            // ⚔️ Weapon shop  
-      "Arcanum",           // 🔮 Spell shop
-      "Revive Station",    // 🆘 SOS revive station
-      "Gem Crucible",      // 💎 Gem shop
-      "Teleporter"         // 🌀 Zone teleporter
+    
+    // Core feature types with consistent positions across ALL zones
+    const coreFeatures = [
+      { type: 'Sanctuary', position: { q: 0, r: 0 } }, // Always center
+      { type: 'Bank', position: { q: 0, r: -Math.min(2, gridSize - 1) } }, // North
+      { type: 'Armory', position: { q: Math.min(2, gridSize - 1), r: 0 } }, // East
+      { type: 'Arcanum', position: { q: -Math.min(2, gridSize - 1), r: 0 } }, // West
+      { type: 'Revive Station', position: { q: 0, r: Math.min(2, gridSize - 1) } }, // South
+      { type: 'Gem Crucible', position: { q: Math.min(1, gridSize - 2), r: -Math.min(1, gridSize - 2) } }, // Northeast
+      { type: 'Teleporter', position: { q: -Math.min(1, gridSize - 2), r: Math.min(1, gridSize - 2) } } // Southwest
     ];
 
-    // Use zone ID to seed different patterns for consistent but unique layouts
-    const baseSeed = zoneId * 7 + 13;
-    let seedCounter = 0;
-    
-    // Place each of the 6 required core features
-    for (const featureType of coreFeatureTypes) {
-      const coords = this.generateUniqueCoordinates(gridSize, usedCoordinates, baseSeed + seedCounter++);
-      features.push({ type: featureType, q: coords.q, r: coords.r });
+    // Add all core features to the zone with proper bounds checking
+    for (const feature of coreFeatures) {
+      // Ensure coordinates are within hexagonal bounds
+      const q = Math.max(-gridSize, Math.min(gridSize, feature.position.q));
+      const r = Math.max(-gridSize, Math.min(gridSize, feature.position.r));
+      const s = -q - r;
+      
+      // Validate hexagonal bounds (all three coordinates must be within gridSize)
+      if (Math.abs(q) <= gridSize && Math.abs(r) <= gridSize && Math.abs(s) <= gridSize) {
+        features.push({
+          q: q,
+          r: r,
+          type: feature.type
+        });
+      }
     }
 
-    console.log(`Zone ${zoneId} generated with ${features.length} features:`, features.map(f => f.type));
+    console.log(`Zone ${zoneId} (${zoneColor} ${gridSize}x${gridSize}) generated with ${features.length} features:`, features.map(f => f.type));
     return { gridSize, features };
   }
 
