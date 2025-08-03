@@ -260,6 +260,40 @@
     #monster-hp-text { color: var(--glow-red); font-weight: bold; text-shadow: 0 0 5px var(--glow-red); }
     #enemy-defeated-msg { font-size: 1.5rem; color: var(--glow-red); font-weight: bold; display: none; font-family: 'Orbitron'; }
 
+    /* --- Compact Combat Actions Bar --- */
+    .compact-combat-btn {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(249, 115, 22, 0.25);
+        color: var(--text-primary);
+        transition: all 0.2s ease-in-out;
+        font-family: 'Orbitron', sans-serif;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-shadow: 0 0 5px rgba(249, 115, 22, 0.3);
+        padding: 0.5rem 1rem;
+        border-radius: 0.375rem;
+        cursor: pointer;
+        min-width: 90px;
+    }
+    .compact-combat-btn:not(:disabled):hover {
+        background: rgba(249, 115, 22, 0.15);
+        border-color: rgba(249, 115, 22, 0.6);
+        transform: translateY(-1px);
+        color: var(--highlight-orange);
+        text-shadow: 0 0 10px var(--highlight-orange);
+    }
+    .compact-combat-btn:disabled {
+        background: rgba(60, 60, 60, 0.4) !important;
+        border-color: rgba(100, 100, 100, 0.8) !important;
+        cursor: not-allowed;
+        color: #6b7280 !important;
+        text-shadow: none !important;
+        transform: none !important;
+    }
+    .compact-combat-btn:not(:disabled):active {
+        transform: translateY(0) scale(0.98);
+    }
+
     /* --- Smart Tooltip / Action Modal --- */
     #item-action-modal-backdrop {
         position: fixed;
@@ -2915,10 +2949,12 @@ const EquipmentManager = {
     }, 
     render() { 
         ui.tabContentCombat.innerHTML = ` 
-            <div class="space-y-4 flex flex-col items-center h-full combat-display"> 
-                <div id="combat-info-panel" class="w-full p-2 rounded-lg bg-black/20 border border-[var(--border-color-main)]">
-                    <div id="combat-stats-container">
-                        <div class="location-info">
+            <div class="space-y-3 flex flex-col h-full combat-display"> 
+                <!-- Unified Combat Dashboard -->
+                <div id="combat-info-panel" class="w-full p-3 rounded-lg bg-black/20 border border-[var(--border-color-main)]">
+                    <!-- Player Stats Section -->
+                    <div id="combat-stats-container" class="mb-3">
+                        <div class="location-info mb-2">
                             <span class="stats-label label-location">Location:</span>
                             <span id="location-value" class="stats-value">Starting Zone</span>
                         </div>
@@ -2937,26 +2973,42 @@ const EquipmentManager = {
                             </div>
                         </div>
                     </div>
-                </div> 
-                <div class="flex-grow w-full flex flex-col space-y-3"> 
-                    <select id="monsterSelect" class="w-full"></select> 
-                    <div id="monster-info" class="text-center invisible min-h-[60px] combat-character"> 
-                        <div id="enemy-defeated-msg" style="display: none;" class="text-green-400 font-bold text-xl mb-2">⚡ ENEMY DEFEATED ⚡</div>
-                        <h3 id="monster-name" class="font-orbitron text-lg text-red-400"></h3> 
-                        <div class="monster-hp-container">
-                            <div class="progress-bar-track h-4 mt-2 w-full max-w-xs mx-auto hp-bar-container">
-                                <div id="monster-hp-bar" class="progress-bar-fill h-full" style="width: 100%; background-color: var(--hp-color);"></div>
+                    
+                    <!-- Enemy Stats Section (Integrated) -->
+                    <div id="enemy-stats-container" class="combat-character border-t border-[var(--border-color-main)] pt-2" style="display: none;">
+                        <div class="enemy-info-row flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="stats-label label-location">Enemy:</span>
+                                <span id="monster-name" class="stats-value text-red-400"></span>
                             </div>
+                            <div id="enemy-defeated-msg" style="display: none;" class="text-green-400 font-bold text-sm">⚡ DEFEATED ⚡</div>
                         </div>
-                        <div id="monster-hp-text" class="text-sm mt-1"></div> 
-                    </div> 
-                    <div id="scrolling-combat-log-container" class="flex-grow"></div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-auto"> 
-                        <button class="glass-button py-2 rounded-md combat-character" id="engageBtn" disabled>🎯 ENGAGE</button> 
-                        <button class="glass-button py-2 rounded-md combat-character" id="attackBtn" disabled>⚔️ ATTACK</button> 
-                        <button class="glass-button py-2 rounded-md combat-character" id="castBtn" disabled style="display: none;">🔮 CAST</button> 
-                    </div> 
+                        <div class="enemy-health-row flex items-center gap-3 mt-1">
+                            <span class="stats-label label-health" style="min-width: 50px;">Enemy HP:</span>
+                            <div class="flex-grow">
+                                <div class="progress-bar-track h-3">
+                                    <div id="monster-hp-bar" class="progress-bar-fill h-full" style="width: 100%; background-color: var(--hp-color);"></div>
+                                </div>
+                            </div>
+                            <span id="monster-hp-text" class="stats-value text-red-400 text-xs" style="min-width: 80px; text-align: right;"></span>
+                        </div>
+                    </div>
                 </div> 
+                
+                <!-- Main Content Area -->
+                <div class="flex-grow w-full flex flex-col"> 
+                    <select id="monsterSelect" class="w-full mb-3"></select> 
+                    <div id="scrolling-combat-log-container" class="flex-grow min-h-[100px]"></div>
+                </div>
+                
+                <!-- Compact Combat Actions Bar -->
+                <div id="combat-actions-bar" class="w-full">
+                    <div class="flex gap-2 justify-center"> 
+                        <button class="compact-combat-btn combat-character" id="engageBtn" disabled>🎯 ENGAGE</button> 
+                        <button class="compact-combat-btn combat-character" id="attackBtn" disabled>⚔️ ATTACK</button> 
+                        <button class="compact-combat-btn combat-character" id="castBtn" disabled style="display: none;">🔮 CAST</button> 
+                    </div> 
+                </div>
             </div>`; 
     }, 
     addEventListeners() { 
@@ -2969,7 +3021,8 @@ const EquipmentManager = {
     resetCombatSelection() { 
         this.currentMonster = null; 
         state.game.combatActive = false; 
-        ui.tabContentCombat.querySelector('#monster-info').classList.add('invisible'); 
+        const enemyContainer = ui.tabContentCombat.querySelector('#enemy-stats-container');
+        if (enemyContainer) enemyContainer.style.display = 'none';
         this.updateButtons(); 
     }, 
     clearMonsterList() { 
@@ -3068,9 +3121,13 @@ const EquipmentManager = {
             zoneId: zoneTier
         }; 
 
-        const monsterInfo = ui.tabContentCombat.querySelector('#monster-info'); 
-        monsterInfo.querySelector('#monster-name').textContent = this.currentMonster.name; 
-        monsterInfo.classList.remove('invisible');
+        // Show the enemy stats container and populate the monster data
+        const enemyContainer = ui.tabContentCombat.querySelector('#enemy-stats-container');
+        const monsterNameEl = ui.tabContentCombat.querySelector('#monster-name');
+        if (enemyContainer && monsterNameEl) {
+            enemyContainer.style.display = 'block';
+            monsterNameEl.textContent = this.currentMonster.name;
+        }
         this.updateEnemyUI();
         this.engage(true); 
     }, 
@@ -3078,14 +3135,9 @@ const EquipmentManager = {
         if (!this.currentMonster) return;
     
         const defeatedMsg = document.getElementById('enemy-defeated-msg');
-        const monsterName = document.getElementById('monster-name');
-        const hpBar = document.getElementById('monster-hp-bar').parentElement;
-        const hpText = document.getElementById('monster-hp-text');
-    
-        defeatedMsg.style.display = 'none';
-        monsterName.style.display = 'block';
-        hpBar.style.display = 'block';
-        hpText.style.display = 'block';
+        
+        // Hide defeated message since we're starting combat
+        if (defeatedMsg) defeatedMsg.style.display = 'none';
     
         if (isInitialSetup) {
             this.updateButtons();
@@ -3150,15 +3202,10 @@ const EquipmentManager = {
             ItemManager.progressShadowItems();
 
             const defeatedMsg = document.getElementById('enemy-defeated-msg');
-            const monsterName = document.getElementById('monster-name');
-            const hpBar = document.getElementById('monster-hp-bar').parentElement;
-            const hpText = document.getElementById('monster-hp-text');
             
+            // Show defeated message in the integrated layout
             setTimeout(() => {
-                defeatedMsg.style.display = 'block';
-                monsterName.style.display = 'none';
-                hpBar.style.display = 'none';
-                hpText.style.display = 'none';
+                if (defeatedMsg) defeatedMsg.style.display = 'block';
             }, 750);
 
             let xpReward = enemy.xpValue;
@@ -3228,7 +3275,7 @@ const EquipmentManager = {
         if (this.currentMonster && monsterHpText && monsterHpBar) {
             const hpPercent = (this.currentMonster.hp / this.currentMonster.maxHp) * 100;
             monsterHpBar.style.width = `${hpPercent}%`;
-            monsterHpText.textContent = `Enemy Health: ${Math.ceil(this.currentMonster.hp)} / ${Math.ceil(this.currentMonster.maxHp)}`;
+            monsterHpText.textContent = `${Math.ceil(this.currentMonster.hp)} / ${Math.ceil(this.currentMonster.maxHp)}`;
         }
     },
     updateCombatInfoPanel(loot = {}) { 
