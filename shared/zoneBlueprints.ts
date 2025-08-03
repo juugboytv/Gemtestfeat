@@ -47,10 +47,15 @@ export const ZONE_BLUEPRINTS: Record<string, ZoneBlueprint> = {
     features: [
       { type: "Sanctuary", q: 0, r: 0 },
       { type: "Armory", q: -2, r: 2 },
+      { type: "Arcanum", q: 2, r: 1 },
+      { type: "AetheriumConduit", q: -1, r: 2 },
       { type: "Teleporter", q: 3, r: -1 },
       { type: "Monster Zone", q: -1, r: -2 },
       { type: "Monster Zone", q: 1, r: 1 },
       { type: "Monster Zone", q: 2, r: -2 },
+      { type: "Monster Zone", q: 1, r: -1 },
+      { type: "Monster Zone", q: -2, r: 0 },
+      { type: "Monster Zone", q: 0, r: 2 },
       { type: "Resource Node", q: -3, r: 1, name: "Moonwell Spring" }
     ]
   },
@@ -62,11 +67,14 @@ export const ZONE_BLUEPRINTS: Record<string, ZoneBlueprint> = {
     difficulty: 3,
     features: [
       { type: "Sanctuary", q: -1, r: -1 },
+      { type: "Armory", q: -2, r: 0 },
       { type: "Arcanum", q: 2, r: -1 },
       { type: "AetheriumConduit", q: 0, r: 2 },
       { type: "Teleporter", q: -2, r: 2 },
       { type: "Monster Zone", q: 1, r: 0 },
       { type: "Monster Zone", q: 0, r: -1 },
+      { type: "Monster Zone", q: 2, r: 0 },
+      { type: "Monster Zone", q: 0, r: -2 },
       { type: "Boss Arena", q: 1, r: 1, name: "Magma Lord's Chamber" }
     ]
   },
@@ -79,10 +87,15 @@ export const ZONE_BLUEPRINTS: Record<string, ZoneBlueprint> = {
     features: [
       { type: "Sanctuary", q: 2, r: -2 },
       { type: "Armory", q: -1, r: 0 },
+      { type: "Arcanum", q: 1, r: 2 },
+      { type: "AetheriumConduit", q: -2, r: 2 },
       { type: "Teleporter", q: 0, r: 3 },
       { type: "Monster Zone", q: -2, r: 1 },
       { type: "Monster Zone", q: 1, r: -1 },
       { type: "Monster Zone", q: 0, r: -2 },
+      { type: "Monster Zone", q: 2, r: 0 },
+      { type: "Monster Zone", q: -1, r: -1 },
+      { type: "Monster Zone", q: 0, r: 1 },
       { type: "Resource Node", q: -2, r: 3, name: "Eternal Ice" }
     ]
   },
@@ -94,12 +107,16 @@ export const ZONE_BLUEPRINTS: Record<string, ZoneBlueprint> = {
     difficulty: 5,
     features: [
       { type: "Sanctuary", q: -3, r: 0 },
+      { type: "Armory", q: 2, r: -1 },
       { type: "Arcanum", q: 2, r: 1 },
       { type: "AetheriumConduit", q: 0, r: -3 },
       { type: "Teleporter", q: 3, r: -2 },
       { type: "Monster Zone", q: -1, r: 2 },
       { type: "Monster Zone", q: 1, r: -2 },
       { type: "Monster Zone", q: 0, r: 1 },
+      { type: "Monster Zone", q: -2, r: 1 },
+      { type: "Monster Zone", q: 1, r: 0 },
+      { type: "Monster Zone", q: 0, r: -1 },
       { type: "Boss Arena", q: -1, r: -1, name: "Shadow Nexus" }
     ]
   },

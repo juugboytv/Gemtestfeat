@@ -5422,6 +5422,11 @@ const InfusionManager = {
             const activeQuestsContainer = document.getElementById('active-quests');
             const streakContainer = document.getElementById('quest-streak-container');
 
+            if (!activeQuestsContainer) {
+                console.warn('Quest container not found, skipping quest log update');
+                return;
+            }
+
             if (!p.activeQuests || p.activeQuests.length === 0) {
                 activeQuestsContainer.innerHTML = '<p class="text-gray-500">No active quests. Level up to find new adventures!</p>';
             } else {
