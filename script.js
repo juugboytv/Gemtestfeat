@@ -1819,7 +1819,42 @@ const EquipmentManager = {
             this.grid.get('2,0').feature = { name: 'Bank', icon: '🏧' }; 
             this.grid.get('-2,0').feature = { name: 'Sanctuary', icon: '🆘' }; 
             this.grid.get('0,2').feature = { name: 'Teleport Zone', icon: '🌀' }; 
-        }, movePlayer(dq, dr) { const newQ = this.playerPos.q + dq; const newR = this.playerPos.r + dr; if (this.grid.has(`${newQ},${newR}`)) { this.playerPos.q = newQ; this.playerPos.r = newR; this.draw(); this.updateInteractButton(); const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); if (currentHex && currentHex.feature && currentHex.feature.name === 'Monster Zone') { CombatManager.populateMonsterList(state.game.currentZoneTier); } else { CombatManager.clearMonsterList(); } } }, updateInteractButton() { const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); const interactKey = document.getElementById('key-interact'); if (currentHex && currentHex.feature && currentHex.feature.name !== 'Monster Zone') { interactKey.textContent = `Enter`; interactKey.style.fontSize = '14px'; } else { interactKey.textContent = 'Interact'; interactKey.style.fontSize = '16px'; } }, handleInteraction() { const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); if (currentHex && currentHex.feature) { if (currentHex.feature.name === 'Weapons/Combat Shop') { ShopManager.openShop('armory'); } else if (currentHex.feature.name === 'Magic/Accessories Shop') { ShopManager.openShop('magic'); } else if (currentHex.feature.name === 'Bank') { BankManager.openBank(); } else if (currentHex.feature.name === 'Sanctuary') { ProfileManager.healPlayer(); } else if (currentHex.feature.name === 'Teleport Zone') { TeleportManager.showModal(); } } }, draw() { const canvas = ui.miniMapCanvas; this.ctx.clearRect(0, 0, canvas.width, canvas.height); const centerX = canvas.width / 2; const centerY = canvas.height / 2; this.grid.forEach(hex => { const relQ = hex.q - this.playerPos.q; const relR = hex.r - this.playerPos.r; const {x, y} = HexUtils.hexToPixel(relQ, relR, this.hexSize); this.drawHex(centerX + x, centerY + y, this.hexSize, hex.feature); }); this.drawPlayer(centerX, centerY); }, drawHex(cx, cy, size, feature) { this.ctx.beginPath(); for (let i = 0; i < 6; i++) { const angle = 2 * Math.PI / 6 * (i + 0.5); const x = cx + size * Math.cos(angle); const y = cy + size * Math.sin(angle); if (i === 0) this.ctx.moveTo(x, y); else this.ctx.lineTo(x, y); } this.ctx.closePath(); this.ctx.fillStyle = 'rgba(10, 10, 10, 0.5)'; this.ctx.fill(); this.ctx.strokeStyle = 'rgba(249, 115, 22, 0.3)'; this.ctx.lineWidth = 1.5; this.ctx.stroke(); if (feature) { this.ctx.font = `${size * 1.5}px sans-serif`; this.ctx.textAlign = 'center'; this.ctx.textBaseline = 'middle'; this.ctx.fillText(feature.icon, cx, cy); } }, drawPlayer(cx, cy) { this.ctx.font = `${this.hexSize * 1.5}px sans-serif`; this.ctx.textAlign = 'center'; this.ctx.textBaseline = 'middle'; this.ctx.fillText('🟠', cx, cy); } };
+        }, movePlayer(dq, dr) { const newQ = this.playerPos.q + dq; const newR = this.playerPos.r + dr; if (this.grid.has(`${newQ},${newR}`)) { this.playerPos.q = newQ; this.playerPos.r = newR; this.draw(); this.updateInteractButton(); const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); if (currentHex && currentHex.feature && currentHex.feature.name === 'Monster Zone') { CombatManager.populateMonsterList(state.game.currentZoneTier); } else { CombatManager.clearMonsterList(); } } }, updateInteractButton() { const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); const interactKey = document.getElementById('key-interact'); if (currentHex && currentHex.feature && currentHex.feature.name !== 'Monster Zone') { interactKey.textContent = `Enter`; interactKey.style.fontSize = '14px'; } else { interactKey.textContent = 'Interact'; interactKey.style.fontSize = '16px'; } }, handleInteraction() { const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); if (currentHex && currentHex.feature) { if (currentHex.feature.name === 'Weapons/Combat Shop') { ShopManager.openShop('armory'); } else if (currentHex.feature.name === 'Magic/Accessories Shop') { ShopManager.openShop('magic'); } else if (currentHex.feature.name === 'Bank') { BankManager.openBank(); } else if (currentHex.feature.name === 'Sanctuary') { ProfileManager.healPlayer(); } else if (currentHex.feature.name === 'Teleport Zone') { TeleportManager.showModal(); } } }, draw() { const canvas = ui.miniMapCanvas; this.ctx.clearRect(0, 0, canvas.width, canvas.height); const centerX = canvas.width / 2; const centerY = canvas.height / 2; this.grid.forEach(hex => { const relQ = hex.q - this.playerPos.q; const relR = hex.r - this.playerPos.r; const {x, y} = HexUtils.hexToPixel(relQ, relR, this.hexSize); this.drawHex(centerX + x, centerY + y, this.hexSize, hex.feature); }); this.drawPlayer(centerX, centerY); }, drawHex(cx, cy, size, feature) { 
+            this.ctx.beginPath(); 
+            for (let i = 0; i < 6; i++) { 
+                const angle = 2 * Math.PI / 6 * (i + 0.5); 
+                const x = cx + size * Math.cos(angle); 
+                const y = cy + size * Math.sin(angle); 
+                if (i === 0) this.ctx.moveTo(x, y); 
+                else this.ctx.lineTo(x, y); 
+            } 
+            this.ctx.closePath(); 
+            
+            // Different hex colors based on current zone for visual variety
+            const zoneColors = [
+                'rgba(10, 10, 10, 0.5)',     // Default
+                'rgba(0, 50, 100, 0.5)',     // Zone 1: Blue (Crystal Caves)
+                'rgba(0, 100, 50, 0.5)',     // Zone 2: Green (Whispering Woods)  
+                'rgba(100, 30, 0, 0.5)',     // Zone 3: Red (Ember Peaks)
+                'rgba(50, 100, 200, 0.5)',   // Zone 4: Light Blue (Frost Hollow)
+                'rgba(50, 50, 100, 0.5)'     // Zone 5: Purple (Shadowmere Swamp)
+            ];
+            
+            const colorIndex = Math.min(this.currentZoneId || 0, zoneColors.length - 1);
+            this.ctx.fillStyle = zoneColors[colorIndex];
+            this.ctx.fill(); 
+            this.ctx.strokeStyle = 'rgba(249, 115, 22, 0.3)'; 
+            this.ctx.lineWidth = 1.5; 
+            this.ctx.stroke(); 
+            
+            if (feature) { 
+                this.ctx.font = `${size * 1.5}px sans-serif`; 
+                this.ctx.textAlign = 'center'; 
+                this.ctx.textBaseline = 'middle'; 
+                this.ctx.fillStyle = 'white';
+                this.ctx.fillText(feature.icon, cx, cy); 
+            } 
+        }, drawPlayer(cx, cy) { this.ctx.font = `${this.hexSize * 1.5}px sans-serif`; this.ctx.textAlign = 'center'; this.ctx.textBaseline = 'middle'; this.ctx.fillText('🟠', cx, cy); } };
     const BankManager = { isInitialized: false, init() { if (this.isInitialized) return; this.isInitialized = true; }, openBank() { this.renderBankUI(); }, renderBankUI() { const contentHTML = ` <div id="bank-content" class="p-4 text-center"> <div class="grid grid-cols-2 gap-4 mb-4 text-lg"> <div> <div class="text-sm text-gray-400 font-orbitron">Your Gold</div> <div id="bank-player-gold" class="font-bold text-yellow-400 font-orbitron">${state.player.gold.toLocaleString()}</div> </div> <div> <div class="text-sm text-gray-400 font-orbitron">Banked Gold</div> <div id="bank-vault-gold" class="font-bold text-yellow-400 font-orbitron">${state.player.bankGold.toLocaleString()}</div> </div> </div> <input type="number" id="bank-amount-input" class="w-full p-2 rounded text-lg text-black bg-gray-200" placeholder="Enter amount..."> <div class="grid grid-cols-2 gap-2 mt-4"> <button id="bank-deposit-btn" class="glass-button py-2 rounded-md">Deposit</button> <button id="bank-withdraw-btn" class="glass-button py-2 rounded-md">Withdraw</button> </div> </div> `; ModalManager.show('Bank Vault', contentHTML, { onContentReady: (contentDiv) => { contentDiv.querySelector('#bank-deposit-btn').addEventListener('click', () => this.handleTransaction('deposit')); contentDiv.querySelector('#bank-withdraw-btn').addEventListener('click', () => this.handleTransaction('withdraw')); } }); }, handleTransaction(type) { const input = document.getElementById('bank-amount-input'); const amount = parseInt(input.value); if (isNaN(amount) || amount <= 0) { showToast("Please enter a valid amount.", true); return; } if (type === 'deposit') { if (amount > state.player.gold) { showToast("You don't have enough gold to deposit.", true); return; } state.player.gold -= amount; state.player.bankGold += amount; showToast(`Deposited ${amount.toLocaleString()} gold.`); } else if (type === 'withdraw') { if (amount > state.player.bankGold) { showToast("You don't have enough gold in the bank.", true); return; } state.player.bankGold -= amount; state.player.gold += amount; showToast(`Withdrew ${amount.toLocaleString()} gold.`); } input.value = ''; ProfileManager.updateAllProfileUI(); document.getElementById('bank-player-gold').textContent = state.player.gold.toLocaleString(); document.getElementById('bank-vault-gold').textContent = state.player.bankGold.toLocaleString(); } };
     const ShopManager = { isInitialized: false, init() { if (this.isInitialized) return; this.isInitialized = true; }, openShop(shopType) { const contentHTML = ` <div class="p-4 text-center"> <h3 class="font-orbitron text-lg mb-2">Welcome to the ${shopType} Shop!</h3> <p class="text-gray-400">Shop functionality is not yet implemented.</p> <div class="mt-4"> <div class="shop-item-row"> <span>Item Name</span> <span>Description</span> <span>Price</span> </div> <div class="shop-item-row"> <span>Placeholder Item</span> <span>A nice placeholder.</span> <span class="text-yellow-400">100g</span> </div> </div> </div> `; ModalManager.show(`${shopType.charAt(0).toUpperCase() + shopType.slice(1)} Shop`, contentHTML); } };
     
@@ -1873,7 +1908,12 @@ const EquipmentManager = {
                 
                 // Check if there's a blueprint for this zone and use its name instead
                 const blueprint = WorldMapManager.getZoneBlueprint(zone.id);
-                const displayName = blueprint ? blueprint.name : zone.name;
+                let displayName;
+                if (parseInt(zone.id) <= 5 && blueprint) {
+                    displayName = blueprint.name;
+                } else {
+                    displayName = blueprint ? blueprint.name : zone.name;
+                }
                 
                 return `
                     <li class="${!isUnlocked ? 'disabled' : ''} font-orbitron" data-zone-id="${zone.id}" title="${isUnlocked ? displayName : `Requires Level ${zone.levelReq}`}">
@@ -1889,6 +1929,7 @@ const EquipmentManager = {
             state.game.currentZoneTier = parseInt(zoneId);
             
             // Load new zone blueprint and reset player position
+            WorldMapManager.currentZoneId = parseInt(zoneId);  // Update current zone
             WorldMapManager.loadZoneBlueprint(parseInt(zoneId));
             WorldMapManager.playerPos = { q: 0, r: 0 };
             WorldMapManager.draw();
@@ -1902,14 +1943,21 @@ const EquipmentManager = {
             }
             
             const blueprint = WorldMapManager.getZoneBlueprint(zoneId);
-            const zoneName = blueprint ? blueprint.name : zone.name;
+            
+            // Force use blueprint names for first 5 zones
+            let zoneName;
+            if (parseInt(zoneId) <= 5 && blueprint) {
+                zoneName = blueprint.name;
+            } else {
+                zoneName = blueprint ? blueprint.name : zone.name;
+            }
+            
             const gridInfo = blueprint ? ` (${blueprint.gridSize}x${blueprint.gridSize})` : '';
             
             console.log(`Teleporting to zone ${zoneId}: ${zoneName}${gridInfo}`);
             console.log('Blueprint found:', blueprint ? 'YES' : 'NO');
-            if (blueprint) {
-                console.log('Blueprint details:', blueprint);
-            }
+            console.log('Using zone name:', zoneName);
+            
             showToast(`Teleported to ${zoneName}${gridInfo}`, false);
             ProfileManager.updateAllProfileUI();
             
