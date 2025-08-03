@@ -1,5 +1,6 @@
-import { type User, type InsertUser, type Character, type InsertCharacter, type Item, type InsertItem } from "@shared/schema";
+import { type User, type InsertUser, type Character, type InsertCharacter, type Zone, type InsertZone } from "@shared/schema";
 import { drizzle } from 'drizzle-orm/postgres-js';
+import { eq } from 'drizzle-orm';
 import postgres from 'postgres';
 import * as schema from '../shared/schema';
 
@@ -20,18 +21,19 @@ export interface IStorage {
   createCharacter(character: InsertCharacter): Promise<Character>;
   updateCharacter(id: number, updates: Partial<Character>): Promise<Character | undefined>;
   
-  // Item management
-  getItem(id: number): Promise<Item | undefined>;
-  getItemsByCharacterId(characterId: number): Promise<Item[]>;
-  createItem(item: InsertItem): Promise<Item>;
-  updateItem(id: number, updates: Partial<Item>): Promise<Item | undefined>;
-  deleteItem(id: number): Promise<boolean>;
+  // Item management - simplified for now
+  // getItem(id: number): Promise<any>;
+  // createItem(item: any): Promise<any>;
+  
+  // Zone management
+  getAllZones(): Promise<Zone[]>;
+  getZone(id: number): Promise<Zone | undefined>;
 }
 
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private characters: Map<number, Character>;
-  private items: Map<number, Item>;
+  private zones: Map<number, Zone>;
   private nextUserId: number = 1;
   private nextCharacterId: number = 1;
   private nextItemId: number = 1;
@@ -39,7 +41,7 @@ export class MemStorage implements IStorage {
   constructor() {
     this.users = new Map();
     this.characters = new Map();
-    this.items = new Map();
+    this.zones = new Map();
   }
 
   // User methods
@@ -101,39 +103,26 @@ export class MemStorage implements IStorage {
     return updatedCharacter;
   }
 
-  // Item methods
-  async getItem(id: number): Promise<Item | undefined> {
-    return this.items.get(id);
+  // Item methods removed for now - focus on zone functionality
+
+  // Zone methods - use database for production
+  async getAllZones(): Promise<Zone[]> {
+    if (process.env.NODE_ENV === 'development') {
+      // In development, fetch from database
+      return await db.select().from(schema.zones);
+    }
+    // Fallback to memory storage (should not be used in production)
+    return Array.from(this.zones.values());
   }
 
-  async getItemsByCharacterId(characterId: number): Promise<Item[]> {
-    return Array.from(this.items.values()).filter(
-      (item) => item.characterId === characterId,
-    );
-  }
-
-  async createItem(insertItem: InsertItem): Promise<Item> {
-    const id = this.nextItemId++;
-    const item: Item = {
-      id,
-      ...insertItem,
-      createdAt: new Date(),
-    };
-    this.items.set(id, item);
-    return item;
-  }
-
-  async updateItem(id: number, updates: Partial<Item>): Promise<Item | undefined> {
-    const item = this.items.get(id);
-    if (!item) return undefined;
-    
-    const updatedItem: Item = { ...item, ...updates };
-    this.items.set(id, updatedItem);
-    return updatedItem;
-  }
-
-  async deleteItem(id: number): Promise<boolean> {
-    return this.items.delete(id);
+  async getZone(id: number): Promise<Zone | undefined> {
+    if (process.env.NODE_ENV === 'development') {
+      // In development, fetch from database
+      const result = await db.select().from(schema.zones).where(eq(schema.zones.zoneId, id)).limit(1);
+      return result[0];
+    }
+    // Fallback to memory storage
+    return this.zones.get(id);
   }
 }
 
