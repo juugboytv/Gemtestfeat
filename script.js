@@ -1775,10 +1775,29 @@ const EquipmentManager = {
             window.testFeatureMapping = () => {
                 console.log('=== Feature Mapping Test ===');
                 const testFeatures = ['Bank', 'Armory', 'Arcanum', 'Revive Station', 'Gem Crucible', 'Teleporter', 'Sanctuary'];
+                console.log('Expected feature display:');
                 testFeatures.forEach(type => {
                     const info = WorldMapManager.getFeatureInfo(type);
-                    console.log(`${type} -> ${info.name} (${info.icon})`);
+                    console.log(`${type} -> Emoji: ${info.icon} | Fallback: ${info.fallback} | Color: ${info.color}`);
                 });
+            };
+            
+            window.testCanvasEmoji = () => {
+                console.log('=== Canvas Emoji Test ===');
+                const canvas = document.createElement('canvas');
+                canvas.width = 100;
+                canvas.height = 100;
+                const ctx = canvas.getContext('2d');
+                
+                const testEmojis = ['🏧', '⚔️', '🔮', '🆘', '💎', '🌀', '🏠'];
+                testEmojis.forEach((emoji, i) => {
+                    ctx.font = '20px "Noto Color Emoji", "Apple Color Emoji", "Segoe UI Emoji", system-ui, sans-serif';
+                    ctx.fillStyle = 'white';
+                    ctx.fillText(emoji, 10, 20 + (i * 10));
+                });
+                
+                document.body.appendChild(canvas);
+                console.log('Canvas with emojis added to page for visual test');
             };
             
             window.testZoneColors = () => {
@@ -1928,28 +1947,28 @@ const EquipmentManager = {
             };
         },
         
-        // Map feature types to display information
+        // Map feature types to display information with reliable fallbacks
         getFeatureInfo(featureType) {
             const featureMap = {
                 // Core 6 features - must match server-side generation exactly
-                'Bank': { name: 'Bank', icon: '🏧' },                        // 🏧 ATM
-                'Armory': { name: 'Weapons/Combat Shop', icon: '⚔️' },       // ⚔️ Weapon shop  
-                'Arcanum': { name: 'Magic/Accessories Shop', icon: '🔮' },   // 🔮 Spell shop
-                'Revive Station': { name: 'Revive Station', icon: '🆘' },    // 🆘 SOS revive station
-                'Gem Crucible': { name: 'Gem Crucible', icon: '💎' },        // 💎 Gem shop
-                'Teleporter': { name: 'Teleport Zone', icon: '🌀' },         // 🌀 Zone teleporter
+                'Bank': { name: 'Bank', icon: '🏧', fallback: '$', color: '#FFC107' },                        
+                'Armory': { name: 'Weapons/Combat Shop', icon: '⚔️', fallback: 'W', color: '#F44336' },       
+                'Arcanum': { name: 'Magic/Accessories Shop', icon: '🔮', fallback: 'M', color: '#9C27B0' },   
+                'Revive Station': { name: 'Revive Station', icon: '🆘', fallback: '+', color: '#4CAF50' },    
+                'Gem Crucible': { name: 'Gem Crucible', icon: '💎', fallback: 'G', color: '#00BCD4' },        
+                'Teleporter': { name: 'Teleport Zone', icon: '🌀', fallback: 'T', color: '#2196F3' },         
                 
                 // Additional features
-                'Sanctuary': { name: 'Sanctuary', icon: '🏠' },              // Home base
-                'Monster Zone': { name: 'Monster Zone', icon: '◻️' },
-                'Resource Node': { name: 'Resource Node', icon: '⛏️' },
-                'Boss Arena': { name: 'Boss Arena', icon: '👑' },
+                'Sanctuary': { name: 'Sanctuary', icon: '🏠', fallback: 'H', color: '#FFEB3B' },              
+                'Monster Zone': { name: 'Monster Zone', icon: '◻️', fallback: '•', color: '#757575' },
+                'Resource Node': { name: 'Resource Node', icon: '⛏️', fallback: 'R', color: '#795548' },
+                'Boss Arena': { name: 'Boss Arena', icon: '👑', fallback: 'B', color: '#FF9800' },
                 
                 // Legacy mappings for backward compatibility
-                'AetheriumConduit': { name: 'Bank', icon: '🏧' },
-                'Gem Node': { name: 'Gem Crucible', icon: '💎' }
+                'AetheriumConduit': { name: 'Bank', icon: '🏧', fallback: '$', color: '#FFC107' },
+                'Gem Node': { name: 'Gem Crucible', icon: '💎', fallback: 'G', color: '#00BCD4' }
             };
-            return featureMap[featureType] || { name: featureType, icon: '❓' };
+            return featureMap[featureType] || { name: featureType, icon: '❓', fallback: '?', color: '#F44336' };
         },
         
         // Fallback to old static grid (for compatibility)
@@ -2016,26 +2035,32 @@ const EquipmentManager = {
             this.ctx.stroke(); 
             
             if (feature) { 
-                // Use fallback text rendering if emoji fails
                 this.ctx.textAlign = 'center'; 
                 this.ctx.textBaseline = 'middle'; 
-                this.ctx.fillStyle = 'white';
                 
-                // Try different font approaches for better emoji support
+                // Get the complete feature info including fallback
+                const fullFeatureInfo = this.getFeatureInfo(feature.type || 'Unknown');
+                
+                // First try to render emoji
                 const fontSize = Math.max(12, size * 1.2);
                 this.ctx.font = `${fontSize}px "Noto Color Emoji", "Apple Color Emoji", "Segoe UI Emoji", system-ui, sans-serif`;
                 
-                // Debug and render the feature icon
-                const iconToRender = feature.icon || '?';
-                if (iconToRender === '❓' || iconToRender === '?' || !feature.icon) {
-                    // Use text fallback for failed icons
-                    this.ctx.font = `${Math.max(8, size * 0.8)}px Arial, sans-serif`;
-                    this.ctx.fillStyle = 'yellow';
-                    const fallbackText = (feature.type || feature.name || 'UNK').substring(0, 3);
-                    this.ctx.fillText(fallbackText, cx, cy);
-                    console.log(`Using text fallback for feature:`, feature, `-> "${fallbackText}"`);
+                // Create a test to see if emoji renders properly
+                const testCanvas = document.createElement('canvas');
+                const testCtx = testCanvas.getContext('2d');
+                testCtx.font = this.ctx.font;
+                const emojiWidth = testCtx.measureText(fullFeatureInfo.icon).width;
+                
+                // If emoji doesn't render properly (width is 0 or very small), use fallback
+                if (emojiWidth < 5 || fullFeatureInfo.icon === '❓') {
+                    // Use reliable text fallback with color coding
+                    this.ctx.font = `bold ${Math.max(10, size * 1.0)}px Arial, sans-serif`;
+                    this.ctx.fillStyle = fullFeatureInfo.color || '#FFFFFF';
+                    this.ctx.fillText(fullFeatureInfo.fallback || '?', cx, cy);
                 } else {
-                    this.ctx.fillText(iconToRender, cx, cy);
+                    // Use emoji
+                    this.ctx.fillStyle = 'white';
+                    this.ctx.fillText(fullFeatureInfo.icon, cx, cy);
                 }
             } 
         }, drawPlayer(cx, cy) { this.ctx.font = `${this.hexSize * 1.5}px sans-serif`; this.ctx.textAlign = 'center'; this.ctx.textBaseline = 'middle'; this.ctx.fillText('🟠', cx, cy); } };
