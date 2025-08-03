@@ -3245,7 +3245,7 @@ const EquipmentManager = {
             
             // Enemy defeated - no animation delay
             
-            ItemManager.progressShadowItems();
+            // TODO: Add item drop system here
 
             const defeatedMsg = document.getElementById('enemy-defeated-msg');
             
@@ -3270,8 +3270,8 @@ const EquipmentManager = {
 
             ProfileManager.addXp(xpReward); 
             ProfileManager.addGold(goldReward); 
-            const loot = ItemManager.generateAndAwardLoot(state.game.currentZoneTier, enemy.guaranteedDrop); 
-            this.updateCombatInfoPanel(loot); 
+            // TODO: Add loot generation system here
+            this.updateCombatInfoPanel([]); 
             this.endCombat(); 
         } else { 
             // Enemy counter-attack - immediate response
