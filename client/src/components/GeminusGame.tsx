@@ -642,6 +642,76 @@ export default function GeminusGame() {
                         );
                       })}
 
+                      {/* Sort & Filter Gems */}
+                      <div className="stat-accordion-item open mb-2">
+                        <button className="stat-accordion-header">
+                          <h3 className="flex items-center">
+                            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4h13M3 8h9M3 12h9m-9 4h6"></path>
+                            </svg>
+                            Sort & Filter Gems
+                          </h3>
+                          <svg className="accordion-arrow w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                          </svg>
+                        </button>
+                        <div className="stat-accordion-content !p-2">
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                            <div>
+                              <label className="text-xs text-gray-400">Category</label>
+                              <select className="editor-input !w-full !text-xs">
+                                <option value="All">All</option>
+                                <option value="Spell">Spell</option>
+                                <option value="Melee">Melee</option>
+                                <option value="Ranged">Ranged</option>
+                                <option value="Defense">Defense</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="text-xs text-gray-400">Element</label>
+                              <select className="editor-input !w-full !text-xs">
+                                <option value="All">All</option>
+                                <option value="Fire">Fire</option>
+                                <option value="Air">Air</option>
+                                <option value="Earth">Earth</option>
+                                <option value="Cold">Cold</option>
+                                <option value="Death">Death</option>
+                                <option value="Arcane">Arcane</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="text-xs text-gray-400">Grade</label>
+                              <select className="editor-input !w-full !text-xs">
+                                <option value="All">All Grades</option>
+                                <option value="1">Grade 1</option>
+                                <option value="2">Grade 2</option>
+                                <option value="3">Grade 3</option>
+                                <option value="4">Grade 4</option>
+                                <option value="5">Grade 5</option>
+                              </select>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 mt-2 border-t border-gray-700 pt-2">
+                            <div>
+                              <label className="text-xs text-gray-400">Sort By</label>
+                              <select className="editor-input !w-full !text-xs">
+                                <option value="grade">Grade</option>
+                                <option value="name">Name</option>
+                                <option value="category">Category</option>
+                                <option value="element">Element</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="text-xs text-gray-400">Order</label>
+                              <select className="editor-input !w-full !text-xs">
+                                <option value="desc">Descending</option>
+                                <option value="asc">Ascending</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
                       {/* Gem Pouch */}
                       <div className="stat-accordion-item open">
                         <button className="stat-accordion-header">
@@ -824,12 +894,12 @@ export default function GeminusGame() {
                   </div>
                 )}
 
-                {/* Focus Mode Button */}
+                {/* Focus Mode Button - Fixed positioning to prevent disappearing */}
                 <button 
                   id="focus-mode-btn"
                   onClick={toggleFocusMode}
                   title="Toggle Focus Mode"
-                  className="absolute bottom-2 right-2 w-8 h-8 rounded-full bg-red-500 border border-white/30 flex items-center justify-center cursor-pointer transition-colors hover:bg-red-600 z-50"
+                  className="fixed bottom-4 right-4 w-10 h-10 rounded-full bg-red-500 border border-white/30 flex items-center justify-center cursor-pointer transition-colors hover:bg-red-600 z-[999] shadow-lg"
                 >
                   {gameState.focusMode ? (
                     <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
