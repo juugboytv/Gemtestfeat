@@ -2163,8 +2163,17 @@ const EquipmentManager = {
                 
                 console.log(`Mapped to: "${displayChar}" with color ${displayColor}`);
                 
-                // Use simple, reliable font for text characters
-                this.ctx.font = `bold ${Math.max(12, size * 1.2)}px Arial, sans-serif`;
+                // Set font - different handling for emojis vs text
+                const isEmoji = displayChar.length > 1 || /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/u.test(displayChar);
+                
+                if (isEmoji) {
+                    // For emojis, use larger size and system font
+                    this.ctx.font = `${Math.max(16, size * 1.4)}px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Android Emoji", sans-serif`;
+                } else {
+                    // For text characters, use bold Arial
+                    this.ctx.font = `bold ${Math.max(12, size * 1.2)}px Arial, sans-serif`;
+                }
+                
                 this.ctx.fillStyle = displayColor;
                 this.ctx.textAlign = 'center';
                 this.ctx.textBaseline = 'middle';
