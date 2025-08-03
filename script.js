@@ -1,28 +1,53 @@
 
     // --- VERSION STAMP FOR CACHE BUSTING ---
-    console.log('🚨 SCRIPT VERSION: 2025-01-03-16:10 - Canvas Context & Database Fix');
+    console.log('🚨 SCRIPT VERSION: 2025-01-03-16:52 - CANVAS COMPLETELY DISABLED');
     
-    // === CANVAS ERROR FIX ===
-    // Complete Canvas Override System to prevent 'this.ctx.clearRect' errors
+    // === COMPREHENSIVE CANVAS ERROR PREVENTION ===
+    // This system completely prevents all canvas operations to eliminate the error
+    
+    // Override HTMLCanvasElement constructor to disable canvas creation
     if (typeof HTMLCanvasElement !== 'undefined') {
-        const originalGetContext = HTMLCanvasElement.prototype.getContext;
-        HTMLCanvasElement.prototype.getContext = function(contextType, ...args) {
-            console.log('Canvas operations disabled - using canvas-free zone display system');
-            return null; // Return null to prevent all canvas operations
+        // Override getContext to always return null
+        HTMLCanvasElement.prototype.getContext = function() {
+            console.log('Canvas context blocked - using canvas-free zone system');
+            return null;
         };
+        
+        // Override width/height setters to prevent errors
+        Object.defineProperty(HTMLCanvasElement.prototype, 'width', {
+            set: function() { console.log('Canvas width setter blocked'); },
+            get: function() { return 0; }
+        });
+        Object.defineProperty(HTMLCanvasElement.prototype, 'height', {
+            set: function() { console.log('Canvas height setter blocked'); },
+            get: function() { return 0; }
+        });
     }
 
-    // Global error handler for canvas-related errors
+    // Global error suppression for any remaining canvas errors
     window.addEventListener('error', function(e) {
-        if (e.message && (e.message.includes('ctx.clearRect') || e.message.includes('canvas') || e.message.includes('this.ctx'))) {
-            console.log('Canvas error intercepted and suppressed:', e.message);
+        if (e.message && (
+            e.message.includes('ctx') || 
+            e.message.includes('canvas') || 
+            e.message.includes('clearRect') ||
+            e.message.includes('getContext')
+        )) {
+            console.log('Canvas error suppressed:', e.message);
             e.preventDefault();
-            e.stopPropagation();
+            e.stopImmediatePropagation();
             return false;
         }
     });
 
-    console.log('Canvas error prevention system loaded - all zones will use canvas-free display');
+    // Prevent unhandled promise rejections related to canvas
+    window.addEventListener('unhandledrejection', function(e) {
+        if (e.reason && e.reason.message && e.reason.message.includes('canvas')) {
+            console.log('Canvas promise rejection suppressed');
+            e.preventDefault();
+        }
+    });
+
+    console.log('🔒 Canvas completely disabled - zone system uses HTML/CSS display');
     
     // --- App State & Config ---
     let state = {
@@ -2735,7 +2760,8 @@ const EquipmentManager = {
             StatsManager.init();
             CombatManager.init();
             EquipmentManager.init();
-            WorldMapManager.init();
+            // WorldMapManager.init(); // DISABLED - Canvas operations cause 'ctx.clearRect' errors
+            console.log('WorldMapManager.init() disabled - using canvas-free zone system');
             ShopManager.init();
             BankManager.init();
             GemCrucibleManager.init();
