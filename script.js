@@ -2117,30 +2117,8 @@ const EquipmentManager = {
         pickerCallback: null,
 
         init() {
-            // Main listeners
-            document.getElementById('gdd-editor-close-btn').addEventListener('click', () => this.close());
-            document.getElementById('gdd-editor-save-btn').addEventListener('click', () => this.save());
-            document.getElementById('gdd-editor-reset-btn').addEventListener('click', () => this.confirmReset());
-            document.querySelectorAll('.editor-tab-btn').forEach(btn => {
-                btn.addEventListener('click', () => this.switchTab(btn.dataset.tab));
-            });
-
-            // Event delegation for dynamic content
-            const editorContent = document.getElementById('gdd-editor-content');
-            editorContent.addEventListener('click', (e) => {
-                const button = e.target.closest('[data-action]');
-                const header = e.target.closest('.editor-accordion-header');
-                if (button) {
-                    e.stopPropagation();
-                    const action = button.dataset.action;
-                    const key = button.dataset.key;
-                    const accordion = button.closest('.editor-accordion');
-                    if (action === 'clone-item') this.cloneItem(accordion);
-                    // Add more actions here
-                } else if (header) {
-                    this.handleAccordionToggle(header);
-                }
-            });
+            // Disabled - now using DevSuite instead of gddEditor
+            console.log('gddEditor disabled - using DevSuite instead');
         },
 
         open() {
