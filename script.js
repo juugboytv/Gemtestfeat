@@ -1639,7 +1639,11 @@ const EquipmentManager = {
             ui.miniMapCanvas.style.width = `${ui.miniMapContainer.clientWidth}px`; 
             ui.miniMapCanvas.style.height = `${ui.miniMapContainer.clientHeight}px`; 
             this.ctx = ui.miniMapCanvas.getContext('2d'); 
-            this.loadZoneBlueprint(this.currentZoneId);
+            
+            // Load blueprint for current zone (if any) or default to zone 1
+            const startingZone = state.game.currentZoneTier || 1;
+            console.log(`WorldMapManager initializing with zone ${startingZone}`);
+            this.loadZoneBlueprint(startingZone);
             this.updateInteractButton(); 
             this.draw(); 
         }, 
@@ -1686,7 +1690,8 @@ const EquipmentManager = {
                 }
             });
             
-            console.log(`Loaded zone blueprint: ${blueprint.name} (Zone ${zoneId}) - Grid Size: ${gridSize}`);
+            console.log(`Loaded zone blueprint: ${blueprint.name} (Zone ${zoneId}) - Grid Size: ${gridSize}`, blueprint.features);
+            showToast(`Zone Layout: ${blueprint.name} (${gridSize}x${gridSize} grid)`, false);
         },
         
         // Get zone blueprint data
@@ -1709,7 +1714,20 @@ const EquipmentManager = {
                     features: [
                         { type: "Sanctuary", q: 0, r: 0 },
                         { type: "Armory", q: -2, r: 2 },
-                        { type: "Teleporter", q: 3, r: -1 }
+                        { type: "Arcanum", q: 2, r: -3 },
+                        { type: "Teleporter", q: 3, r: -1 },
+                        { type: "AetheriumConduit", q: -3, r: 3 }
+                    ]
+                },
+                "3": {
+                    name: "Ember Peaks", 
+                    gridSize: 6,
+                    features: [
+                        { type: "Sanctuary", q: -1, r: -1 },
+                        { type: "Arcanum", q: 2, r: -1 },
+                        { type: "AetheriumConduit", q: 0, r: 2 },
+                        { type: "Teleporter", q: -2, r: 2 },
+                        { type: "Boss Arena", q: 1, r: 1, name: "Magma Lord's Chamber" }
                     ]
                 },
                 "25": {
@@ -1729,13 +1747,26 @@ const EquipmentManager = {
         // Generate basic blueprint for zones without custom layouts
         generateBasicBlueprint(zoneId) {
             const size = Math.min(10, Math.floor(3 + (zoneId / 25))); // Gradually increase size
+            const zoneNum = parseInt(zoneId);
+            
+            // Create more variety in auto-generated zones
+            const variations = [
+                { sanctuary: {q: 0, r: 0}, teleporter: {q: 2, r: -1}, armory: {q: -1, r: 2}, bank: {q: -2, r: 0} },
+                { sanctuary: {q: -1, r: 1}, teleporter: {q: 1, r: -2}, armory: {q: 2, r: 0}, bank: {q: 0, r: 2} },
+                { sanctuary: {q: 2, r: -1}, teleporter: {q: -2, r: 1}, armory: {q: 0, r: -2}, bank: {q: 1, r: 1} },
+                { sanctuary: {q: -2, r: 2}, teleporter: {q: 2, r: -2}, armory: {q: 0, r: 0}, bank: {q: -1, r: -1} }
+            ];
+            
+            const variation = variations[zoneNum % variations.length];
+            
             return {
-                name: `Zone ${zoneId}`,
+                name: `Auto Zone ${zoneId}`,
                 gridSize: size,
                 features: [
-                    { type: "Sanctuary", q: 0, r: 0 },
-                    { type: "Teleporter", q: 2, r: -1 },
-                    { type: "Armory", q: -1, r: 2 }
+                    { type: "Sanctuary", q: variation.sanctuary.q, r: variation.sanctuary.r },
+                    { type: "Teleporter", q: variation.teleporter.q, r: variation.teleporter.r },
+                    { type: "Armory", q: variation.armory.q, r: variation.armory.r },
+                    { type: "AetheriumConduit", q: variation.bank.q, r: variation.bank.r }
                 ]
             };
         },
@@ -1847,6 +1878,12 @@ const EquipmentManager = {
             const zoneName = blueprint ? blueprint.name : zone.name;
             showToast(`Teleported to ${zoneName} - New layout loaded!`);
             ProfileManager.updateAllProfileUI();
+            
+            // Force a complete redraw to ensure blueprint changes are visible
+            setTimeout(() => {
+                WorldMapManager.draw();
+            }, 100);
+            
             this.hideModal();
         }
     };
