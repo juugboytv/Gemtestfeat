@@ -105,21 +105,42 @@ export class GameLogicManager {
     return this.gameStates.get(playerId) || null;
   }
 
-  // Handle zone teleportation
-  teleportToZone(playerId: string, zoneId: number): { success: boolean; message: string; zoneData?: ZoneState } {
+  // Handle zone teleportation (prioritize database data)
+  async teleportToZone(playerId: string, zoneId: number): Promise<{ success: boolean; message: string; zoneData?: ZoneState }> {
     const gameState = this.gameStates.get(playerId);
     if (!gameState) {
       return { success: false, message: "Player not found" };
     }
 
-    const targetZone = gameState.zones[zoneId.toString()];
-    if (!targetZone) {
-      return { success: false, message: "Zone not found" };
+    // Get fresh zone data from database
+    const dbZoneData = await this.getZoneFromDatabase(zoneId);
+    if (!dbZoneData) {
+      return { success: false, message: "Zone not found in database" };
     }
+
+    // Convert database zone data to ZoneState format with all 6 buildings
+    const targetZone: ZoneState = {
+      id: dbZoneData.zone.zoneId,
+      name: dbZoneData.zone.name,
+      gridSize: dbZoneData.zone.gridSize,
+      features: dbZoneData.zone.features as Array<{ q: number; r: number; type: string; name?: string }>,
+      currentMonsters: dbZoneData.monsters.map(m => ({
+        id: m.monsterId,
+        hp: m.health,
+        maxHp: m.health,
+        name: m.name
+      }))
+    };
 
     // Update player's current zone and reset position
     gameState.player.currentZoneId = zoneId;
     gameState.player.position = { q: 0, r: 0 };
+    
+    // Update memory cache with fresh database data
+    gameState.zones[zoneId.toString()] = targetZone;
+
+    console.log(`Teleport: Zone ${zoneId} has ${targetZone.features.length} features:`, 
+                targetZone.features.map(f => f.type).join(', '));
 
     return {
       success: true,
@@ -171,12 +192,37 @@ export class GameLogicManager {
     }
   }
 
-  // Get current zone data
-  getCurrentZone(playerId: string): ZoneState | null {
+  // Get current zone data (prioritize database over memory)
+  async getCurrentZone(playerId: string): Promise<ZoneState | null> {
     const gameState = this.gameStates.get(playerId);
     if (!gameState) return null;
 
-    return gameState.zones[gameState.player.currentZoneId.toString()] || null;
+    const currentZoneId = gameState.player.currentZoneId;
+    
+    // Try to get fresh data from database first
+    const dbZoneData = await this.getZoneFromDatabase(currentZoneId);
+    if (dbZoneData) {
+      // Convert database zone data to ZoneState format
+      const zoneState: ZoneState = {
+        id: dbZoneData.zone.zoneId,
+        name: dbZoneData.zone.name,
+        gridSize: dbZoneData.zone.gridSize,
+        features: dbZoneData.zone.features as Array<{ q: number; r: number; type: string; name?: string }>,
+        currentMonsters: dbZoneData.monsters.map(m => ({
+          id: m.monsterId,
+          hp: m.health,
+          maxHp: m.health,
+          name: m.name
+        }))
+      };
+      
+      // Update memory cache
+      gameState.zones[currentZoneId.toString()] = zoneState;
+      return zoneState;
+    }
+
+    // Fallback to memory cache
+    return gameState.zones[currentZoneId.toString()] || null;
   }
 }
 

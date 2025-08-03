@@ -25,36 +25,51 @@ router.post('/api/game/seed-zones', async (req, res) => {
 });
 
 // Initialize player session
-router.post('/api/game/init', (req, res) => {
+router.post('/api/game/init', async (req, res) => {
   const playerId = (req.session as any)?.id || req.ip || 'default_player';
-  const gameState = gameLogic.initializePlayer(playerId);
   
-  res.json({
-    success: true,
-    playerId,
-    gameState: {
-      player: gameState.player,
-      currentZone: gameLogic.getCurrentZone(playerId)
-    }
-  });
+  try {
+    const gameState = gameLogic.initializePlayer(playerId);
+    const currentZone = await gameLogic.getCurrentZone(playerId);
+    
+    res.json({
+      success: true,
+      playerId,
+      gameState: {
+        player: gameState.player,
+        currentZone
+      }
+    });
+  } catch (error) {
+    console.error('Init error:', error);
+    res.status(500).json({ success: false, message: 'Internal server error during initialization' });
+  }
 });
 
 // Get current game state
-router.get('/api/game/state', (req, res) => {
+router.get('/api/game/state', async (req, res) => {
   const playerId = (req.session as any)?.id || req.ip || 'default_player';
-  const gameState = gameLogic.getGameState(playerId);
   
-  if (!gameState) {
-    return res.status(404).json({ success: false, message: 'Player not found' });
-  }
-
-  res.json({
-    success: true,
-    gameState: {
-      player: gameState.player,
-      currentZone: gameLogic.getCurrentZone(playerId)
+  try {
+    const gameState = gameLogic.getGameState(playerId);
+    
+    if (!gameState) {
+      return res.status(404).json({ success: false, message: 'Player not found' });
     }
-  });
+
+    const currentZone = await gameLogic.getCurrentZone(playerId);
+
+    res.json({
+      success: true,
+      gameState: {
+        player: gameState.player,
+        currentZone
+      }
+    });
+  } catch (error) {
+    console.error('Game state error:', error);
+    res.status(500).json({ success: false, message: 'Internal server error fetching game state' });
+  }
 });
 
 // Get available zones for teleportation
@@ -76,7 +91,7 @@ router.get('/api/game/zones', async (req, res) => {
 });
 
 // Teleport to a zone
-router.post('/api/game/teleport', (req, res) => {
+router.post('/api/game/teleport', async (req, res) => {
   const playerId = (req.session as any)?.id || req.ip || 'default_player';
   const { zoneId } = req.body;
   
@@ -84,17 +99,22 @@ router.post('/api/game/teleport', (req, res) => {
     return res.status(400).json({ success: false, message: 'Invalid zone ID' });
   }
 
-  const result = gameLogic.teleportToZone(playerId, parseInt(zoneId));
-  
-  if (result.success) {
-    res.json({
-      success: true,
-      message: result.message,
-      zoneData: result.zoneData,
-      playerPosition: { q: 0, r: 0 }
-    });
-  } else {
-    res.status(400).json({ success: false, message: result.message });
+  try {
+    const result = await gameLogic.teleportToZone(playerId, parseInt(zoneId));
+    
+    if (result.success) {
+      res.json({
+        success: true,
+        message: result.message,
+        zoneData: result.zoneData,
+        playerPosition: { q: 0, r: 0 }
+      });
+    } else {
+      res.status(400).json({ success: false, message: result.message });
+    }
+  } catch (error) {
+    console.error('Teleport error:', error);
+    res.status(500).json({ success: false, message: 'Internal server error during teleport' });
   }
 });
 
@@ -121,18 +141,24 @@ router.post('/api/game/move', (req, res) => {
 });
 
 // Get current zone details
-router.get('/api/game/current-zone', (req, res) => {
+router.get('/api/game/current-zone', async (req, res) => {
   const playerId = (req.session as any)?.id || req.ip || 'default_player';
-  const currentZone = gameLogic.getCurrentZone(playerId);
   
-  if (!currentZone) {
-    return res.status(404).json({ success: false, message: 'Current zone not found' });
-  }
+  try {
+    const currentZone = await gameLogic.getCurrentZone(playerId);
+    
+    if (!currentZone) {
+      return res.status(404).json({ success: false, message: 'Current zone not found' });
+    }
 
-  res.json({
-    success: true,
-    zone: currentZone
-  });
+    res.json({
+      success: true,
+      zone: currentZone
+    });
+  } catch (error) {
+    console.error('Current zone error:', error);
+    res.status(500).json({ success: false, message: 'Internal server error fetching current zone' });
+  }
 });
 
 export default router;
