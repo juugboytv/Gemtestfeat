@@ -1685,10 +1685,12 @@ const EquipmentManager = {
                 for (let r = -gridSize; r <= gridSize; r++) {
                     const s = -q - r;
                     if (s >= -gridSize && s <= gridSize) {
-                        // Default all hexes to Monster Zones
+                        // Default all hexes to Monster Zones with different icons per zone for visual variety
+                        const zoneIcons = ['◻️', '🔲', '⬜', '🟫', '🟪', '🟦'];
+                        const iconIndex = parseInt(zoneId) % zoneIcons.length;
                         this.grid.set(`${q},${r}`, { 
                             q, r, s, 
-                            feature: { name: 'Monster Zone', icon: '◻️' } 
+                            feature: { name: 'Monster Zone', icon: zoneIcons[iconIndex] } 
                         });
                     }
                 }
@@ -1826,7 +1828,12 @@ const EquipmentManager = {
         init() {
             if (this.isInitialized) return;
             this.isInitialized = true;
-            this.populateZoneList();
+            
+            // Delay initial population to ensure blueprints are loaded
+            setTimeout(() => {
+                this.populateZoneList();
+            }, 100);
+            
             this.addEventListeners();
         },
         addEventListeners() {
@@ -1863,9 +1870,14 @@ const EquipmentManager = {
 
             container.innerHTML = zones.map(zone => {
                 const isUnlocked = state.player.level >= zone.levelReq;
+                
+                // Check if there's a blueprint for this zone and use its name instead
+                const blueprint = WorldMapManager.getZoneBlueprint(zone.id);
+                const displayName = blueprint ? blueprint.name : zone.name;
+                
                 return `
-                    <li class="${!isUnlocked ? 'disabled' : ''} font-orbitron" data-zone-id="${zone.id}" title="${isUnlocked ? zone.name : `Requires Level ${zone.levelReq}`}">
-                        ${zone.name} - Level ${zone.levelReq}
+                    <li class="${!isUnlocked ? 'disabled' : ''} font-orbitron" data-zone-id="${zone.id}" title="${isUnlocked ? displayName : `Requires Level ${zone.levelReq}`}">
+                        ${displayName} - Level ${zone.levelReq}
                     </li>`;
             }).join('');
         },
@@ -1894,6 +1906,10 @@ const EquipmentManager = {
             const gridInfo = blueprint ? ` (${blueprint.gridSize}x${blueprint.gridSize})` : '';
             
             console.log(`Teleporting to zone ${zoneId}: ${zoneName}${gridInfo}`);
+            console.log('Blueprint found:', blueprint ? 'YES' : 'NO');
+            if (blueprint) {
+                console.log('Blueprint details:', blueprint);
+            }
             showToast(`Teleported to ${zoneName}${gridInfo}`, false);
             ProfileManager.updateAllProfileUI();
             
