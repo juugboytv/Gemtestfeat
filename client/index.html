@@ -2579,18 +2579,11 @@ const EquipmentManager = {
         
         // Handle regular items with tier system
         if (item.tier) {
-            // Dropper items: T1-T20
-            if (item.type === 'Dropper' || !item.type) {
-                return `T${item.tier}`;
-            }
-            // Shadow items: T1-T20  
-            else if (item.type === 'Shadow') {
-                return `T${item.tier}`;
-            }
-            // Echo items: T1-T10
-            else if (item.type === 'Echo') {
-                return `T${item.tier}`;
-            }
+            // All item types display T1-T20
+            // Dropper items: T1-T20 (20 tiers)
+            // Shadow items: T1-T20 (20 tiers)  
+            // Echo items: T1-T20 (but only 10 actual tiers, so tier 1-10 maps to T1-T10)
+            return `T${item.tier}`;
         }
         
         // Fallback for any items without proper type/tier
