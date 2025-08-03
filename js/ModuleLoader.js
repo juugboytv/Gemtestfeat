@@ -18,12 +18,21 @@ class ModuleLoader {
             { id: 'uiElements', path: 'js/utils/UIElements.js', dependencies: [] },
             { id: 'hexUtils', path: 'js/utils/HexUtils.js', dependencies: [] },
 
-            // Services (load after utilities)
+            // Core services (load second)
+            { id: 'eventBus', path: 'js/services/EventBus.js', dependencies: [] },
+            { id: 'stateManager', path: 'js/services/StateManager.js', dependencies: ['eventBus'] },
+            { id: 'dataService', path: 'js/services/DataService.js', dependencies: ['stateManager', 'eventBus'] },
+
+            // UI and game services (load after core services)
             { id: 'backgroundAnimations', path: 'js/services/BackgroundAnimations.js', dependencies: ['uiElements'] },
-            { id: 'gameAPI', path: 'js/services/GameAPI.js', dependencies: ['uiElements'] },
+            { id: 'gameAPI', path: 'js/services/GameAPI.js', dependencies: ['uiElements', 'dataService'] },
 
             // Managers (load after services)
-            { id: 'tabManager', path: 'js/modules/TabManager.js', dependencies: ['gameState', 'uiElements'] },
+            { id: 'tabManager', path: 'js/modules/TabManager.js', dependencies: ['gameState', 'uiElements', 'eventBus'] },
+
+            // API patterns and bridge system (load last)
+            { id: 'apiPatterns', path: 'js/utils/APIPatterns.js', dependencies: ['stateManager', 'eventBus', 'dataService'] },
+            { id: 'legacyBridge', path: 'js/utils/LegacyBridge.js', dependencies: ['stateManager', 'eventBus', 'dataService', 'uiElements'] },
 
             // Additional modules will be added here as we extract them
         ];
