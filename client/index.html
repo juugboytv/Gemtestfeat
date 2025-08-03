@@ -4270,8 +4270,34 @@ const EquipmentManager = {
         ],
 
         init() {
-            // DevSuite initialization - event listeners will be attached when modal opens
-            console.log('DevSuite initialized');
+            // DevSuite initialization with event delegation
+            const modal = document.getElementById('dev-suite-modal');
+            if (modal) {
+                modal.addEventListener('click', (e) => {
+                    // Handle all clicks through event delegation
+                    if (e.target.id === 'dev-suite-close-btn') {
+                        this.close();
+                    } else if (e.target.id === 'dev-suite-auth-btn') {
+                        this.authenticate();
+                    } else if (e.target.id === 'push-live-btn') {
+                        this.pushLive();
+                    } else if (e.target.classList.contains('dev-suite-tab-btn')) {
+                        this.switchTab(e.target.dataset.tab);
+                    } else if (e.target.closest('[data-action]')) {
+                        const button = e.target.closest('[data-action]');
+                        const action = button.dataset.action;
+                        const module = button.dataset.module;
+                        if (action === 'open-module') this.openModule(module);
+                    }
+                });
+
+                modal.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && e.target.id === 'dev-suite-password') {
+                        this.authenticate();
+                    }
+                });
+            }
+            console.log('DevSuite initialized with event delegation');
         },
 
         open() {
@@ -4324,20 +4350,7 @@ const EquipmentManager = {
                 </div>
             `;
             
-            // Attach event listeners after DOM update
-            setTimeout(() => {
-                const closeBtn = document.getElementById('dev-suite-close-btn');
-                const authBtn = document.getElementById('dev-suite-auth-btn');
-                const passwordInput = document.getElementById('dev-suite-password');
-                
-                if (closeBtn) closeBtn.addEventListener('click', () => this.close());
-                if (authBtn) authBtn.addEventListener('click', () => this.authenticate());
-                if (passwordInput) {
-                    passwordInput.addEventListener('keypress', (e) => {
-                        if (e.key === 'Enter') this.authenticate();
-                    });
-                }
-            }, 10);
+            // Event delegation handles all interactions automatically
         },
 
         close() {
@@ -4386,31 +4399,7 @@ const EquipmentManager = {
                 </div>
             `;
             
-            // Attach event listeners after DOM update
-            setTimeout(() => {
-                const closeBtn = document.getElementById('dev-suite-close-btn');
-                const pushBtn = document.getElementById('push-live-btn');
-                const devContent = document.getElementById('dev-suite-content');
-                
-                if (closeBtn) closeBtn.addEventListener('click', () => this.close());
-                if (pushBtn) pushBtn.addEventListener('click', () => this.pushLive());
-                
-                document.querySelectorAll('.dev-suite-tab-btn').forEach(btn => {
-                    btn.addEventListener('click', () => this.switchTab(btn.dataset.tab));
-                });
-
-                if (devContent) {
-                    devContent.addEventListener('click', (e) => {
-                        const button = e.target.closest('[data-action]');
-                        if (button) {
-                            e.stopPropagation();
-                            const action = button.dataset.action;
-                            const module = button.dataset.module;
-                            if (action === 'open-module') this.openModule(module);
-                        }
-                    });
-                }
-            }, 10);
+            // Event delegation handles all interactions automatically
         },
 
         switchTab(tabId) {
