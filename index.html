@@ -842,14 +842,25 @@
                                     Loading location...
                                 </div>
                                 
-                                <!-- Building Quick Access -->
-                                <div id="building-quick-access" class="grid grid-cols-3 gap-1 text-xs">
-                                    <button class="glass-button px-1 py-1 text-xs" title="Sanctuary">🆘</button>
-                                    <button class="glass-button px-1 py-1 text-xs" title="Armory">⚔️</button>
-                                    <button class="glass-button px-1 py-1 text-xs" title="Arcanum">🔮</button>
-                                    <button class="glass-button px-1 py-1 text-xs" title="Bank">🏧</button>
-                                    <button class="glass-button px-1 py-1 text-xs" title="Teleporter">🌀</button>
-                                    <button class="glass-button px-1 py-1 text-xs" title="Gem Crucible">💎</button>
+                                <!-- Zone Buildings Layout (Canvas-Free) -->
+                                <div id="zone-buildings-display" class="mb-2">
+                                    <div class="text-xs text-gray-400 text-center mb-1">Zone Buildings (6/6)</div>
+                                    <div id="building-layout-grid" class="grid grid-cols-3 gap-1 text-xs">
+                                        <button class="building-btn glass-button px-1 py-1 text-xs bg-green-600/20" title="Sanctuary" data-building="Sanctuary">🆘</button>
+                                        <button class="building-btn glass-button px-1 py-1 text-xs bg-red-600/20" title="Armory" data-building="Armory">⚔️</button>
+                                        <button class="building-btn glass-button px-1 py-1 text-xs bg-purple-600/20" title="Arcanum" data-building="Arcanum">🔮</button>
+                                        <button class="building-btn glass-button px-1 py-1 text-xs bg-blue-600/20" title="Bank" data-building="AetheriumConduit">🏧</button>
+                                        <button class="building-btn glass-button px-1 py-1 text-xs bg-cyan-600/20" title="Teleporter" data-building="Teleporter">🌀</button>
+                                        <button class="building-btn glass-button px-1 py-1 text-xs bg-yellow-600/20" title="Gem Crucible" data-building="GemCrucible">💎</button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Zone Layout Visualization -->
+                                <div id="zone-layout-mini" class="bg-black/30 rounded p-1 mb-2">
+                                    <div class="text-xs text-gray-400 text-center mb-1">Zone Layout</div>
+                                    <div id="zone-hex-display" class="grid grid-cols-4 gap-0.5 text-xs h-8">
+                                        <!-- Dynamic hex layout will be populated here -->
+                                    </div>
                                 </div>
                             </div>
                             <div class="flex flex-col items-center gap-1">
