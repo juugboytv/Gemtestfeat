@@ -2169,7 +2169,12 @@ const EquipmentManager = {
             
 
             
-            this.ctx.fillStyle = zoneColor;
+            // For zones with Bank or Revive Station, use very light background to not interfere with emojis
+            if (feature && (feature.type === 'Bank' || feature.type === 'Revive Station')) {
+                this.ctx.fillStyle = 'rgba(50, 50, 50, 0.1)'; // Very light background
+            } else {
+                this.ctx.fillStyle = zoneColor;
+            }
             this.ctx.fill(); 
             this.ctx.strokeStyle = 'rgba(249, 115, 22, 0.3)'; 
             this.ctx.lineWidth = 1.5; 
@@ -2236,7 +2241,7 @@ const EquipmentManager = {
                 
                 // Set font - different handling for emojis vs text
                 // Simplified emoji detection with explicit checks for our specific emojis
-                const isEmoji = displayChar === '🏦' || displayChar === '⛑️' || displayChar === '⚔️' || 
+                const isEmoji = displayChar === '💰' || displayChar === '🏥' || displayChar === '⚔️' || 
                                displayChar === '🔮' || displayChar === '🌀' || displayChar === '💎' ||
                                displayChar === '🏠' || displayChar === '👑' || displayChar === '⛏️' ||
                                displayChar === '🏧' || displayChar === '🆘' || // Keep old emojis for compatibility
@@ -2244,8 +2249,7 @@ const EquipmentManager = {
                 
                 // Log emoji rendering for Bank and Revive Station
                 if (displayChar === '💰' || displayChar === '🏥') {
-                    console.log(`RENDERING EMOJI: "${displayChar}" (char code: ${displayChar.charCodeAt(0)}) at (${cx}, ${cy})`);
-                    console.log(`Canvas context:`, this.ctx);
+                    console.log(`RENDERING NEW EMOJI: "${displayChar}" at (${cx}, ${cy}) with isEmoji=${isEmoji}`);
                 }
                 
                 this.ctx.textAlign = 'center';
