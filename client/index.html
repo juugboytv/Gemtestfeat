@@ -3170,43 +3170,26 @@ const EquipmentManager = {
         const isCritical = Math.random() < 0.1;
         if (isCritical) {
             playerDamage *= 2;
-            this.triggerCriticalHit();
             logToGame(`CRITICAL HIT! You strike ${enemy.name} for ${playerDamage.toFixed(0)} damage!`, 'player');
         } else {
             logToGame(`You strike ${enemy.name} for ${playerDamage.toFixed(0)} damage!`, 'player');
         }
         
-        // Trigger player attack animation
-        this.triggerAttackAnimation(true);
-        
-        // Create damage number animation
-        this.createDamageNumber(playerDamage, 'player-damage', isCritical);
-        
         enemy.hp -= playerDamage;
-        
-        // Animate enemy health bar
-        setTimeout(() => {
-            this.updateEnemyUI();
-            this.animateHealthBar(false);
-        }, 250);
+        this.updateEnemyUI();
         
         if (enemy.hp <= 0) { 
             enemy.hp = 0;
             logToGame(`${enemy.name} defeated!`, 'system'); 
             
-            // Trigger enemy defeat animation
-            setTimeout(() => {
-                this.triggerEnemyDefeat();
-            }, 500);
+            // Enemy defeated - no animation delay
             
             ItemManager.progressShadowItems();
 
             const defeatedMsg = document.getElementById('enemy-defeated-msg');
             
-            // Show defeated message in the integrated layout
-            setTimeout(() => {
-                if (defeatedMsg) defeatedMsg.style.display = 'block';
-            }, 750);
+            // Show defeated message immediately
+            if (defeatedMsg) defeatedMsg.style.display = 'block';
 
             let xpReward = enemy.xpValue;
             let goldReward = enemy.goldValue;
@@ -3230,36 +3213,23 @@ const EquipmentManager = {
             this.updateCombatInfoPanel(loot); 
             this.endCombat(); 
         } else { 
-            // Enemy counter-attack with delay for better animation flow
-            setTimeout(() => {
-                let enemyDamage = enemy.attack - (player.stats.finalAC * 0.5); 
-                enemyDamage = Math.max(1, enemyDamage);
+            // Enemy counter-attack - immediate response
+            let enemyDamage = enemy.attack - (player.stats.finalAC * 0.5); 
+            enemyDamage = Math.max(1, enemyDamage);
+            
+            player.hp -= enemyDamage; 
+            logToGame(`${enemy.name} strikes you for ${enemyDamage.toFixed(0)} damage!`, 'enemy');
+            ProfileManager.updateAllProfileUI();
                 
-                // Trigger enemy attack animation
-                this.triggerAttackAnimation(false);
-                
-                // Create enemy damage number
-                this.createDamageNumber(enemyDamage, 'enemy-damage');
-                
-                player.hp -= enemyDamage; 
-                logToGame(`${enemy.name} strikes you for ${enemyDamage.toFixed(0)} damage!`, 'enemy');
-                
-                // Animate player health bar
-                setTimeout(() => {
-                    ProfileManager.updateAllProfileUI();
-                    this.animateHealthBar(true);
-                }, 100);
-                
-                if (player.hp <= 0) { 
-                    player.hp = 0; 
-                    logToGame("You have been defeated! You are returned to the sanctuary.", 'system'); 
-                    ProfileManager.healPlayer(); 
-                    WorldMapManager.playerPos = { q: 0, r: 0 }; 
-                    WorldMapManager.draw(); 
-                    WorldMapManager.updateInteractButton(); 
-                    this.endCombat(); 
-                }
-            }, 800);
+            if (player.hp <= 0) { 
+                player.hp = 0; 
+                logToGame("You have been defeated! You are returned to the sanctuary.", 'system'); 
+                ProfileManager.healPlayer(); 
+                WorldMapManager.playerPos = { q: 0, r: 0 }; 
+                WorldMapManager.draw(); 
+                WorldMapManager.updateInteractButton(); 
+                this.endCombat(); 
+            }
         } 
         
         // Update UI immediately for player action feedback
