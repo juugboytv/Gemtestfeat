@@ -2141,12 +2141,16 @@ const EquipmentManager = {
                         displayColor = '#9C27B0';
                         break;
                     case 'Revive Station':
-                        displayChar = '+';  // Plus symbol for Revive Station (SOS)
+                        displayChar = '🆘';  // SOS emoji for Revive Station
                         displayColor = '#4CAF50';
                         break;
                     case 'Teleporter':
                         displayChar = 'T';  // T for Teleporter
                         displayColor = '#2196F3';
+                        break;
+                    case 'Bank':
+                        displayChar = '🏧';  // ATM emoji for Bank
+                        displayColor = '#FFC107';
                         break;
                     case 'Monster Zone':
                         displayChar = '•';
