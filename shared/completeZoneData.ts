@@ -250,7 +250,7 @@ export const COMPLETE_ZONE_DATA: CompleteZone[] = [
       name: `Zone ${zoneId}: Advanced Realm`,
       description: `A level ${baseLevel} zone with challenging monsters and rewards.`,
       gridSize,
-      levelRequirement: zoneId, // Zone level requirement matches zone number
+      levelRequirement: zoneId, // Zone level requirement matches zone number for zones 26+
       theme: `advanced_${zoneId % 10}`,
       features: generateZoneFeatures(zoneId, gridSize),
       monsters: Array.from({ length: 11 }, (_, j) => {
