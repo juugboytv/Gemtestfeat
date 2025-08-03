@@ -3839,8 +3839,34 @@ const InfusionManager = {
      * Ensures data is loaded before initializing the game modules.
      */
     async function main() {
-        await loadGameData(); // Ensure data is loaded before the game starts
-        CreationManager.init();
+        try {
+            // Load the module loader first
+            await loadModuleLoader();
+            
+            // Initialize the module system
+            await window.moduleLoader.init();
+            
+            // Load game data
+            await loadGameData();
+            
+            // Initialize the original game
+            CreationManager.init();
+            
+            console.log('Game initialization complete');
+        } catch (error) {
+            console.error('Game initialization failed:', error);
+            showToast('Failed to initialize game. Please refresh the page.', true);
+        }
+    }
+
+    async function loadModuleLoader() {
+        return new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'js/ModuleLoader.js';
+            script.onload = () => resolve();
+            script.onerror = () => reject(new Error('Failed to load ModuleLoader'));
+            document.head.appendChild(script);
+        });
     }
 
     document.addEventListener('DOMContentLoaded', main);
