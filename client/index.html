@@ -7,6 +7,7 @@
     <title>Geminus - Dark Fantasy RPG (GDD Integrated)</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="./gameAPI.js"></script>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -3541,13 +3542,34 @@ const EquipmentManager = {
         hideModal() {
             ui.zonePopupModal.classList.add('hidden');
         },
-        populateZoneList() {
+        async populateZoneList() {
             const container = ui.zoneListContainer;
             if (!container || !state.player.level || Object.keys(AllZones).length === 0) return;
             
-            const zones = Object.entries(AllZones)
-                .map(([id, zone]) => ({ id, ...zone }))
-                .sort((a, b) => a.levelReq - b.levelReq);
+            // Try to get server-side zone data first
+            let zones;
+            if (window.gameAPI && window.gameAPI.isServerMode) {
+                const serverZones = await window.gameAPI.getAvailableZones();
+                if (serverZones) {
+                    zones = serverZones.map(zone => ({ 
+                        id: zone.id.toString(), 
+                        name: zone.name, 
+                        levelReq: zone.levelReq,
+                        unlocked: zone.unlocked
+                    }));
+                    console.log('Using server-side zone data:', zones);
+                } else {
+                    // Fallback to client-side zones
+                    zones = Object.entries(AllZones)
+                        .map(([id, zone]) => ({ id, ...zone }));
+                }
+            } else {
+                // Use client-side zones
+                zones = Object.entries(AllZones)
+                    .map(([id, zone]) => ({ id, ...zone }));
+            }
+            
+            zones.sort((a, b) => a.levelReq - b.levelReq);
 
             container.innerHTML = zones.map(zone => {
                 const isUnlocked = state.player.level >= zone.levelReq;
@@ -3557,8 +3579,27 @@ const EquipmentManager = {
                     </li>`;
             }).join('');
         },
-        handleTeleport(zoneId) {
+        async handleTeleport(zoneId) {
             if (!zoneId) return;
+            
+            // Try server-side teleportation first
+            if (window.gameAPI && window.gameAPI.isServerMode) {
+                const result = await window.gameAPI.teleportToZone(parseInt(zoneId));
+                if (result && result.success) {
+                    // Update client state from server response
+                    state.game.currentZoneTier = parseInt(zoneId);
+                    WorldMapManager.playerPos = { q: 0, r: 0 };
+                    WorldMapManager.draw();
+                    WorldMapManager.updateInteractButton();
+                    
+                    showToast(result.message);
+                    ProfileManager.updateAllProfileUI();
+                    this.hideModal();
+                    return;
+                }
+            }
+            
+            // Fallback to client-side teleportation
             const zone = AllZones[zoneId];
             if (!zone) return;
 
@@ -5580,9 +5621,23 @@ const InfusionManager = {
     };
 
     async function main() {
+        // Initialize server-side game API first
+        await window.gameAPI.init();
+        
         await loadGameData(); // Ensure data is loaded before the game starts
         CreationManager.init();
-        // LogControlManager.init() is called when Combat tab is loaded
+        
+        // Initialize systems after a short delay for DOM elements
+        setTimeout(() => {
+            if (typeof UICustomization !== 'undefined') UICustomization.init();
+            if (typeof UIManager !== 'undefined') UIManager.init();
+            if (typeof DevSuite !== 'undefined') DevSuite.init();
+            
+            // Update zone teleport list to use server data if available
+            TeleportManager.populateZoneList();
+            QuestManager.assignQuests();
+            ProfileManager.updateAllProfileUI();
+        }, 100);
     }
 
     document.addEventListener('DOMContentLoaded', main);

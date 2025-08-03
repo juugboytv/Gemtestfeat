@@ -1,0 +1,30 @@
+1. System Overview
+This is the most critical architectural upgrade for Geminus. We will migrate all essential game logic from the client-side JavaScript file to a backend server. The player's game will no longer be the "source of truth"; instead, it will send requests to the server and display the results. This is the only way to create a secure, persistent, and multiplayer-ready game.
+2. Key Systems to Migrate to the Server
+The following systems must be removed from the client and rebuilt on the server:
+ * Combat Resolution:
+   * The server must handle all calculations for damage, hit chance, critical hits, and status effects. The client will only send an "attack" command and then wait for the server to report the outcome.
+ * Loot Generation:
+   * The server will be solely responsible for determining all loot drops. This is where we will implement the Archetype Dropper System and the Zone Trait bonuses. The client will simply be told, "You received a Tier 5 Steel Helm."
+ * Player Data Management:
+   * The server must be the ultimate authority on a player's stats, level, XP, gold, inventory, and equipment. The client will no longer modify these values directly; it will only request changes (e.g., "request to equip item") that the server must validate.
+ * Quest & Progression Logic:
+   * The server will track quest completion and distribute rewards. This prevents players from illicitly completing quests or claiming rewards.
+3. The New "Client-Server" Communication Flow
+This example illustrates the fundamental change in how the game will operate.
+Action: Player Attacks a Monster
+ * Current (Insecure) Method:
+   * The player clicks "Attack."
+   * The script.js file on the player's browser calculates the damage, subtracts the monster's HP, checks if it's dead, calculates the loot, and adds the XP and gold directly to the player's state.
+   * A cheater can simply open the console and give themselves infinite gold or one-hit kills.
+ * New (Secure) Method:
+   * The player clicks "Attack."
+   * The client sends a single, simple message to the server: "I am attacking Monster X."
+   * The server receives the request and validates it (Is the player in range? Is their attack on cooldown?).
+   * The server performs all the combat calculations using the secure player data it has stored.
+   * The server determines the outcome (damage dealt, monster HP remaining, etc.).
+   * The server sends a message back to the client: "You dealt 85 damage to Monster X. Its new HP is 415."
+   * The client receives this message and updates the UI accordingly.
+4. Why This is the Priority
+This architectural change is the foundation for every other system we have designed. We cannot securely implement the Gemini Crucible, the Gilded Vault, or the Death Penalty until the server is in control of the game's state and rules. This is the step that turns Geminus from a browser toy into a real, persistent online game.
+
