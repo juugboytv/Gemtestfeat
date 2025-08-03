@@ -34,6 +34,12 @@ class ModuleLoader {
             { id: 'apiPatterns', path: 'js/utils/APIPatterns.js', dependencies: ['stateManager', 'eventBus', 'dataService'] },
             { id: 'legacyBridge', path: 'js/utils/LegacyBridge.js', dependencies: ['stateManager', 'eventBus', 'dataService', 'uiElements'] },
 
+            // Phase 3: Feature development templates (load last)
+            { id: 'featureTemplate', path: 'js/templates/FeatureTemplate.js', dependencies: [] },
+            { id: 'quickStart', path: 'js/templates/QuickStart.js', dependencies: ['featureTemplate'] },
+            { id: 'databaseHelper', path: 'js/templates/DatabaseHelper.js', dependencies: [] },
+            { id: 'demoSystem', path: 'js/demo/DemoSystem.js', dependencies: ['quickStart', 'databaseHelper', 'apiPatterns'] },
+
             // Additional modules will be added here as we extract them
         ];
 
