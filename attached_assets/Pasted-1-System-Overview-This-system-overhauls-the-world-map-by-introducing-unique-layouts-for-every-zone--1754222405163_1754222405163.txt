@@ -1,0 +1,47 @@
+1. System Overview
+This system overhauls the world map by introducing unique layouts for every zone. The current static map will be replaced by a dynamic map generator that reads from a "Zone Blueprint" each time the player enters a new zone. This will make every zone feel like a distinct location with its own strategic layout.
+2. The Coordinate System
+ * Axial Coordinates: We will use the hex grid's native (Q, R) coordinate system to define the location of all features on the map. This functions just like a standard (X, Y) grid.
+   * Q represents the column (horizontal position).
+   * R represents the row (diagonal position).
+ * Example: A Sanctuary might be located at (Q: -3, R: 5) in one zone, and (Q: 2, R: -1) in another.
+3. The "Zone Blueprint" Data Structure
+For each of the 101 zones, we will create a data blueprint that defines its unique properties.
+ * Blueprint Contents:
+   * gridSize: Defines the radius of the map (e.g., a size of 3 creates a small map, a size of 10 creates a large one).
+   * features: An array of objects that lists all special locations and their (Q, R) coordinates.
+   * terrain: (Future expansion) Can define the type of terrain for each hex, affecting monster spawns or movement speed.
+ * Example Blueprints:
+   Zone 1: Crystal Caves (Starter Zone)
+   "1": {
+  "name": "Crystal Caves",
+  "gridSize": 4,
+  "features": [
+    { "type": "Sanctuary", "q": -2, "r": 0 },
+    { "type": "Armory", "q": 1, "r": -1 },
+    { "type": "Arcanum", "q": 1, "r": 1 },
+    { "type": "AetheriumConduit", "q": 2, "r": 0 },
+    { "type": "Teleporter", "q": 0, "r": 2 }
+  ]
+}
+
+   Zone 25: Echoing Chasms (Progression Zone)
+   "25": {
+  "name": "Echoing Chasms",
+  "gridSize": 7,
+  "features": [
+    { "type": "Sanctuary", "q": 5, "r": -2 },
+    { "type": "AetheriumConduit", "q": -4, "r": 1 },
+    { "type": "Teleporter", "q": 0, "r": -5 }
+  ]
+}
+
+   (Notice this zone has no shops, forcing players to travel back to town.)
+4. Implementation Plan
+ * Create Blueprints: We will need to methodically create a unique blueprint for all 101 zones, defining the size and feature locations for each.
+ * Update Map Manager: The WorldMapManager will be refactored. When a player teleports to a new zone, it will:
+   * Clear the old map data.
+   * Load the blueprint for the new zone.
+   * Generate the hex grid and place all features according to the new blueprint's coordinates.
+ * Update UI: The mini-map will now dynamically render the new, unique layout of the player's current zone.
+

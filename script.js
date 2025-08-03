@@ -1623,7 +1623,155 @@ const EquipmentManager = {
     } 
 };
 
-      const WorldMapManager = { isInitialized: false, grid: new Map(), playerPos: { q: 0, r: 0 }, hexSize: 18, ctx: null, init() { if (this.isInitialized) return; this.isInitialized = true; ui.miniMapCanvas.width = ui.miniMapContainer.clientWidth * 2; ui.miniMapCanvas.height = ui.miniMapContainer.clientHeight * 2; ui.miniMapCanvas.style.width = `${ui.miniMapContainer.clientWidth}px`; ui.miniMapCanvas.style.height = `${ui.miniMapContainer.clientHeight}px`; this.ctx = ui.miniMapCanvas.getContext('2d'); this.generateGrid(); this.updateInteractButton(); this.draw(); }, generateGrid() { for (let q = -3; q <= 3; q++) { for (let r = -3; r <= 3; r++) { const s = -q - r; if (s >= -3 && s <= 3) { this.grid.set(`${q},${r}`, { q, r, s, feature: { name: 'Monster Zone', icon: '◻️' } }); } } } this.grid.get('1,-1').feature = { name: 'Weapons/Combat Shop', icon: '⚔️' }; this.grid.get('-1,1').feature = { name: 'Magic/Accessories Shop', icon: '🔮' }; this.grid.get('2,0').feature = { name: 'Bank', icon: '🏧' }; this.grid.get('-2,0').feature = { name: 'Sanctuary', icon: '🆘' }; this.grid.get('0,2').feature = { name: 'Teleport Zone', icon: '🌀' }; }, movePlayer(dq, dr) { const newQ = this.playerPos.q + dq; const newR = this.playerPos.r + dr; if (this.grid.has(`${newQ},${newR}`)) { this.playerPos.q = newQ; this.playerPos.r = newR; this.draw(); this.updateInteractButton(); const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); if (currentHex && currentHex.feature && currentHex.feature.name === 'Monster Zone') { CombatManager.populateMonsterList(state.game.currentZoneTier); } else { CombatManager.clearMonsterList(); } } }, updateInteractButton() { const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); const interactKey = document.getElementById('key-interact'); if (currentHex && currentHex.feature && currentHex.feature.name !== 'Monster Zone') { interactKey.textContent = `Enter`; interactKey.style.fontSize = '14px'; } else { interactKey.textContent = 'Interact'; interactKey.style.fontSize = '16px'; } }, handleInteraction() { const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); if (currentHex && currentHex.feature) { if (currentHex.feature.name === 'Weapons/Combat Shop') { ShopManager.openShop('armory'); } else if (currentHex.feature.name === 'Magic/Accessories Shop') { ShopManager.openShop('magic'); } else if (currentHex.feature.name === 'Bank') { BankManager.openBank(); } else if (currentHex.feature.name === 'Sanctuary') { ProfileManager.healPlayer(); } else if (currentHex.feature.name === 'Teleport Zone') { TeleportManager.showModal(); } } }, draw() { const canvas = ui.miniMapCanvas; this.ctx.clearRect(0, 0, canvas.width, canvas.height); const centerX = canvas.width / 2; const centerY = canvas.height / 2; this.grid.forEach(hex => { const relQ = hex.q - this.playerPos.q; const relR = hex.r - this.playerPos.r; const {x, y} = HexUtils.hexToPixel(relQ, relR, this.hexSize); this.drawHex(centerX + x, centerY + y, this.hexSize, hex.feature); }); this.drawPlayer(centerX, centerY); }, drawHex(cx, cy, size, feature) { this.ctx.beginPath(); for (let i = 0; i < 6; i++) { const angle = 2 * Math.PI / 6 * (i + 0.5); const x = cx + size * Math.cos(angle); const y = cy + size * Math.sin(angle); if (i === 0) this.ctx.moveTo(x, y); else this.ctx.lineTo(x, y); } this.ctx.closePath(); this.ctx.fillStyle = 'rgba(10, 10, 10, 0.5)'; this.ctx.fill(); this.ctx.strokeStyle = 'rgba(249, 115, 22, 0.3)'; this.ctx.lineWidth = 1.5; this.ctx.stroke(); if (feature) { this.ctx.font = `${size * 1.5}px sans-serif`; this.ctx.textAlign = 'center'; this.ctx.textBaseline = 'middle'; this.ctx.fillText(feature.icon, cx, cy); } }, drawPlayer(cx, cy) { this.ctx.font = `${this.hexSize * 1.5}px sans-serif`; this.ctx.textAlign = 'center'; this.ctx.textBaseline = 'middle'; this.ctx.fillText('🟠', cx, cy); } };
+      const WorldMapManager = { 
+        isInitialized: false, 
+        grid: new Map(), 
+        playerPos: { q: 0, r: 0 }, 
+        hexSize: 18, 
+        ctx: null, 
+        currentZoneId: 1, // Current zone being displayed
+        
+        init() { 
+            if (this.isInitialized) return; 
+            this.isInitialized = true; 
+            ui.miniMapCanvas.width = ui.miniMapContainer.clientWidth * 2; 
+            ui.miniMapCanvas.height = ui.miniMapContainer.clientHeight * 2; 
+            ui.miniMapCanvas.style.width = `${ui.miniMapContainer.clientWidth}px`; 
+            ui.miniMapCanvas.style.height = `${ui.miniMapContainer.clientHeight}px`; 
+            this.ctx = ui.miniMapCanvas.getContext('2d'); 
+            this.loadZoneBlueprint(this.currentZoneId);
+            this.updateInteractButton(); 
+            this.draw(); 
+        }, 
+        
+        // Load zone blueprint dynamically
+        loadZoneBlueprint(zoneId) {
+            this.currentZoneId = zoneId;
+            const blueprint = this.getZoneBlueprint(zoneId);
+            
+            if (!blueprint) {
+                // Fallback to old static grid if blueprint not found
+                this.generateStaticGrid();
+                return;
+            }
+            
+            // Clear existing grid
+            this.grid.clear();
+            
+            // Generate hexagonal grid based on blueprint size
+            const gridSize = blueprint.gridSize;
+            for (let q = -gridSize; q <= gridSize; q++) {
+                for (let r = -gridSize; r <= gridSize; r++) {
+                    const s = -q - r;
+                    if (s >= -gridSize && s <= gridSize) {
+                        // Default all hexes to Monster Zones
+                        this.grid.set(`${q},${r}`, { 
+                            q, r, s, 
+                            feature: { name: 'Monster Zone', icon: '◻️' } 
+                        });
+                    }
+                }
+            }
+            
+            // Place features from blueprint
+            blueprint.features.forEach(feature => {
+                const key = `${feature.q},${feature.r}`;
+                if (this.grid.has(key)) {
+                    const featureInfo = this.getFeatureInfo(feature.type);
+                    this.grid.get(key).feature = {
+                        name: feature.name || featureInfo.name,
+                        icon: featureInfo.icon,
+                        type: feature.type
+                    };
+                }
+            });
+            
+            console.log(`Loaded zone blueprint: ${blueprint.name} (Zone ${zoneId}) - Grid Size: ${gridSize}`);
+        },
+        
+        // Get zone blueprint data
+        getZoneBlueprint(zoneId) {
+            const blueprints = {
+                "1": {
+                    name: "Crystal Caves",
+                    gridSize: 4,
+                    features: [
+                        { type: "Sanctuary", q: -2, r: 0 },
+                        { type: "Armory", q: 1, r: -1 },
+                        { type: "Arcanum", q: 1, r: 1 },
+                        { type: "AetheriumConduit", q: 2, r: 0 },
+                        { type: "Teleporter", q: 0, r: 2 }
+                    ]
+                },
+                "2": {
+                    name: "Whispering Woods",
+                    gridSize: 5,
+                    features: [
+                        { type: "Sanctuary", q: 0, r: 0 },
+                        { type: "Armory", q: -2, r: 2 },
+                        { type: "Teleporter", q: 3, r: -1 }
+                    ]
+                },
+                "25": {
+                    name: "Echoing Chasms",
+                    gridSize: 7,
+                    features: [
+                        { type: "Sanctuary", q: 5, r: -2 },
+                        { type: "AetheriumConduit", q: -4, r: 1 },
+                        { type: "Teleporter", q: 0, r: -5 }
+                    ]
+                }
+            };
+            
+            return blueprints[String(zoneId)] || this.generateBasicBlueprint(zoneId);
+        },
+        
+        // Generate basic blueprint for zones without custom layouts
+        generateBasicBlueprint(zoneId) {
+            const size = Math.min(10, Math.floor(3 + (zoneId / 25))); // Gradually increase size
+            return {
+                name: `Zone ${zoneId}`,
+                gridSize: size,
+                features: [
+                    { type: "Sanctuary", q: 0, r: 0 },
+                    { type: "Teleporter", q: 2, r: -1 },
+                    { type: "Armory", q: -1, r: 2 }
+                ]
+            };
+        },
+        
+        // Map feature types to display information
+        getFeatureInfo(featureType) {
+            const featureMap = {
+                'Sanctuary': { name: 'Sanctuary', icon: '🆘' },
+                'Armory': { name: 'Weapons/Combat Shop', icon: '⚔️' },
+                'Arcanum': { name: 'Magic/Accessories Shop', icon: '🔮' },
+                'AetheriumConduit': { name: 'Bank', icon: '🏧' },
+                'Teleporter': { name: 'Teleport Zone', icon: '🌀' },
+                'Monster Zone': { name: 'Monster Zone', icon: '◻️' },
+                'Resource Node': { name: 'Resource Node', icon: '⛏️' },
+                'Boss Arena': { name: 'Boss Arena', icon: '👑' }
+            };
+            return featureMap[featureType] || { name: featureType, icon: '❓' };
+        },
+        
+        // Fallback to old static grid (for compatibility)
+        generateStaticGrid() { 
+            this.grid.clear();
+            for (let q = -3; q <= 3; q++) { 
+                for (let r = -3; r <= 3; r++) { 
+                    const s = -q - r; 
+                    if (s >= -3 && s <= 3) { 
+                        this.grid.set(`${q},${r}`, { q, r, s, feature: { name: 'Monster Zone', icon: '◻️' } }); 
+                    } 
+                } 
+            } 
+            this.grid.get('1,-1').feature = { name: 'Weapons/Combat Shop', icon: '⚔️' }; 
+            this.grid.get('-1,1').feature = { name: 'Magic/Accessories Shop', icon: '🔮' }; 
+            this.grid.get('2,0').feature = { name: 'Bank', icon: '🏧' }; 
+            this.grid.get('-2,0').feature = { name: 'Sanctuary', icon: '🆘' }; 
+            this.grid.get('0,2').feature = { name: 'Teleport Zone', icon: '🌀' }; 
+        }, movePlayer(dq, dr) { const newQ = this.playerPos.q + dq; const newR = this.playerPos.r + dr; if (this.grid.has(`${newQ},${newR}`)) { this.playerPos.q = newQ; this.playerPos.r = newR; this.draw(); this.updateInteractButton(); const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); if (currentHex && currentHex.feature && currentHex.feature.name === 'Monster Zone') { CombatManager.populateMonsterList(state.game.currentZoneTier); } else { CombatManager.clearMonsterList(); } } }, updateInteractButton() { const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); const interactKey = document.getElementById('key-interact'); if (currentHex && currentHex.feature && currentHex.feature.name !== 'Monster Zone') { interactKey.textContent = `Enter`; interactKey.style.fontSize = '14px'; } else { interactKey.textContent = 'Interact'; interactKey.style.fontSize = '16px'; } }, handleInteraction() { const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); if (currentHex && currentHex.feature) { if (currentHex.feature.name === 'Weapons/Combat Shop') { ShopManager.openShop('armory'); } else if (currentHex.feature.name === 'Magic/Accessories Shop') { ShopManager.openShop('magic'); } else if (currentHex.feature.name === 'Bank') { BankManager.openBank(); } else if (currentHex.feature.name === 'Sanctuary') { ProfileManager.healPlayer(); } else if (currentHex.feature.name === 'Teleport Zone') { TeleportManager.showModal(); } } }, draw() { const canvas = ui.miniMapCanvas; this.ctx.clearRect(0, 0, canvas.width, canvas.height); const centerX = canvas.width / 2; const centerY = canvas.height / 2; this.grid.forEach(hex => { const relQ = hex.q - this.playerPos.q; const relR = hex.r - this.playerPos.r; const {x, y} = HexUtils.hexToPixel(relQ, relR, this.hexSize); this.drawHex(centerX + x, centerY + y, this.hexSize, hex.feature); }); this.drawPlayer(centerX, centerY); }, drawHex(cx, cy, size, feature) { this.ctx.beginPath(); for (let i = 0; i < 6; i++) { const angle = 2 * Math.PI / 6 * (i + 0.5); const x = cx + size * Math.cos(angle); const y = cy + size * Math.sin(angle); if (i === 0) this.ctx.moveTo(x, y); else this.ctx.lineTo(x, y); } this.ctx.closePath(); this.ctx.fillStyle = 'rgba(10, 10, 10, 0.5)'; this.ctx.fill(); this.ctx.strokeStyle = 'rgba(249, 115, 22, 0.3)'; this.ctx.lineWidth = 1.5; this.ctx.stroke(); if (feature) { this.ctx.font = `${size * 1.5}px sans-serif`; this.ctx.textAlign = 'center'; this.ctx.textBaseline = 'middle'; this.ctx.fillText(feature.icon, cx, cy); } }, drawPlayer(cx, cy) { this.ctx.font = `${this.hexSize * 1.5}px sans-serif`; this.ctx.textAlign = 'center'; this.ctx.textBaseline = 'middle'; this.ctx.fillText('🟠', cx, cy); } };
     const BankManager = { isInitialized: false, init() { if (this.isInitialized) return; this.isInitialized = true; }, openBank() { this.renderBankUI(); }, renderBankUI() { const contentHTML = ` <div id="bank-content" class="p-4 text-center"> <div class="grid grid-cols-2 gap-4 mb-4 text-lg"> <div> <div class="text-sm text-gray-400 font-orbitron">Your Gold</div> <div id="bank-player-gold" class="font-bold text-yellow-400 font-orbitron">${state.player.gold.toLocaleString()}</div> </div> <div> <div class="text-sm text-gray-400 font-orbitron">Banked Gold</div> <div id="bank-vault-gold" class="font-bold text-yellow-400 font-orbitron">${state.player.bankGold.toLocaleString()}</div> </div> </div> <input type="number" id="bank-amount-input" class="w-full p-2 rounded text-lg text-black bg-gray-200" placeholder="Enter amount..."> <div class="grid grid-cols-2 gap-2 mt-4"> <button id="bank-deposit-btn" class="glass-button py-2 rounded-md">Deposit</button> <button id="bank-withdraw-btn" class="glass-button py-2 rounded-md">Withdraw</button> </div> </div> `; ModalManager.show('Bank Vault', contentHTML, { onContentReady: (contentDiv) => { contentDiv.querySelector('#bank-deposit-btn').addEventListener('click', () => this.handleTransaction('deposit')); contentDiv.querySelector('#bank-withdraw-btn').addEventListener('click', () => this.handleTransaction('withdraw')); } }); }, handleTransaction(type) { const input = document.getElementById('bank-amount-input'); const amount = parseInt(input.value); if (isNaN(amount) || amount <= 0) { showToast("Please enter a valid amount.", true); return; } if (type === 'deposit') { if (amount > state.player.gold) { showToast("You don't have enough gold to deposit.", true); return; } state.player.gold -= amount; state.player.bankGold += amount; showToast(`Deposited ${amount.toLocaleString()} gold.`); } else if (type === 'withdraw') { if (amount > state.player.bankGold) { showToast("You don't have enough gold in the bank.", true); return; } state.player.bankGold -= amount; state.player.gold += amount; showToast(`Withdrew ${amount.toLocaleString()} gold.`); } input.value = ''; ProfileManager.updateAllProfileUI(); document.getElementById('bank-player-gold').textContent = state.player.gold.toLocaleString(); document.getElementById('bank-vault-gold').textContent = state.player.bankGold.toLocaleString(); } };
     const ShopManager = { isInitialized: false, init() { if (this.isInitialized) return; this.isInitialized = true; }, openShop(shopType) { const contentHTML = ` <div class="p-4 text-center"> <h3 class="font-orbitron text-lg mb-2">Welcome to the ${shopType} Shop!</h3> <p class="text-gray-400">Shop functionality is not yet implemented.</p> <div class="mt-4"> <div class="shop-item-row"> <span>Item Name</span> <span>Description</span> <span>Price</span> </div> <div class="shop-item-row"> <span>Placeholder Item</span> <span>A nice placeholder.</span> <span class="text-yellow-400">100g</span> </div> </div> </div> `; ModalManager.show(`${shopType.charAt(0).toUpperCase() + shopType.slice(1)} Shop`, contentHTML); } };
     
@@ -1681,6 +1829,9 @@ const EquipmentManager = {
             if (!zone) return;
 
             state.game.currentZoneTier = parseInt(zoneId);
+            
+            // Load new zone blueprint and reset player position
+            WorldMapManager.loadZoneBlueprint(parseInt(zoneId));
             WorldMapManager.playerPos = { q: 0, r: 0 };
             WorldMapManager.draw();
             WorldMapManager.updateInteractButton();
@@ -1692,7 +1843,9 @@ const EquipmentManager = {
                 CombatManager.clearMonsterList();
             }
             
-            showToast(`Teleported to ${zone.name}.`);
+            const blueprint = WorldMapManager.getZoneBlueprint(zoneId);
+            const zoneName = blueprint ? blueprint.name : zone.name;
+            showToast(`Teleported to ${zoneName} - New layout loaded!`);
             ProfileManager.updateAllProfileUI();
             this.hideModal();
         }
