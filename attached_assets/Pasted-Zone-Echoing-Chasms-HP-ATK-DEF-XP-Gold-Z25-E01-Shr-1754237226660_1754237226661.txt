@@ -1,0 +1,73 @@
+Zone: Echoing Chasms
+                                     HP   ATK   DEF   XP     Gold
+Z25-E01   Shrieker         185   93    123   1500   300
+Z25-E02   Rocklurker       204   102   135   1650   330
+Z25-E03   Deep Crawler     224   112   149   1815   363
+Z25-E04   Echo Bat         246   123   164   1997   399
+Z25-E05   Chasm Worm       271   135   180   2196   439
+Z25-E06   Gloom Elemental  298   149   198   2416   483
+Z25-E07   Pit Spider       328   164   218   2657   531
+Z25-E08   Stone Sentinel   361   180   240   2923   585
+Z25-E09   Whisper Wraith   397   198   264   3215   643
+Z25-E10   Abyss Stalker    433   216   288   3507   701
+Z25-E10* Abyss Stalker - Boss 437   218   290   10000  2000
+
+
+Zone: Starfall Deserts
+          HP   ATK   DEF   XP     Gold
+Z26-E01   Sand Serpent     185   93    123   1500   300
+Z26-E02   Dune Strider     204   102   135   1650   330
+Z26-E03   Ember Scorpion   224   112   149   1815   363
+Z26-E04   Sun Golem        246   123   164   1997   399
+Z26-E05   Desert Drifter   271   135   180   2196   439
+Z26-E06   Dust Devil       298   149   198   2416   483
+Z26-E07   Meteorite Beetle 328   164   218   2657   531
+Z26-E08   Oasis Bandit     361   180   240   2923   585
+Z26-E09   Starfall Sprite  397   198   264   3215   643
+Z26-E10   Nomad Hunter     433   216   288   3507   701
+Z26-E10* Nomad Hunter - Boss 437   218   290   10000  2000
+
+
+Zone: The Weeping Mire
+          HP   ATK   DEF   XP     Gold
+Z27-E01   Bog Lurker       185   93    123   1500   300
+Z27-E02   Mire Slime       204   102   135   1650   330
+Z27-E03   Fen Strangler    224   112   149   1815   363
+Z27-E04   Murk Creeper     246   123   164   1997   399
+Z27-E05   Gloom Toad       271   135   180   2196   439
+Z27-E06   Moss Golem       298   149   198   2416   483
+Z27-E07   Swamp Serpent    328   164   218   2657   531
+Z27-E08   Water Hag        361   180   240   2923   585
+Z27-E09   Spore Cloud      397   198   264   3215   643
+Z27-E10   Reed Ambusher    433   216   288   3507   701
+Z27-E10* Reed Ambusher - Boss 437   218   290   10000  2000
+
+
+Zone: Frozen Spirelands
+          HP   ATK   DEF   XP     Gold
+Z28-E01   Ice Drake        185   93    123   1500   300
+Z28-E02   Frost Elemental  204   102   135   1650   330
+Z28-E03   Glacier Yeti     224   112   149   1815   363
+Z28-E04   Snow Harpy       246   123   164   1997   399
+Z28-E05   Crystal Golem    271   135   180   2196   439
+Z28-E06   Blizzard Wight   298   149   198   2416   483
+Z28-E07   Rime Wolf        328   164   218   2657   531
+Z28-E08   Spire Guard      361   180   240   2923   585
+Z28-E09   Avalanche Beast  397   198   264   3215   643
+Z28-E10   Ice Construct    433   216   288   3507   701
+Z28-E10* Ice Construct - Boss 437   218   290   10000  2000
+
+
+Zone: Living Mountain
+          HP   ATK   DEF   XP     Gold
+Z29-E01   Stone Giant      185   93    123   1500   300
+Z29-E02   Earth Elemental  204   102   135   1650   330
+Z29-E03   Grotto Spider    224   112   149   1815   363
+Z29-E04   Mountain Ape     246   123   164   1997   399
+Z29-E05   Crystal Shardling 271   135   180   2196   439
+Z29-E06   Geomancer        298   149   198   2416   483
+Z29-E07   Deep Burrower    328   164   218   2657   531
+Z29-E08   Peak Harpy       361   180   240   2923   585
+Z29-E09   Basalt Ogre      397   198   264   3215   643
+Z29-E10   Vine Strangler   433   216   288   3507   701
+Z29-E10* Vine Strangler - Boss 437   218   290   10000  2000
