@@ -4324,14 +4324,20 @@ const EquipmentManager = {
                 </div>
             `;
             
-            // Attach event listeners
-            document.getElementById('dev-suite-close-btn').addEventListener('click', () => this.close());
-            document.getElementById('dev-suite-auth-btn').addEventListener('click', () => this.authenticate());
-            
-            // Enter key support
-            document.getElementById('dev-suite-password').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') this.authenticate();
-            });
+            // Attach event listeners after DOM update
+            setTimeout(() => {
+                const closeBtn = document.getElementById('dev-suite-close-btn');
+                const authBtn = document.getElementById('dev-suite-auth-btn');
+                const passwordInput = document.getElementById('dev-suite-password');
+                
+                if (closeBtn) closeBtn.addEventListener('click', () => this.close());
+                if (authBtn) authBtn.addEventListener('click', () => this.authenticate());
+                if (passwordInput) {
+                    passwordInput.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') this.authenticate();
+                    });
+                }
+            }, 10);
         },
 
         close() {
@@ -4380,24 +4386,31 @@ const EquipmentManager = {
                 </div>
             `;
             
-            // Attach event listeners
-            document.getElementById('dev-suite-close-btn').addEventListener('click', () => this.close());
-            document.getElementById('push-live-btn').addEventListener('click', () => this.pushLive());
-            
-            document.querySelectorAll('.dev-suite-tab-btn').forEach(btn => {
-                btn.addEventListener('click', () => this.switchTab(btn.dataset.tab));
-            });
+            // Attach event listeners after DOM update
+            setTimeout(() => {
+                const closeBtn = document.getElementById('dev-suite-close-btn');
+                const pushBtn = document.getElementById('push-live-btn');
+                const devContent = document.getElementById('dev-suite-content');
+                
+                if (closeBtn) closeBtn.addEventListener('click', () => this.close());
+                if (pushBtn) pushBtn.addEventListener('click', () => this.pushLive());
+                
+                document.querySelectorAll('.dev-suite-tab-btn').forEach(btn => {
+                    btn.addEventListener('click', () => this.switchTab(btn.dataset.tab));
+                });
 
-            const devContent = document.getElementById('dev-suite-content');
-            devContent.addEventListener('click', (e) => {
-                const button = e.target.closest('[data-action]');
-                if (button) {
-                    e.stopPropagation();
-                    const action = button.dataset.action;
-                    const module = button.dataset.module;
-                    if (action === 'open-module') this.openModule(module);
+                if (devContent) {
+                    devContent.addEventListener('click', (e) => {
+                        const button = e.target.closest('[data-action]');
+                        if (button) {
+                            e.stopPropagation();
+                            const action = button.dataset.action;
+                            const module = button.dataset.module;
+                            if (action === 'open-module') this.openModule(module);
+                        }
+                    });
                 }
-            });
+            }, 10);
         },
 
         switchTab(tabId) {
