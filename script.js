@@ -2133,31 +2133,31 @@ const EquipmentManager = {
                 
                 switch (featureType) {
                     case 'Bank':
-                        displayChar = '🏧';  // Using emoji with proper font support
+                        displayChar = '$';  // Dollar symbol for Bank
                         displayColor = '#FFC107';
                         break;
                     case 'Armory':
-                        displayChar = '⚔️';  // Using emoji with proper font support
+                        displayChar = 'A';  // A for Armory
                         displayColor = '#F44336';
                         break;
                     case 'Arcanum':
-                        displayChar = '🔮';  // Using emoji with proper font support
+                        displayChar = 'M';  // M for Magic/Arcanum
                         displayColor = '#9C27B0';
                         break;
                     case 'Revive Station':
-                        displayChar = '🆘';  // Using emoji with proper font support
+                        displayChar = '+';  // Plus symbol for Revive Station
                         displayColor = '#4CAF50';
                         break;
                     case 'Gem Crucible':
-                        displayChar = '💎';  // Using emoji with proper font support
+                        displayChar = 'G';  // G for Gem Crucible
                         displayColor = '#00BCD4';
                         break;
                     case 'Teleporter':
-                        displayChar = '🌀';  // Using emoji with proper font support
+                        displayChar = 'T';  // T for Teleporter
                         displayColor = '#2196F3';
                         break;
                     case 'Sanctuary':
-                        displayChar = '🏠';  // Using emoji with proper font support
+                        displayChar = 'S';  // S for Sanctuary
                         displayColor = '#FFEB3B';
                         break;
                     case 'Monster Zone':
@@ -2171,9 +2171,11 @@ const EquipmentManager = {
                 
                 console.log(`Mapped to: "${displayChar}" with color ${displayColor}`);
                 
-                // Use comprehensive emoji-supporting font stack
-                this.ctx.font = `bold ${Math.max(10, size * 1.0)}px Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"`;
+                // Use simple, reliable font for text characters
+                this.ctx.font = `bold ${Math.max(12, size * 1.2)}px Arial, sans-serif`;
                 this.ctx.fillStyle = displayColor;
+                this.ctx.textAlign = 'center';
+                this.ctx.textBaseline = 'middle';
                 this.ctx.fillText(displayChar, cx, cy);
             } 
         }, drawPlayer(cx, cy) { this.ctx.font = `${this.hexSize * 1.5}px sans-serif`; this.ctx.textAlign = 'center'; this.ctx.textBaseline = 'middle'; this.ctx.fillText('🟠', cx, cy); } };
