@@ -59,7 +59,9 @@ export class MemStorage implements IStorage {
     const id = this.nextUserId++;
     const user: User = { 
       id, 
-      ...insertUser,
+      username: insertUser.username,
+      passwordHash: insertUser.passwordHash,
+      email: insertUser.email || null,
       createdAt: new Date(),
       lastLogin: null
     };
@@ -82,7 +84,29 @@ export class MemStorage implements IStorage {
     const id = this.nextCharacterId++;
     const character: Character = {
       id,
-      ...insertCharacter,
+      userId: insertCharacter.userId,
+      name: insertCharacter.name,
+      race: insertCharacter.race,
+      level: insertCharacter.level || 1,
+      experience: insertCharacter.experience || 0,
+      currentZone: insertCharacter.currentZone || 1,
+      health: insertCharacter.health || 100,
+      maxHealth: insertCharacter.maxHealth || 100,
+      attack: insertCharacter.attack || 10,
+      defense: insertCharacter.defense || 10,
+      gold: insertCharacter.gold || 100,
+      bankGold: insertCharacter.bankGold || 0,
+      equippedWeapon: insertCharacter.equippedWeapon || null,
+      equippedArmor: insertCharacter.equippedArmor || null,
+      equippedShield: insertCharacter.equippedShield || null,
+      equippedHelmet: insertCharacter.equippedHelmet || null,
+      equippedBoots: insertCharacter.equippedBoots || null,
+      equippedGloves: insertCharacter.equippedGloves || null,
+      equippedRing: insertCharacter.equippedRing || null,
+      equippedAmulet: insertCharacter.equippedAmulet || null,
+      combatTarget: insertCharacter.combatTarget || null,
+      lastCombatAction: insertCharacter.lastCombatAction || null,
+      autoFightEnabled: insertCharacter.autoFightEnabled || false,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
