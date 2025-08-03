@@ -898,8 +898,8 @@ export default function GeminusGame() {
                 <button 
                   id="focus-mode-btn"
                   onClick={toggleFocusMode}
-                  title="Toggle Focus Mode"
-                  className="fixed bottom-4 right-4 w-10 h-10 rounded-full bg-red-500 border border-white/30 flex items-center justify-center cursor-pointer transition-colors hover:bg-red-600 z-[999] shadow-lg"
+                  title="Toggle Focus Mode - Now Fixed!"
+                  className="fixed bottom-4 right-4 w-12 h-12 rounded-full bg-red-600 border-2 border-white/50 flex items-center justify-center cursor-pointer transition-all hover:bg-red-700 hover:scale-110 z-[999] shadow-xl"
                 >
                   {gameState.focusMode ? (
                     <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
