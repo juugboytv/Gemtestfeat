@@ -1,51 +1,91 @@
 
-    // --- App State & Config ---
-    let state = {
-        player: {}, 
-        ui: { isFocused: false, selectedInventoryId: null, selectedGemId: null },
-        game: { combatActive: false, currentZoneTier: 1, globalJackpot: 0 },
-        keyState: { up: false, left: false, down: false, right: false, interact: false },
-    };
-
-    // --- UI Elements ---
-    const ui = {};
-    document.querySelectorAll('[id]').forEach(el => {
-        const camelCaseId = el.id.replace(/-(\w)/g, (m, g) => g.toUpperCase());
-        ui[camelCaseId] = el;
+    // --- App State & Config (MIGRATED TO MODULE) ---
+    // Note: state and ui are now managed by modules but we keep backward compatibility
+    let state, ui;
+    
+    // Initialize modular systems with backward compatibility
+    function initializeBackwardCompatibility() {
+        // Use modular GameState if available, otherwise fallback to original
+        if (window.gameState) {
+            state = window.gameState.getState();
+        } else {
+            state = {
+                player: {}, 
+                ui: { isFocused: false, selectedInventoryId: null, selectedGemId: null },
+                game: { combatActive: false, currentZoneTier: 1, globalJackpot: 0 },
+                keyState: { up: false, left: false, down: false, right: false, interact: false },
+            };
+        }
+        
+        // Use modular UIElements if available, otherwise fallback to original
+        if (window.uiElements) {
+            ui = window.uiElements.ui;
+        } else {
+            ui = {};
+            document.querySelectorAll('[id]').forEach(el => {
+                const camelCaseId = el.id.replace(/-(\w)/g, (m, g) => g.toUpperCase());
+                ui[camelCaseId] = el;
+            });
+        }
+    }
+    
+    // Call this when DOM is ready
+    document.addEventListener('modulesReady', initializeBackwardCompatibility);
+    document.addEventListener('DOMContentLoaded', () => {
+        // Fallback initialization if modules aren't loaded
+        setTimeout(() => {
+            if (!state || !ui) {
+                initializeBackwardCompatibility();
+            }
+        }, 100);
     });
     
-    // --- Utility Functions ---
+    // --- Utility Functions (MIGRATED TO MODULE) ---
     function showToast(message, isError = false) {
-        ui.toastNotification.textContent = message;
-        ui.toastNotification.className = `glass-panel fixed left-1/2 -translate-x-1/2 z-[210] transition-all duration-500 ease-in-out px-6 py-3 rounded-lg font-semibold ${isError ? 'toast-error' : 'toast-success'}`;
-        ui.toastNotification.style.bottom = '5rem';
-        setTimeout(() => { ui.toastNotification.style.bottom = '-100px'; }, 3000);
-    }
-
- function logToGame(message, type = 'system') {
-    const combatLogContainer = document.getElementById('scrolling-combat-log-container');
-    if (combatLogContainer) {
-        const newLogEntry = document.createElement('p');
-        newLogEntry.className = 'log-entry';
-        
-        let typeClass = 'log-system';
-        if (type === 'player') typeClass = 'log-player';
-        else if (type === 'enemy') typeClass = 'log-enemy';
-        newLogEntry.classList.add(typeClass);
-
-        newLogEntry.innerHTML = message; // Using innerHTML to allow for strong tags if needed
-        
-        combatLogContainer.appendChild(newLogEntry);
-
-        // Keep the log from getting too long
-        while (combatLogContainer.children.length > 20) {
-            combatLogContainer.removeChild(combatLogContainer.firstChild);
+        // Use modular UIElements if available, otherwise fallback to original
+        if (window.uiElements) {
+            window.uiElements.showToast(message, isError);
+        } else {
+            // Fallback to original implementation
+            if (ui && ui.toastNotification) {
+                ui.toastNotification.textContent = message;
+                ui.toastNotification.className = `glass-panel fixed left-1/2 -translate-x-1/2 z-[210] transition-all duration-500 ease-in-out px-6 py-3 rounded-lg font-semibold ${isError ? 'toast-error' : 'toast-success'}`;
+                ui.toastNotification.style.bottom = '5rem';
+                setTimeout(() => { ui.toastNotification.style.bottom = '-100px'; }, 3000);
+            }
         }
-
-        // Automatically scroll to the bottom
-        combatLogContainer.scrollTop = combatLogContainer.scrollHeight;
     }
-    console.log(`Game Log: ${message}`);
+
+function logToGame(message, type = 'system') {
+    // Use modular UIElements if available, otherwise fallback to original
+    if (window.uiElements) {
+        window.uiElements.logToGame(message, type);
+    } else {
+        // Fallback to original implementation
+        const combatLogContainer = document.getElementById('scrolling-combat-log-container');
+        if (combatLogContainer) {
+            const newLogEntry = document.createElement('p');
+            newLogEntry.className = 'log-entry';
+            
+            let typeClass = 'log-system';
+            if (type === 'player') typeClass = 'log-player';
+            else if (type === 'enemy') typeClass = 'log-enemy';
+            newLogEntry.classList.add(typeClass);
+
+            newLogEntry.innerHTML = message; // Using innerHTML to allow for strong tags if needed
+            
+            combatLogContainer.appendChild(newLogEntry);
+
+            // Keep the log from getting too long
+            while (combatLogContainer.children.length > 20) {
+                combatLogContainer.removeChild(combatLogContainer.firstChild);
+            }
+
+            // Automatically scroll to the bottom
+            combatLogContainer.scrollTop = combatLogContainer.scrollHeight;
+        }
+        console.log(`Game Log: ${message}`);
+    }
 }
 
     // --- Background Animations ---
