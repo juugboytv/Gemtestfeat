@@ -2239,6 +2239,11 @@ const EquipmentManager = {
                 
                 console.log(`Mapped to: "${displayChar}" with color ${displayColor}`);
                 
+                // Enhanced debug logging for all features
+                if (featureType === 'Bank' || featureType === 'Revive Station') {
+                    console.log(`CRITICAL: Feature "${featureType}" mapped to "${displayChar}" - char codes:`, displayChar.split('').map(c => c.charCodeAt(0)));
+                }
+                
                 // Set font - different handling for emojis vs text
                 // Simplified emoji detection with explicit checks for our specific emojis
                 const isEmoji = displayChar === '💰' || displayChar === '🏥' || displayChar === '⚔️' || 
