@@ -1,0 +1,27 @@
+1. System Overview
+This system introduces two key customization features to empower players to tailor their gameplay experience: UI Tab Reordering and Visual Theme Selection. The goal is to provide a more comfortable and personalized interface for every player.
+2. UI Tab Reordering
+This feature will allow players to change the order of the main tabs (Equipment, Inventory, Combat, etc.) to prioritize the screens they use most often.
+ * Functionality:
+   * Players will be able to click and drag the tab buttons in the main content panel to rearrange them into any order they prefer.
+   * A subtle visual indicator will show where the tab will be placed as it's being dragged.
+ * Persistence:
+   * The player's custom tab order will be saved to their account settings.
+   * The game will remember their layout every time they log in.
+ * Implementation: This will be achieved using the native HTML Drag and Drop API, which is lightweight and efficient.
+3. Visual Theme Selection
+This feature will allow players to change the entire color scheme of the game's UI by cycling through a set of five professionally designed themes.
+ * Functionality:
+   * The "Change Theme" button in the Settings Tab will become fully functional.
+   * Each click will cycle to the next available theme, instantly updating the entire UI's color palette.
+ * Persistence: The player's chosen theme will be saved to their account settings.
+ * Implementation: The system will work by changing the values of the CSS custom properties (variables) at the :root level. This is extremely efficient, as it allows us to change the entire game's look without reloading or rewriting any other CSS.
+ * The Five Themes:
+| Theme Name | Description | Key Colors |
+|---|---|---|
+| Molten Core (Default) | The current theme. A fiery, volcanic look with a focus on raw power. | Orange, Red, Dark Gray |
+| Geminus Magi-Tech | The signature theme. A dark, futuristic, 'cyber-mystical' UI with glowing neon highlights. | Bright Cyan, Dark Glass, Black |
+| Frostbite | A cold, icy theme with sharp, cool colors that evoke the feeling of a frozen wasteland. | Light Blue, Indigo, Dark Blue |
+| Arcane Violet | A magical, ethereal theme with vibrant, mystical colors that feel otherworldly. | Purple, Magenta, Deep Indigo |
+| Verdant Growth | An earthy, natural theme with forest-like colors, perfect for a more grounded fantasy feel. | Green, Lime, Dark Brown |
+

@@ -13,8 +13,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
 
 <style>
-    /* --- Molten Core Theme --- */
+    /* --- Theme System Variables --- */
     :root {
+        /* Active theme colors - defaults to Molten Core */
         --highlight-orange: #f97316;
         --glow-red: #ef4444;
         --text-primary: #f0f0f0;
@@ -117,7 +118,33 @@
         border-bottom: 3px solid transparent;
         color: var(--text-secondary);
         cursor: pointer;
-        transition: color 0.3s;
+        transition: color 0.3s, transform 0.2s;
+        position: relative;
+    }
+    
+    .main-tab-button.dragging {
+        opacity: 0.5;
+        transform: rotate(2deg);
+        z-index: 1000;
+    }
+    
+    .main-tab-button.drag-over {
+        transform: translateX(5px);
+    }
+    
+    .drag-indicator {
+        position: absolute;
+        top: 0;
+        left: -2px;
+        bottom: 0;
+        width: 3px;
+        background: var(--highlight-orange);
+        opacity: 0;
+        transition: opacity 0.2s;
+    }
+    
+    .drag-indicator.visible {
+        opacity: 1;
     }
     .main-tab-button.active {
         color: var(--highlight-orange);
@@ -3690,35 +3717,251 @@ const EquipmentManager = {
     // --- SETTINGS MANAGER ---
     const SettingsManager = {
         isInitialized: false,
+        currentTheme: 'molten-core',
+        tabOrder: ['equipment', 'infusion', 'inventory', 'stats', 'combat', 'quest', 'settings'],
+        
         themes: {
-            'Molten Core': {
-                '--highlight-orange': '#f97316',
-                '--glow-red': '#ef4444',
-                '--text-primary': '#f0f0f0',
-                '--text-secondary': '#a0a0a0',
-                '--panel-bg': 'rgba(20, 20, 22, 0.75)',
-                '--input-bg': 'rgba(0, 0, 0, 0.4)',
-                '--border-color-main': 'rgba(249, 115, 22, 0.4)',
-                '--border-color-pulse': 'rgba(239, 68, 68, 0.7)',
+            'molten-core': {
+                name: 'Molten Core',
+                description: 'A fiery, volcanic look with a focus on raw power',
+                colors: {
+                    '--highlight-orange': '#f97316',
+                    '--glow-red': '#ef4444',
+                    '--text-primary': '#f0f0f0',
+                    '--text-secondary': '#a0a0a0',
+                    '--panel-bg': 'rgba(20, 20, 22, 0.75)',
+                    '--input-bg': 'rgba(0, 0, 0, 0.4)',
+                    '--border-color-main': 'rgba(249, 115, 22, 0.4)',
+                    '--border-color-pulse': 'rgba(239, 68, 68, 0.7)'
+                }
             },
-            'Frostbite': { // Placeholder theme
-                '--highlight-orange': '#3b82f6', // blue-500
-                '--glow-red': '#6366f1', // indigo-500
-                '--text-primary': '#e5e7eb',
-                '--text-secondary': '#9ca3af',
-                '--panel-bg': 'rgba(23, 37, 84, 0.75)',
-                '--input-bg': 'rgba(0, 0, 0, 0.4)',
-                '--border-color-main': 'rgba(59, 130, 246, 0.4)',
-                '--border-color-pulse': 'rgba(99, 102, 241, 0.7)',
+            'geminus-magi-tech': {
+                name: 'Geminus Magi-Tech',
+                description: 'A dark, futuristic, cyber-mystical UI with glowing neon highlights',
+                colors: {
+                    '--highlight-orange': '#00ffff',
+                    '--glow-red': '#00cccc',
+                    '--text-primary': '#e0ffff',
+                    '--text-secondary': '#80cccc',
+                    '--panel-bg': 'rgba(10, 20, 30, 0.85)',
+                    '--input-bg': 'rgba(0, 30, 40, 0.6)',
+                    '--border-color-main': 'rgba(0, 255, 255, 0.4)',
+                    '--border-color-pulse': 'rgba(0, 204, 204, 0.7)'
+                }
+            },
+            'frostbite': {
+                name: 'Frostbite',
+                description: 'A cold, icy theme that evokes the feeling of a frozen wasteland',
+                colors: {
+                    '--highlight-orange': '#87ceeb',
+                    '--glow-red': '#4169e1',
+                    '--text-primary': '#f0f8ff',
+                    '--text-secondary': '#b0d4f1',
+                    '--panel-bg': 'rgba(15, 25, 45, 0.8)',
+                    '--input-bg': 'rgba(0, 20, 40, 0.5)',
+                    '--border-color-main': 'rgba(135, 206, 235, 0.4)',
+                    '--border-color-pulse': 'rgba(65, 105, 225, 0.7)'
+                }
+            },
+            'arcane-violet': {
+                name: 'Arcane Violet',
+                description: 'A magical, ethereal theme with vibrant, mystical colors',
+                colors: {
+                    '--highlight-orange': '#9370db',
+                    '--glow-red': '#ff1493',
+                    '--text-primary': '#f8f0ff',
+                    '--text-secondary': '#d8bfd8',
+                    '--panel-bg': 'rgba(25, 15, 35, 0.8)',
+                    '--input-bg': 'rgba(20, 0, 30, 0.5)',
+                    '--border-color-main': 'rgba(147, 112, 219, 0.4)',
+                    '--border-color-pulse': 'rgba(255, 20, 147, 0.7)'
+                }
+            },
+            'verdant-growth': {
+                name: 'Verdant Growth',
+                description: 'An earthy, natural theme with forest-like colors',
+                colors: {
+                    '--highlight-orange': '#32cd32',
+                    '--glow-red': '#7cfc00',
+                    '--text-primary': '#f0fff0',
+                    '--text-secondary': '#90ee90',
+                    '--panel-bg': 'rgba(20, 30, 15, 0.8)',
+                    '--input-bg': 'rgba(10, 20, 5, 0.5)',
+                    '--border-color-main': 'rgba(50, 205, 50, 0.4)',
+                    '--border-color-pulse': 'rgba(124, 252, 0, 0.7)'
+                }
             }
         },
-        currentThemeIndex: 0,
 
         init() {
             if (this.isInitialized) return;
             this.isInitialized = true;
+            this.loadSettings();
             this.render();
             this.addEventListeners();
+            this.setupTabDragAndDrop();
+        },
+        
+        loadSettings() {
+            const savedTheme = localStorage.getItem('geminus-theme');
+            const savedTabOrder = localStorage.getItem('geminus-tab-order');
+            
+            if (savedTheme && this.themes[savedTheme]) {
+                this.currentTheme = savedTheme;
+            }
+            
+            if (savedTabOrder) {
+                try {
+                    this.tabOrder = JSON.parse(savedTabOrder);
+                } catch (e) {
+                    console.warn('Failed to parse saved tab order');
+                }
+            }
+            
+            this.applyTheme(this.currentTheme);
+            this.applyTabOrder();
+        },
+        
+        saveSettings() {
+            localStorage.setItem('geminus-theme', this.currentTheme);
+            localStorage.setItem('geminus-tab-order', JSON.stringify(this.tabOrder));
+        },
+        
+        applyTheme(themeKey) {
+            const theme = this.themes[themeKey];
+            if (!theme) return;
+            
+            const root = document.documentElement;
+            Object.entries(theme.colors).forEach(([property, value]) => {
+                root.style.setProperty(property, value);
+            });
+            
+            this.currentTheme = themeKey;
+            this.updateThemeDisplay();
+        },
+        
+        cycleTheme() {
+            const themeKeys = Object.keys(this.themes);
+            const currentIndex = themeKeys.indexOf(this.currentTheme);
+            const nextIndex = (currentIndex + 1) % themeKeys.length;
+            const nextTheme = themeKeys[nextIndex];
+            
+            this.applyTheme(nextTheme);
+            this.saveSettings();
+            showToast(`Theme changed to ${this.themes[nextTheme].name}`, false);
+        },
+        
+        updateThemeDisplay() {
+            const themeNameEl = document.getElementById('current-theme-name');
+            if (themeNameEl && this.themes[this.currentTheme]) {
+                themeNameEl.textContent = this.themes[this.currentTheme].name;
+            }
+        },
+        
+        applyTabOrder() {
+            const tabsContainer = document.getElementById('main-tabs-container');
+            if (!tabsContainer) return;
+            
+            // Reorder tabs based on saved order
+            const tabButtons = Array.from(tabsContainer.querySelectorAll('.main-tab-button'));
+            const orderedButtons = [];
+            
+            this.tabOrder.forEach(tabKey => {
+                const button = tabButtons.find(btn => btn.dataset.tab === tabKey);
+                if (button) orderedButtons.push(button);
+            });
+            
+            // Add any new tabs that weren't in the saved order
+            tabButtons.forEach(button => {
+                if (!orderedButtons.includes(button)) {
+                    orderedButtons.push(button);
+                }
+            });
+            
+            // Clear and re-append in new order
+            tabsContainer.innerHTML = '';
+            orderedButtons.forEach(button => tabsContainer.appendChild(button));
+        },
+        
+        setupTabDragAndDrop() {
+            const tabsContainer = document.getElementById('main-tabs-container');
+            if (!tabsContainer) return;
+            
+            let draggedTab = null;
+            
+            tabsContainer.addEventListener('dragstart', (e) => {
+                if (e.target.classList.contains('main-tab-button')) {
+                    draggedTab = e.target;
+                    e.target.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                }
+            });
+            
+            tabsContainer.addEventListener('dragend', (e) => {
+                if (e.target.classList.contains('main-tab-button')) {
+                    e.target.classList.remove('dragging');
+                    document.querySelectorAll('.drag-indicator').forEach(indicator => {
+                        indicator.remove();
+                    });
+                    draggedTab = null;
+                }
+            });
+            
+            tabsContainer.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                if (!draggedTab) return;
+                
+                const afterElement = this.getDragAfterElement(tabsContainer, e.clientX);
+                if (afterElement == null) {
+                    tabsContainer.appendChild(draggedTab);
+                } else {
+                    tabsContainer.insertBefore(draggedTab, afterElement);
+                }
+                
+                this.updateTabOrderFromDOM();
+            });
+            
+            // Make tabs draggable
+            const observer = new MutationObserver(() => {
+                tabsContainer.querySelectorAll('.main-tab-button').forEach(tab => {
+                    if (!tab.draggable) {
+                        tab.draggable = true;
+                    }
+                });
+            });
+            
+            observer.observe(tabsContainer, { childList: true });
+            
+            // Initial setup
+            tabsContainer.querySelectorAll('.main-tab-button').forEach(tab => {
+                tab.draggable = true;
+            });
+        },
+        
+        getDragAfterElement(container, x) {
+            const draggableElements = [...container.querySelectorAll('.main-tab-button:not(.dragging)')];
+            
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = x - box.left - box.width / 2;
+                
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        },
+        
+        updateTabOrderFromDOM() {
+            const tabsContainer = document.getElementById('main-tabs-container');
+            if (!tabsContainer) return;
+            
+            const newOrder = Array.from(tabsContainer.querySelectorAll('.main-tab-button'))
+                .map(button => button.dataset.tab);
+            
+            this.tabOrder = newOrder;
+            this.saveSettings();
         },
 
         render() {
@@ -3731,9 +3974,17 @@ const EquipmentManager = {
                         <div class="bg-black/20 p-4 rounded-lg flex items-center justify-between">
                             <div>
                                 <label class="text-gray-400">Current Theme</label>
-                                <p id="current-theme-name" class="font-bold text-lg font-orbitron">${Object.keys(this.themes)[this.currentThemeIndex]}</p>
+                                <p id="current-theme-name" class="font-bold text-lg font-orbitron">${this.themes[this.currentTheme].name}</p>
+                                <p class="text-sm text-gray-500">${this.themes[this.currentTheme].description}</p>
                             </div>
-                            <button id="change-theme-btn" class="glass-button px-4 py-2 rounded-md">Change</button>
+                            <button id="change-theme-btn" class="glass-button px-4 py-2 rounded-md">Change Theme</button>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-orbitron text-lg mb-2">Tab Layout</h3>
+                        <div class="bg-black/20 p-4 rounded-lg">
+                            <p class="text-gray-400 text-sm mb-2">Drag and drop tabs to reorder them</p>
+                            <div class="text-xs text-gray-500">Your tab order is automatically saved</div>
                         </div>
                     </div>
                     <div>
@@ -3794,24 +4045,7 @@ const EquipmentManager = {
             showToast(`Dev: Player level set to ${newLevel}.`, false);
         },
 
-        applyTheme(themeName) {
-            const theme = this.themes[themeName];
-            if (!theme) return;
 
-            for (const [key, value] of Object.entries(theme)) {
-                document.documentElement.style.setProperty(key, value);
-            }
-            
-            const themeNameEl = document.getElementById('current-theme-name');
-            if(themeNameEl) themeNameEl.textContent = themeName;
-        },
-
-        cycleTheme() {
-            const themeNames = Object.keys(this.themes);
-            this.currentThemeIndex = (this.currentThemeIndex + 1) % themeNames.length;
-            const newThemeName = themeNames[this.currentThemeIndex];
-            this.applyTheme(newThemeName);
-        }
     };
 
     // --- UI MANAGER ---
