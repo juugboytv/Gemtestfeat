@@ -49,7 +49,7 @@ const STARTER_ZONE_MONSTERS: CompleteMonster[] = [
   { monsterId: 'E10*', name: 'StartZone Boss (24h Bonus)', level: 10, health: 60, attack: 20, defense: 25, experienceReward: 100, goldReward: 20, isBoss: true, isBonusBoss: true },
 ];
 
-// Generate complete building set for each zone (5 buildings for now, Gem Crucible will be added later)
+// Generate complete building set for each zone (ALL 6 essential buildings)
 function generateZoneFeatures(zoneId: number, gridSize: number): ZoneFeature[] {
   const features: ZoneFeature[] = [
     { type: 'Sanctuary', q: 0, r: 0 },
@@ -57,6 +57,7 @@ function generateZoneFeatures(zoneId: number, gridSize: number): ZoneFeature[] {
     { type: 'Arcanum', q: 2, r: -1 },
     { type: 'AetheriumConduit', q: 1, r: 2 },
     { type: 'Teleporter', q: -1, r: -2 },
+    { type: 'GemCrucible', q: -1, r: 2 },
   ];
   
   // Fill remaining hexes with Monster Zones
@@ -94,6 +95,7 @@ export const COMPLETE_ZONE_DATA: CompleteZone[] = [
       { type: 'Arcanum', q: 1, r: 1 },
       { type: 'AetheriumConduit', q: 2, r: 0 },
       { type: 'Teleporter', q: 0, r: 2 },
+      { type: 'GemCrucible', q: -1, r: 2 },
       { type: 'Monster Zone', q: -1, r: -1 },
       { type: 'Monster Zone', q: 0, r: -2 },
       { type: 'Monster Zone', q: 2, r: -1 },
