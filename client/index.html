@@ -4466,6 +4466,13 @@ const EquipmentManager = {
             const tabPanel = document.getElementById(`tab-content-${tabName}`);
             if (tabButton) tabButton.classList.add('active');
             if (tabPanel) tabPanel.classList.add('active');
+            
+            // Initialize log controls when switching to combat tab
+            if (tabName === 'combat') {
+                setTimeout(() => {
+                    LogControlManager.init();
+                }, 100); // Small delay to ensure DOM elements are ready
+            }
         }
     };
 
@@ -5170,16 +5177,27 @@ const InfusionManager = {
             const closeBtn = document.getElementById('log-close-btn');
             const reopenBtn = document.getElementById('log-reopen-btn');
             
+            console.log('Setting up log controls:', { minimizeBtn, closeBtn, reopenBtn });
+            
             if (minimizeBtn) {
-                minimizeBtn.addEventListener('click', () => this.toggleMinimize());
+                minimizeBtn.addEventListener('click', () => {
+                    console.log('Minimize button clicked');
+                    this.toggleMinimize();
+                });
             }
             
             if (closeBtn) {
-                closeBtn.addEventListener('click', () => this.closeLog());
+                closeBtn.addEventListener('click', () => {
+                    console.log('Close button clicked');
+                    this.closeLog();
+                });
             }
             
             if (reopenBtn) {
-                reopenBtn.addEventListener('click', () => this.openLog());
+                reopenBtn.addEventListener('click', () => {
+                    console.log('Reopen button clicked');
+                    this.openLog();
+                });
             }
         },
         
@@ -5187,16 +5205,21 @@ const InfusionManager = {
             const wrapper = document.getElementById('combat-log-wrapper');
             const minimizeBtn = document.getElementById('log-minimize-btn');
             
+            console.log('Toggle minimize called. Current state:', this.isMinimized);
+            console.log('Wrapper element:', wrapper);
+            
             if (this.isMinimized) {
                 wrapper.classList.remove('minimized');
                 minimizeBtn.textContent = '−';
                 minimizeBtn.title = 'Minimize';
                 this.isMinimized = false;
+                console.log('Expanded log');
             } else {
                 wrapper.classList.add('minimized');
                 minimizeBtn.textContent = '+';
                 minimizeBtn.title = 'Expand';
                 this.isMinimized = true;
+                console.log('Minimized log');
             }
         },
         
@@ -5204,9 +5227,14 @@ const InfusionManager = {
             const wrapper = document.getElementById('combat-log-wrapper');
             const reopenBtn = document.getElementById('log-reopen-btn');
             
+            console.log('Close log called');
+            console.log('Wrapper element:', wrapper);
+            console.log('Reopen button:', reopenBtn);
+            
             wrapper.classList.add('closed');
             reopenBtn.style.display = 'block';
             this.isClosed = true;
+            console.log('Log closed');
         },
         
         openLog() {
@@ -5230,7 +5258,7 @@ const InfusionManager = {
     async function main() {
         await loadGameData(); // Ensure data is loaded before the game starts
         CreationManager.init();
-        LogControlManager.init();
+        // LogControlManager.init() is called when Combat tab is loaded
     }
 
     document.addEventListener('DOMContentLoaded', main);
