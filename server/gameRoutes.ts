@@ -179,9 +179,9 @@ function getBuildingIcon(featureType: string): string {
     'Sanctuary': '🆘',
     'Armory': '⚔️', 
     'Arcanum': '🔮',
-    'AetheriumConduit': '💎',
+    'AetheriumConduit': '🏧',  // Bank/ATM
     'Teleporter': '🌀',
-    'GemCrucible': '🏧'
+    'GemCrucible': '💎'        // Gem/Diamond
   };
   return buildingIcons[featureType] || '👹';
 }

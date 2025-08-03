@@ -116,13 +116,13 @@ const ZonePage: React.FC = () => {
           alert('🔮 Arcanum: Magic items and spells! (Not implemented yet)');
           break;
         case 'AetheriumConduit':
-          alert('💎 Aetherium Conduit: Bank services! (Not implemented yet)');
+          alert('🏧 Aetherium Conduit: Bank services! (Not implemented yet)');
           break;
         case 'Teleporter':
           alert('🌀 Teleporter: Fast travel to other zones! (Not implemented yet)');
           break;
         case 'GemCrucible':
-          alert('🏧 Gem Crucible: Socket gems into equipment! (Not implemented yet)');
+          alert('💎 Gem Crucible: Socket gems into equipment! (Not implemented yet)');
           break;
         default:
           alert('👹 Monster Zone: Prepare for battle!');
@@ -248,9 +248,9 @@ const ZonePage: React.FC = () => {
                 <div>🆘 Sanctuary - Healing</div>
                 <div>⚔️ Armory - Weapons & Armor</div>
                 <div>🔮 Arcanum - Magic & Spells</div>
-                <div>💎 Aetherium Conduit - Banking</div>
+                <div>🏧 Aetherium Conduit - Banking</div>
                 <div>🌀 Teleporter - Fast Travel</div>
-                <div>🏧 Gem Crucible - Gem Socketing</div>
+                <div>💎 Gem Crucible - Gem Socketing</div>
                 <div>👹 Monster Zone - Combat</div>
                 <div>🟠 You - Player Position</div>
               </div>
