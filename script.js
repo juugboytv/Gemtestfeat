@@ -1743,12 +1743,12 @@ const EquipmentManager = {
                 console.log(`Feature ${index + 1}: ${feature.type} at (${feature.q}, ${feature.r}) - key: "${key}"`);
                 
                 if (this.grid.has(key)) {
-                    const featureInfo = this.getFeatureInfo(feature.type);
-                    console.log(`  → Placing ${feature.type} with icon ${featureInfo.icon}`);
+                    console.log(`  → Placing ${feature.type} at grid position ${key}`);
                     this.grid.get(key).feature = {
-                        name: feature.name || featureInfo.name,
-                        icon: featureInfo.icon,
-                        type: feature.type
+                        type: feature.type,  // This is what drawHex looks for
+                        name: feature.name || feature.type,
+                        q: feature.q,
+                        r: feature.r
                     };
                 } else {
                     console.log(`  → WARNING: Grid position ${key} does not exist! (Feature: ${feature.type})`);
@@ -2047,6 +2047,9 @@ const EquipmentManager = {
                 // Handle both server data format (feature.type) and legacy format (feature.name/feature.icon)
                 const featureType = feature.type || feature.name || 'Unknown';
                 const fullFeatureInfo = this.getFeatureInfo(featureType);
+                
+                // Debug output to see what we're drawing
+                console.log(`Drawing hex with feature:`, feature, `-> Using fallback: "${fullFeatureInfo.fallback}" in color: ${fullFeatureInfo.color}`);
                 
                 // Use text fallback for reliable display
                 this.ctx.font = `bold ${Math.max(10, size * 1.0)}px Arial, sans-serif`;
