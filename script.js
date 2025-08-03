@@ -1925,6 +1925,23 @@ const EquipmentManager = {
                 console.log(`Total non-monster features: ${featureCount}`);
             };
             
+            // DEBUG: Add immediate diagnostic function
+            window.debugFeatures = () => {
+                console.log('=== FEATURE DEBUG ===');
+                console.log('Current grid size:', this.grid.size);
+                console.log('Grid entries:');
+                this.grid.forEach((hex, key) => {
+                    if (hex.feature) {
+                        console.log(`  ${key}: ${hex.feature.type || hex.feature.name} (${hex.feature.icon || 'no icon'})`);
+                    }
+                });
+                
+                // Force a redraw
+                console.log('Forcing redraw...');
+                this.draw();
+                console.log('=== END DEBUG ===');
+            };
+            
             // Fix async zone loading in force change
             window.forceZoneChangeAsync = async (zoneId) => {
                 console.log(`Forcing zone change to ${zoneId}`);
@@ -2169,11 +2186,11 @@ const EquipmentManager = {
                 
                 switch (featureType) {
                     case 'Armory':
-                        displayChar = 'A';  // A for Armory (Weapon/Armor Shop)
+                        displayChar = '⚔️';  // Sword emoji for Armory (Weapon/Armor Shop)
                         displayColor = '#F44336';
                         break;
                     case 'Arcanum':
-                        displayChar = 'M';  // M for Magic/Arcanum (Spell Shop)
+                        displayChar = '🔮';  // Crystal ball emoji for Arcanum (Spell Shop)
                         displayColor = '#9C27B0';
                         break;
                     case 'Revive Station':
@@ -2181,7 +2198,7 @@ const EquipmentManager = {
                         displayColor = '#4CAF50';
                         break;
                     case 'Teleporter':
-                        displayChar = 'T';  // T for Teleporter
+                        displayChar = '🌀';  // Cyclone emoji for Teleporter
                         displayColor = '#2196F3';
                         break;
                     case 'Bank':
@@ -2191,6 +2208,23 @@ const EquipmentManager = {
                     case 'Monster Zone':
                         displayChar = '•';
                         displayColor = '#757575';
+                        break;
+                    // Add legacy compatibility for any remaining old format features
+                    case 'Sanctuary':
+                        displayChar = '🆘';  // SOS emoji for Sanctuary (alias for Revive Station)
+                        displayColor = '#4CAF50';
+                        break;
+                    case 'Weapons/Combat Shop':
+                        displayChar = '⚔️';  // Sword emoji for legacy weapon shop
+                        displayColor = '#F44336';
+                        break;
+                    case 'Magic/Accessories Shop':
+                        displayChar = '🔮';  // Crystal ball emoji for legacy magic shop
+                        displayColor = '#9C27B0';
+                        break;
+                    case 'Teleport Zone':
+                        displayChar = '🌀';  // Cyclone emoji for legacy teleport
+                        displayColor = '#2196F3';
                         break;
                     default:
                         console.log(`Unknown feature type: "${featureType}" - using fallback`);
@@ -2207,6 +2241,9 @@ const EquipmentManager = {
                                /[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/u.test(displayChar);
                 
                 console.log(`Is emoji: ${isEmoji} for character: "${displayChar}"`)
+                
+                // IMMEDIATE DEBUG - Log every render call to console
+                console.log(`RENDERING: "${displayChar}" (emoji: ${isEmoji}) at canvas position (${cx}, ${cy})`);
                 
                 if (isEmoji) {
                     // For emojis, use larger size and comprehensive emoji font fallback
