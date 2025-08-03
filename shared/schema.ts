@@ -349,3 +349,74 @@ export type Gem = typeof gems.$inferSelect;
 export type InsertGem = z.infer<typeof insertGemSchema>;
 export type ShadowItem = typeof shadowItems.$inferSelect;
 export type InsertShadowItem = z.infer<typeof insertShadowItemSchema>;
+
+// Zones table - all 101 zones with complete data
+export const zones = pgTable('zones', {
+  id: serial('id').primaryKey(),
+  zoneId: integer('zone_id').notNull().unique(), // 1-101
+  name: text('name').notNull(),
+  description: text('description'),
+  gridSize: integer('grid_size').notNull().default(4),
+  levelRequirement: integer('level_requirement').notNull().default(1),
+  theme: text('theme'), // molten, frost, shadow, etc.
+  features: jsonb('features').notNull(), // Building and monster zone layouts
+  unlocked: boolean('unlocked').default(true),
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
+// Monsters table - all monsters for all zones
+export const monsters = pgTable('monsters', {
+  id: serial('id').primaryKey(),
+  zoneId: integer('zone_id').notNull().references(() => zones.zoneId),
+  monsterId: text('monster_id').notNull(), // Z01-E01, Z01-E02, etc.
+  name: text('name').notNull(),
+  level: integer('level').notNull(),
+  
+  // Core stats
+  health: integer('health').notNull(),
+  attack: integer('attack').notNull(),
+  defense: integer('defense').notNull(),
+  
+  // Rewards
+  experienceReward: integer('experience_reward').notNull(),
+  goldReward: integer('gold_reward').notNull(),
+  
+  // Special properties
+  isBoss: boolean('is_boss').default(false),
+  isBonusBoss: boolean('is_bonus_boss').default(false), // 24h Bonus bosses
+  
+  // Drop tables and special mechanics
+  dropTable: jsonb('drop_table'), // Item drop definitions
+  specialAbilities: jsonb('special_abilities'), // Combat abilities
+  
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
+// Zone relations
+export const zonesRelations = relations(zones, ({ many }) => ({
+  monsters: many(monsters),
+}));
+
+export const monstersRelations = relations(monsters, ({ one }) => ({
+  zone: one(zones, {
+    fields: [monsters.zoneId],
+    references: [zones.zoneId],
+  }),
+}));
+
+// Zone and monster schemas
+export const insertZoneSchema = createInsertSchema(zones).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertMonsterSchema = createInsertSchema(monsters).omit({
+  id: true,
+  createdAt: true,
+});
+
+// Zone and monster types
+export type Zone = typeof zones.$inferSelect;
+export type InsertZone = z.infer<typeof insertZoneSchema>;
+export type Monster = typeof monsters.$inferSelect;
+export type InsertMonster = z.infer<typeof insertMonsterSchema>;
