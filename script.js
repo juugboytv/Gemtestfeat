@@ -1,4 +1,7 @@
 
+    // --- VERSION STAMP FOR CACHE BUSTING ---
+    console.log('🚨 SCRIPT VERSION: 2025-01-03-15:56 - Building Icon Fix');
+    
     // --- App State & Config ---
     let state = {
         player: {}, 
@@ -1663,7 +1666,7 @@ const EquipmentManager = {
             
             // Use server zone data if available
             if (serverZoneData && serverZoneData.features) {
-                console.log('Using server zone data for map generation:', serverZoneData);
+                console.log('🚀 CONFIRMED: Using server zone data for map generation:', serverZoneData);
                 
                 // Clear existing grid
                 this.grid.clear();
@@ -1684,8 +1687,8 @@ const EquipmentManager = {
                 }
                 
                 // Apply features from server data
-                console.log('Applying server features:', serverZoneData.features.length, 'features to apply');
-                console.log('Grid size after generation:', this.grid.size, 'hexes');
+                console.log('🔧 FEATURE APPLICATION: Applying server features:', serverZoneData.features.length, 'features to apply');
+                console.log('🔧 GRID INFO: Grid size after generation:', this.grid.size, 'hexes');
                 
                 serverZoneData.features.forEach(feature => {
                     const key = `${feature.q},${feature.r}`;
@@ -1694,14 +1697,15 @@ const EquipmentManager = {
                     
                     if (this.grid.has(key)) {
                         const featureInfo = this.getFeatureInfo(feature.type);
+                        console.log(`🔍 FEATURE DEBUG: ${feature.type} -> ${featureInfo.name} (${featureInfo.icon})`);
                         this.grid.get(key).feature = {
                             name: feature.name || featureInfo.name,
                             icon: featureInfo.icon,
                             type: feature.type
                         };
-                        console.log(`✓ Applied server feature at (${feature.q},${feature.r}): ${featureInfo.name} ${featureInfo.icon}`);
+                        console.log(`✅ APPLIED: ${feature.type} at (${feature.q},${feature.r}) = ${featureInfo.icon}`);
                     } else {
-                        console.log(`✗ Grid key "${key}" not found. Available keys:`, Array.from(this.grid.keys()).slice(0, 5));
+                        console.log(`❌ MISSING KEY: "${key}" not in grid. Available:`, Array.from(this.grid.keys()).slice(0, 3));
                     }
                 });
                 
@@ -1908,13 +1912,20 @@ const EquipmentManager = {
             this.ctx.stroke(); 
             
             if (feature) { 
-                this.ctx.font = `${size * 1.5}px sans-serif`; 
+                // Use emoji-compatible font stack to ensure building icons display properly
+                this.ctx.font = `${size * 1.5}px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif`; 
                 this.ctx.textAlign = 'center'; 
                 this.ctx.textBaseline = 'middle'; 
                 this.ctx.fillStyle = 'white';
                 this.ctx.fillText(feature.icon, cx, cy); 
             } 
-        }, drawPlayer(cx, cy) { this.ctx.font = `${this.hexSize * 1.5}px sans-serif`; this.ctx.textAlign = 'center'; this.ctx.textBaseline = 'middle'; this.ctx.fillText('🟠', cx, cy); } };
+        }, drawPlayer(cx, cy) { 
+            // Use emoji-compatible font for player icon as well
+            this.ctx.font = `${this.hexSize * 1.5}px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif`; 
+            this.ctx.textAlign = 'center'; 
+            this.ctx.textBaseline = 'middle'; 
+            this.ctx.fillText('🟠', cx, cy); 
+        } };
     const BankManager = { isInitialized: false, init() { if (this.isInitialized) return; this.isInitialized = true; }, openBank() { this.renderBankUI(); }, renderBankUI() { const contentHTML = ` <div id="bank-content" class="p-4 text-center"> <div class="grid grid-cols-2 gap-4 mb-4 text-lg"> <div> <div class="text-sm text-gray-400 font-orbitron">Your Gold</div> <div id="bank-player-gold" class="font-bold text-yellow-400 font-orbitron">${state.player.gold.toLocaleString()}</div> </div> <div> <div class="text-sm text-gray-400 font-orbitron">Banked Gold</div> <div id="bank-vault-gold" class="font-bold text-yellow-400 font-orbitron">${state.player.bankGold.toLocaleString()}</div> </div> </div> <input type="number" id="bank-amount-input" class="w-full p-2 rounded text-lg text-black bg-gray-200" placeholder="Enter amount..."> <div class="grid grid-cols-2 gap-2 mt-4"> <button id="bank-deposit-btn" class="glass-button py-2 rounded-md">Deposit</button> <button id="bank-withdraw-btn" class="glass-button py-2 rounded-md">Withdraw</button> </div> </div> `; ModalManager.show('Bank Vault', contentHTML, { onContentReady: (contentDiv) => { contentDiv.querySelector('#bank-deposit-btn').addEventListener('click', () => this.handleTransaction('deposit')); contentDiv.querySelector('#bank-withdraw-btn').addEventListener('click', () => this.handleTransaction('withdraw')); } }); }, handleTransaction(type) { const input = document.getElementById('bank-amount-input'); const amount = parseInt(input.value); if (isNaN(amount) || amount <= 0) { showToast("Please enter a valid amount.", true); return; } if (type === 'deposit') { if (amount > state.player.gold) { showToast("You don't have enough gold to deposit.", true); return; } state.player.gold -= amount; state.player.bankGold += amount; showToast(`Deposited ${amount.toLocaleString()} gold.`); } else if (type === 'withdraw') { if (amount > state.player.bankGold) { showToast("You don't have enough gold in the bank.", true); return; } state.player.bankGold -= amount; state.player.gold += amount; showToast(`Withdrew ${amount.toLocaleString()} gold.`); } input.value = ''; ProfileManager.updateAllProfileUI(); document.getElementById('bank-player-gold').textContent = state.player.gold.toLocaleString(); document.getElementById('bank-vault-gold').textContent = state.player.bankGold.toLocaleString(); } };
     const ShopManager = { isInitialized: false, init() { if (this.isInitialized) return; this.isInitialized = true; }, openShop(shopType) { const contentHTML = ` <div class="p-4 text-center"> <h3 class="font-orbitron text-lg mb-2">Welcome to the ${shopType} Shop!</h3> <p class="text-gray-400">Shop functionality is not yet implemented.</p> <div class="mt-4"> <div class="shop-item-row"> <span>Item Name</span> <span>Description</span> <span>Price</span> </div> <div class="shop-item-row"> <span>Placeholder Item</span> <span>A nice placeholder.</span> <span class="text-yellow-400">100g</span> </div> </div> </div> `; ModalManager.show(`${shopType.charAt(0).toUpperCase() + shopType.slice(1)} Shop`, contentHTML); } };
 
