@@ -23,7 +23,7 @@ export interface ZoneBlueprint {
 export const ZONE_BLUEPRINTS: Record<string, ZoneBlueprint> = {
   // Starter Zones (1-5)
   "1": {
-    name: "Crystal Caves",
+    name: "Crystal Caves (Dwarf)",
     gridSize: 4,
     description: "A shimmering cavern filled with glowing crystals. Perfect for new adventurers.",
     difficulty: 1,
@@ -40,7 +40,7 @@ export const ZONE_BLUEPRINTS: Record<string, ZoneBlueprint> = {
   },
   
   "2": {
-    name: "Whispering Woods",
+    name: "Elvenwood (Elf)",
     gridSize: 5,
     description: "Ancient trees that seem to murmur secrets to those who listen.",
     difficulty: 2,
@@ -56,7 +56,7 @@ export const ZONE_BLUEPRINTS: Record<string, ZoneBlueprint> = {
   },
 
   "3": {
-    name: "Ember Peaks",
+    name: "Shifting Maze (Halfling)",
     gridSize: 4,
     description: "Volcanic peaks where the earth breathes fire and ash.",
     difficulty: 3,
@@ -72,7 +72,7 @@ export const ZONE_BLUEPRINTS: Record<string, ZoneBlueprint> = {
   },
 
   "4": {
-    name: "Frost Hollow",
+    name: "Arid Badlands (Human)",
     gridSize: 5,
     description: "An eternally frozen valley where ice spirits dance.",
     difficulty: 4,
@@ -88,7 +88,7 @@ export const ZONE_BLUEPRINTS: Record<string, ZoneBlueprint> = {
   },
 
   "5": {
-    name: "Shadowmere",
+    name: "Glimmering Springs (Gnome)",
     gridSize: 6,
     description: "A misty realm where shadows take physical form.",
     difficulty: 5,
