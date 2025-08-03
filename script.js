@@ -1727,12 +1727,10 @@ const EquipmentManager = {
                 for (let r = -gridSize; r <= gridSize; r++) {
                     const s = -q - r;
                     if (s >= -gridSize && s <= gridSize) {
-                        // Default all hexes to Monster Zones with different icons per zone for visual variety
-                        const zoneIcons = ['◻️', '🔲', '⬜', '🟫', '🟪', '🟦'];
-                        const iconIndex = parseInt(zoneId) % zoneIcons.length;
+                        // Default all hexes to Monster Zones with simple icon
                         this.grid.set(`${q},${r}`, { 
                             q, r, s, 
-                            feature: { name: 'Monster Zone', icon: zoneIcons[iconIndex] } 
+                            feature: { name: 'Monster Zone', icon: '◻️' } 
                         });
                     }
                 }
@@ -1762,7 +1760,10 @@ const EquipmentManager = {
             console.log(`Grid generated with ${this.grid.size} hexes total`);
             showToast(`Zone Layout: ${blueprint.name} (${gridSize}x${gridSize} grid)`, false);
             
-                // Add global test functions for debugging
+            // Force redraw after loading blueprint
+            this.draw();
+            
+            // Add global test functions for debugging
             window.testZoneBlueprints = () => {
                 console.log('=== Zone Blueprint Test ===');
                 [1, 2, 3, 25].forEach(zoneId => {
@@ -1771,27 +1772,67 @@ const EquipmentManager = {
                 });
             };
             
-            window.forceZoneChange = (zoneId) => {
-                console.log(`Forcing zone change to ${zoneId}`);
+            window.testFeatureMapping = () => {
+                console.log('=== Feature Mapping Test ===');
+                const testFeatures = ['Bank', 'Armory', 'Arcanum', 'Revive Station', 'Gem Crucible', 'Teleporter', 'Sanctuary'];
+                testFeatures.forEach(type => {
+                    const info = WorldMapManager.getFeatureInfo(type);
+                    console.log(`${type} -> ${info.name} (${info.icon})`);
+                });
+            };
+            
+            window.testZoneColors = () => {
+                console.log('=== Zone Color Test ===');
+                for (let i = 1; i <= 10; i++) {
+                    const patternIndex = ((i - 1) % 5) + 1;
+                    let colorName;
+                    switch (patternIndex) {
+                        case 1: colorName = 'Red (4x4)'; break;
+                        case 2: colorName = 'Blue (5x5)'; break;
+                        case 3: colorName = 'Green (6x6)'; break;
+                        case 4: colorName = 'Yellow (7x7)'; break;
+                        case 5: colorName = 'Purple (8x8)'; break;
+                    }
+                    console.log(`Zone ${i}: Pattern ${patternIndex} -> ${colorName}`);
+                }
+            };
+            
+            window.forceZoneChange = async (zoneId) => {
+                console.log(`=== FORCE ZONE CHANGE TEST TO ${zoneId} ===`);
                 
                 // Update game state
                 state.game.currentZoneTier = parseInt(zoneId);
+                console.log(`Updated game state currentZoneTier to: ${state.game.currentZoneTier}`);
                 
-                // Load new blueprint
-                this.loadZoneBlueprint(zoneId);
+                // Load new blueprint and await it
+                await this.loadZoneBlueprint(zoneId);
                 this.playerPos = { q: 0, r: 0 };
+                
+                // Get blueprint for verification
+                const blueprint = await this.getZoneBlueprint(zoneId);
+                console.log(`Zone ${zoneId} blueprint loaded:`, blueprint);
+                
+                // Force redraw with color test
+                console.log(`Drawing zone ${zoneId} with pattern index: ${((zoneId - 1) % 5) + 1}`);
                 this.draw();
                 this.updateInteractButton();
                 
-                // Get blueprint info for toast
-                const blueprint = this.getZoneBlueprint(zoneId);
                 const zoneName = blueprint ? blueprint.name : `Zone ${zoneId}`;
                 const gridInfo = blueprint ? ` (${blueprint.gridSize}x${blueprint.gridSize})` : '';
                 
                 showToast(`Force changed to ${zoneName}${gridInfo}`, false);
-                
-                // Also update the zone display
                 ProfileManager.updateAllProfileUI();
+                
+                // Debug current grid features
+                console.log(`Current grid has ${this.grid.size} hexes`);
+                let featureCount = 0;
+                this.grid.forEach((hex, key) => {
+                    if (hex.feature && hex.feature.name !== 'Monster Zone') {
+                        featureCount++;
+                        console.log(`  Feature at ${key}: ${hex.feature.name} (${hex.feature.icon})`);
+                    }
+                });
+                console.log(`Total non-monster features: ${featureCount}`);
             };
             
             // Fix async zone loading in force change
@@ -1963,6 +2004,11 @@ const EquipmentManager = {
                     zoneColor = 'rgba(200, 50, 50, 0.7)'; // Default to red
             }
             
+            // Debug logging for color generation
+            if (Math.random() < 0.1) { // Only log 10% of the time to avoid spam
+                console.log(`Zone Color Debug: currentZoneId=${currentZoneId}, patternIndex=${patternIndex}, color=${zoneColor}`);
+            }
+            
             this.ctx.fillStyle = zoneColor;
             this.ctx.fill(); 
             this.ctx.strokeStyle = 'rgba(249, 115, 22, 0.3)'; 
@@ -1970,18 +2016,27 @@ const EquipmentManager = {
             this.ctx.stroke(); 
             
             if (feature) { 
-                // Use a better font for emoji support
-                this.ctx.font = `${size * 1.2}px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif`; 
+                // Use fallback text rendering if emoji fails
                 this.ctx.textAlign = 'center'; 
                 this.ctx.textBaseline = 'middle'; 
                 this.ctx.fillStyle = 'white';
                 
-                // Debug log the feature being drawn
-                if (feature.icon === '❓') {
-                    console.log(`Drawing unknown feature:`, feature);
-                }
+                // Try different font approaches for better emoji support
+                const fontSize = Math.max(12, size * 1.2);
+                this.ctx.font = `${fontSize}px "Noto Color Emoji", "Apple Color Emoji", "Segoe UI Emoji", system-ui, sans-serif`;
                 
-                this.ctx.fillText(feature.icon || '❓', cx, cy); 
+                // Debug and render the feature icon
+                const iconToRender = feature.icon || '?';
+                if (iconToRender === '❓' || iconToRender === '?' || !feature.icon) {
+                    // Use text fallback for failed icons
+                    this.ctx.font = `${Math.max(8, size * 0.8)}px Arial, sans-serif`;
+                    this.ctx.fillStyle = 'yellow';
+                    const fallbackText = (feature.type || feature.name || 'UNK').substring(0, 3);
+                    this.ctx.fillText(fallbackText, cx, cy);
+                    console.log(`Using text fallback for feature:`, feature, `-> "${fallbackText}"`);
+                } else {
+                    this.ctx.fillText(iconToRender, cx, cy);
+                }
             } 
         }, drawPlayer(cx, cy) { this.ctx.font = `${this.hexSize * 1.5}px sans-serif`; this.ctx.textAlign = 'center'; this.ctx.textBaseline = 'middle'; this.ctx.fillText('🟠', cx, cy); } };
     const BankManager = { isInitialized: false, init() { if (this.isInitialized) return; this.isInitialized = true; }, openBank() { this.renderBankUI(); }, renderBankUI() { const contentHTML = ` <div id="bank-content" class="p-4 text-center"> <div class="grid grid-cols-2 gap-4 mb-4 text-lg"> <div> <div class="text-sm text-gray-400 font-orbitron">Your Gold</div> <div id="bank-player-gold" class="font-bold text-yellow-400 font-orbitron">${state.player.gold.toLocaleString()}</div> </div> <div> <div class="text-sm text-gray-400 font-orbitron">Banked Gold</div> <div id="bank-vault-gold" class="font-bold text-yellow-400 font-orbitron">${state.player.bankGold.toLocaleString()}</div> </div> </div> <input type="number" id="bank-amount-input" class="w-full p-2 rounded text-lg text-black bg-gray-200" placeholder="Enter amount..."> <div class="grid grid-cols-2 gap-2 mt-4"> <button id="bank-deposit-btn" class="glass-button py-2 rounded-md">Deposit</button> <button id="bank-withdraw-btn" class="glass-button py-2 rounded-md">Withdraw</button> </div> </div> `; ModalManager.show('Bank Vault', contentHTML, { onContentReady: (contentDiv) => { contentDiv.querySelector('#bank-deposit-btn').addEventListener('click', () => this.handleTransaction('deposit')); contentDiv.querySelector('#bank-withdraw-btn').addEventListener('click', () => this.handleTransaction('withdraw')); } }); }, handleTransaction(type) { const input = document.getElementById('bank-amount-input'); const amount = parseInt(input.value); if (isNaN(amount) || amount <= 0) { showToast("Please enter a valid amount.", true); return; } if (type === 'deposit') { if (amount > state.player.gold) { showToast("You don't have enough gold to deposit.", true); return; } state.player.gold -= amount; state.player.bankGold += amount; showToast(`Deposited ${amount.toLocaleString()} gold.`); } else if (type === 'withdraw') { if (amount > state.player.bankGold) { showToast("You don't have enough gold in the bank.", true); return; } state.player.bankGold -= amount; state.player.gold += amount; showToast(`Withdrew ${amount.toLocaleString()} gold.`); } input.value = ''; ProfileManager.updateAllProfileUI(); document.getElementById('bank-player-gold').textContent = state.player.gold.toLocaleString(); document.getElementById('bank-vault-gold').textContent = state.player.bankGold.toLocaleString(); } };
