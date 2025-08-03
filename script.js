@@ -1579,7 +1579,12 @@ const EquipmentManager = {
                 logToGame("You have been defeated! You are returned to the sanctuary.", 'system'); 
                 ProfileManager.healPlayer(); 
                 WorldMapManager.playerPos = { q: 0, r: 0 }; 
-                WorldMapManager.draw(); 
+                // Only draw if WorldMapManager is properly initialized
+                if (WorldMapManager.ctx && WorldMapManager.isInitialized) {
+                    WorldMapManager.draw(); 
+                } else {
+                    console.log('Skipping draw in combat - WorldMapManager not ready');
+                }
                 WorldMapManager.updateInteractButton(); 
                 this.endCombat(); 
             }
@@ -1728,11 +1733,17 @@ const EquipmentManager = {
                 console.log(`Generated server-based grid: ${serverZoneData.name} (${gridSize}x${gridSize})`, serverZoneData.features);
                 showToast(`Zone Layout: ${serverZoneData.name} (${gridSize}x${gridSize} grid)`, false);
                 
-                // Attempt to draw only if context is ready
-                if (this.ctx && ui.miniMapCanvas) {
+                // Attempt to draw only if context and initialization are ready
+                if (this.isInitialized && this.ctx && ui.miniMapCanvas) {
                     this.draw();
                 } else {
                     console.log('Canvas not ready for initial draw, will draw when ready');
+                    // Set up a delayed retry for the draw operation
+                    setTimeout(() => {
+                        if (this.isInitialized && this.ctx && ui.miniMapCanvas) {
+                            this.draw();
+                        }
+                    }, 500);
                 }
                 return;
             }
@@ -1914,29 +1925,38 @@ const EquipmentManager = {
                 console.log('Skipping draw in movePlayer - context not ready');
             }
             this.updateInteractButton(); const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); if (currentHex && currentHex.feature && currentHex.feature.name === 'Monster Zone') { CombatManager.populateMonsterList(state.game.currentZoneTier); } else { CombatManager.clearMonsterList(); } } }, updateInteractButton() { const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); const interactKey = document.getElementById('key-interact'); if (currentHex && currentHex.feature && currentHex.feature.name !== 'Monster Zone') { interactKey.textContent = `Enter`; interactKey.style.fontSize = '14px'; } else { interactKey.textContent = 'Interact'; interactKey.style.fontSize = '16px'; } }, handleInteraction() { const currentHex = this.grid.get(`${this.playerPos.q},${this.playerPos.r}`); if (currentHex && currentHex.feature) { if (currentHex.feature.name === 'Weapons/Combat Shop') { ShopManager.openShop('armory'); } else if (currentHex.feature.name === 'Magic/Accessories Shop') { ShopManager.openShop('magic'); } else if (currentHex.feature.name === 'Bank') { BankManager.openBank(); } else if (currentHex.feature.name === 'Sanctuary') { ProfileManager.healPlayer(); } else if (currentHex.feature.name === 'Teleport Zone') { TeleportManager.showModal(); } else if (currentHex.feature.name === 'Gem Crucible') { GemCrucibleManager.openGemCrucible(); } } }, draw() { 
-            // Safety check for canvas context
-            if (!this.ctx || !ui.miniMapCanvas) { 
-                console.error('Canvas context or canvas not ready, deferring draw'); 
+            // Comprehensive safety check for canvas context and initialization
+            if (!this.isInitialized || !this.ctx || !ui.miniMapCanvas) { 
+                console.log('Canvas context or WorldMapManager not ready, deferring draw'); 
                 return; 
             } 
             
             const canvas = ui.miniMapCanvas;
             
-            // Verify canvas context is valid before using
+            // Verify canvas context is valid before using with enhanced error handling
             try {
-                this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+                if (this.ctx && typeof this.ctx.clearRect === 'function') {
+                    this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+                } else {
+                    throw new Error('Context clearRect method not available');
+                }
             } catch (error) {
-                console.error('Canvas clearRect failed:', error);
+                console.log('Canvas clearRect failed, attempting context reinitialize:', error.message);
                 // Try to reinitialize context
                 this.ctx = ui.miniMapCanvas.getContext('2d');
-                if (!this.ctx) {
-                    console.error('Failed to reinitialize canvas context');
+                if (!this.ctx || typeof this.ctx.clearRect !== 'function') {
+                    console.log('Failed to reinitialize canvas context, skipping draw');
                     return;
                 }
                 // Set font for emoji support
                 this.ctx.font = '16px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
                 // Retry clear
-                this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+                try {
+                    this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+                } catch (retryError) {
+                    console.log('Retry clearRect also failed, aborting draw');
+                    return;
+                }
             }
             
             const centerX = canvas.width / 2; 
