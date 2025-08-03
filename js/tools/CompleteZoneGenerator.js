@@ -110,16 +110,17 @@ class CompleteZoneGenerator {
 
     generateStandardFeatures(gridSize) {
         return [
-            { type: "Sanctuary", q: 0, r: 0 },               // 🆘 Center sanctuary 
-            { type: "AetheriumConduit", q: -1, r: -1 },      // 🌀 AetheriumConduit
-            { type: "Arcanum", q: 1, r: -1 },                // 🔮 Arcanum
-            { type: "Bank", q: -1, r: 1 },                   // 🏧 Bank
-            { type: "Armory", q: 1, r: 1 },                  // ⚔️ Armory
-            { type: "Gem Node", q: 0, r: 2 },                // 💎 Gem Node
-            { type: "Teleporter", q: 2, r: 0 },              // Teleporter
+            { type: "Sanctuary", q: 0, r: 0 },               // 🆘 Revive
+            { type: "Bank", q: -1, r: -1 },                  // 🏧 Bank
+            { type: "Arcanum", q: 1, r: -1 },                // 🔮 Spell shop
+            { type: "Armory", q: -1, r: 1 },                 // ⚔️ Armor/weapon shop
+            { type: "AetheriumConduit", q: 1, r: 1 },        // 🌀 Teleporter
+            { type: "Gem Node", q: 0, r: 2 },                // 💎 Gem crucible
             { type: "Monster Zone", q: -2, r: 0 },           // Monster areas
             { type: "Monster Zone", q: 0, r: -2 },
-            { type: "Boss Arena", q: 1, r: 1, name: "Boss Chamber" },
+            { type: "Monster Zone", q: 2, r: -2 },
+            { type: "Monster Zone", q: -2, r: 2 },
+            { type: "Boss Arena", q: 2, r: 0, name: "Boss Chamber" },
             { type: "Resource Node", q: -1, r: 2, name: "Rare Resource" }
         ];
     }
