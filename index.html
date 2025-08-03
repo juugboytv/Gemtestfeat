@@ -805,10 +805,32 @@
                     
                     <section id="navigation-panel" class="flex-1 flex justify-end">
                         <div class="flex items-center gap-2">
-                            <div id="mini-map-container" class="relative w-24 h-24" title="World Map">
+                            <!-- Phase 1: Canvas hidden, using navigation instead -->
+                            <div id="mini-map-container" class="relative w-24 h-24" title="World Map" style="display: none;">
                                  <div class="absolute -inset-1 rounded-full border border-dashed border-orange-500/30 animate-spin" style="animation-duration: 20s; animation-timing-function: linear;"></div>
                                 <div class="relative w-full h-full rounded-full overflow-hidden glass-panel border-2 border-[var(--border-color-main)]">
                                    <canvas id="mini-map-canvas"></canvas>
+                                </div>
+                            </div>
+                            
+                            <!-- Temporary Navigation Panel -->
+                            <div id="temp-navigation" class="glass-panel p-2 rounded-lg border border-orange-500/30">
+                                <h4 class="text-xs font-orbitron text-orange-400 text-center mb-1">Navigation</h4>
+                                <div class="grid grid-cols-3 gap-1 text-xs">
+                                    <div></div>
+                                    <button id="nav-north" class="glass-button px-1 py-1 text-xs">↑</button>
+                                    <div></div>
+                                    
+                                    <button id="nav-west" class="glass-button px-1 py-1 text-xs">←</button>
+                                    <div class="text-center text-orange-400 font-bold py-1 text-xs">🚶</div>
+                                    <button id="nav-east" class="glass-button px-1 py-1 text-xs">→</button>
+                                    
+                                    <div></div>
+                                    <button id="nav-south" class="glass-button px-1 py-1 text-xs">↓</button>
+                                    <div></div>
+                                </div>
+                                <div id="current-location" class="text-center mt-1 text-xs text-gray-400">
+                                    Loading...
                                 </div>
                             </div>
                             <div class="flex flex-col items-center gap-1">

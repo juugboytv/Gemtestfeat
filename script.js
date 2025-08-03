@@ -3292,4 +3292,38 @@ const InfusionManager = {
     }
 
     document.addEventListener('DOMContentLoaded', main);
+    
+    // Phase 1: Add navigation button functionality
+    document.addEventListener('DOMContentLoaded', () => {
+        const navButtons = {
+            'nav-north': () => WorldMapManager.movePlayer(0, -1),
+            'nav-south': () => WorldMapManager.movePlayer(0, 1),
+            'nav-west': () => WorldMapManager.movePlayer(-1, 0),
+            'nav-east': () => WorldMapManager.movePlayer(1, 0)
+        };
+        
+        Object.entries(navButtons).forEach(([id, action]) => {
+            const button = document.getElementById(id);
+            if (button) {
+                button.addEventListener('click', action);
+            }
+        });
+        
+        // Update location display
+        const updateLocationDisplay = () => {
+            const locationDiv = document.getElementById('current-location');
+            if (locationDiv && WorldMapManager.grid) {
+                const pos = WorldMapManager.playerPos;
+                const currentHex = WorldMapManager.grid.get(`${pos.q},${pos.r}`);
+                if (currentHex && currentHex.feature) {
+                    locationDiv.textContent = `${currentHex.feature.icon} ${currentHex.feature.name}`;
+                } else {
+                    locationDiv.textContent = `Monster Zone (${pos.q}, ${pos.r})`;
+                }
+            }
+        };
+        
+        // Update location every 2 seconds
+        setInterval(updateLocationDisplay, 2000);
+    });
 
