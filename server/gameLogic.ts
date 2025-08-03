@@ -140,68 +140,27 @@ export class GameLogicManager {
     features.push({ type: "Sanctuary", q: 0, r: 0 });
     usedCoordinates.add("0,0");
 
-    // Core features (🆘,💎,🏧,🔮,🌀,⚔️) - ALL zones must have these 6 features
+    // CRITICAL: ALL zones must have EXACTLY these 6 core features (🏧⚔️🔮🆘💎🌀)
     const coreFeatureTypes = [
-      { type: "Bank", icon: "🏧" },           // ATM
-      { type: "Arcanum", icon: "🔮" },       // Spell shop
-      { type: "Armory", icon: "⚔️" },        // Weapon shop
-      { type: "AetheriumConduit", icon: "🌀" }, // Teleporter functionality
-      { type: "Gem Node", icon: "💎" },      // Gem crucible
-      { type: "Revive Station", icon: "🆘" } // SOS revive station
+      "Bank",              // 🏧 ATM
+      "Armory",            // ⚔️ Weapon shop  
+      "Arcanum",           // 🔮 Spell shop
+      "Revive Station",    // 🆘 SOS revive station
+      "Gem Crucible",      // 💎 Gem shop
+      "Teleporter"         // 🌀 Zone teleporter
     ];
 
     // Use zone ID to seed different patterns for consistent but unique layouts
     const baseSeed = zoneId * 7 + 13;
     let seedCounter = 0;
     
-    for (const feature of coreFeatureTypes) {
+    // Place each of the 6 required core features
+    for (const featureType of coreFeatureTypes) {
       const coords = this.generateUniqueCoordinates(gridSize, usedCoordinates, baseSeed + seedCounter++);
-      features.push({ type: feature.type, q: coords.q, r: coords.r });
+      features.push({ type: featureType, q: coords.q, r: coords.r });
     }
 
-    // Add main teleporter (separate from AetheriumConduit)
-    const teleporterCoords = this.generateUniqueCoordinates(gridSize, usedCoordinates, baseSeed + seedCounter++);
-    features.push({ type: "Teleporter", q: teleporterCoords.q, r: teleporterCoords.r });
-
-    // Add monster zones - number varies by zone size
-    let monsterZoneCount = Math.min(3 + Math.floor(gridSize / 2), 8);
-    for (let i = 0; i < monsterZoneCount; i++) {
-      const coords = this.generateUniqueCoordinates(gridSize, usedCoordinates, baseSeed + seedCounter++);
-      features.push({ type: "Monster Zone", q: coords.q, r: coords.r });
-    }
-
-    // Add boss arena for larger zones
-    if (gridSize >= 5) {
-      const bossCoords = this.generateUniqueCoordinates(gridSize, usedCoordinates, baseSeed + seedCounter++);
-      const bossNames = [
-        "Ancient Guardian", "Shadow Lord", "Crystal Titan", "Void Beast", "Elemental Core",
-        "Nightmare King", "Soul Reaper", "Chaos Bringer", "Time Weaver", "Reality Shaper"
-      ];
-      features.push({ 
-        type: "Boss Arena", 
-        q: bossCoords.q, 
-        r: bossCoords.r, 
-        name: bossNames[zoneId % bossNames.length] 
-      });
-    }
-
-    // Add resource nodes for variety
-    let resourceNodeCount = Math.min(1 + Math.floor(gridSize / 3), 4);
-    const resourceNames = [
-      "Mystic Ore", "Ancient Relic", "Power Crystal", "Ethereal Essence", "Void Fragment",
-      "Time Shard", "Reality Stone", "Soul Gem", "Chaos Fragment", "Divine Essence"
-    ];
-    
-    for (let i = 0; i < resourceNodeCount; i++) {
-      const coords = this.generateUniqueCoordinates(gridSize, usedCoordinates, baseSeed + seedCounter++);
-      features.push({ 
-        type: "Resource Node", 
-        q: coords.q, 
-        r: coords.r, 
-        name: resourceNames[(zoneId + i) % resourceNames.length]
-      });
-    }
-
+    console.log(`Zone ${zoneId} generated with ${features.length} features:`, features.map(f => f.type));
     return { gridSize, features };
   }
 
