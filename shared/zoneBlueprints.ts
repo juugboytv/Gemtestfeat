@@ -5,7 +5,7 @@
  */
 
 export interface ZoneFeature {
-  type: 'Sanctuary' | 'Armory' | 'Arcanum' | 'AetheriumConduit' | 'Teleporter' | 'Monster Zone' | 'Resource Node' | 'Boss Arena';
+  type: 'Sanctuary' | 'Bank' | 'Armory' | 'Arcanum' | 'AetheriumConduit' | 'Teleporter' | 'Monster Zone' | 'Resource Node' | 'Boss Arena' | 'Gem Node';
   q: number; // Column (horizontal position) 
   r: number; // Row (diagonal position)
   name?: string; // Optional custom name for the feature
@@ -20,91 +20,192 @@ export interface ZoneBlueprint {
   difficulty?: number; // Zone difficulty level
 }
 
+// Standardized starter zone features: All 24 starter zones have these core features
+// 🆘 Sanctuary, 🏧 Bank, 🔮 Arcanum, ⚔️ Armory, 🌀 AetheriumConduit, 💎 Gem Node
+const starterZoneFeatures: ZoneFeature[] = [
+  { type: "Sanctuary", q: 0, r: 0 },      // 🆘 Center sanctuary for safety
+  { type: "Bank", q: -1, r: -1 },         // 🏧 Bank for item storage
+  { type: "Arcanum", q: 1, r: -1 },       // 🔮 Arcanum for magic services
+  { type: "Armory", q: -1, r: 1 },        // ⚔️ Armory for equipment
+  { type: "AetheriumConduit", q: 1, r: 1 }, // 🌀 AetheriumConduit for energy
+  { type: "Gem Node", q: 0, r: 2 },       // 💎 Gem Node for gem collection
+  { type: "Teleporter", q: 2, r: 0 },     // Portal for zone travel
+  { type: "Monster Zone", q: -2, r: 0 },  // Monster areas for combat
+  { type: "Monster Zone", q: 0, r: -2 }   // Additional monster area
+];
+
 export const ZONE_BLUEPRINTS: Record<string, ZoneBlueprint> = {
-  // Starter Zones (1-5)
+  // === STARTER ZONES (1-24) - All have standardized features ===
   "1": {
     name: "Crystal Caves (Dwarf)",
     gridSize: 4,
     description: "A shimmering cavern filled with glowing crystals. Perfect for new adventurers.",
     difficulty: 1,
-    features: [
-      { type: "Sanctuary", q: -2, r: 0 },
-      { type: "Armory", q: 1, r: -1 },
-      { type: "Arcanum", q: 1, r: 1 },
-      { type: "AetheriumConduit", q: 2, r: 0 },
-      { type: "Teleporter", q: 0, r: 2 },
-      { type: "Monster Zone", q: -1, r: -1 },
-      { type: "Monster Zone", q: 0, r: -2 },
-      { type: "Resource Node", q: -1, r: 2, name: "Crystal Deposit" }
-    ]
+    features: [...starterZoneFeatures, { type: "Resource Node", q: -1, r: 2, name: "Crystal Deposit" }]
   },
-  
   "2": {
     name: "Elvenwood (Elf)",
-    gridSize: 5,
-    description: "Ancient trees that seem to murmur secrets to those who listen.",
-    difficulty: 2,
-    features: [
-      { type: "Sanctuary", q: 0, r: 0 },
-      { type: "Armory", q: -2, r: 2 },
-      { type: "Teleporter", q: 3, r: -1 },
-      { type: "Monster Zone", q: -1, r: -2 },
-      { type: "Monster Zone", q: 1, r: 1 },
-      { type: "Monster Zone", q: 2, r: -2 },
-      { type: "Resource Node", q: -3, r: 1, name: "Moonwell Spring" }
-    ]
+    gridSize: 4,
+    description: "Ancient elven forest filled with magical energy.",
+    difficulty: 1,
+    features: [...starterZoneFeatures, { type: "Resource Node", q: -1, r: 2, name: "Moonwell Spring" }]
   },
-
   "3": {
     name: "Shifting Maze (Halfling)",
     gridSize: 4,
-    description: "Volcanic peaks where the earth breathes fire and ash.",
-    difficulty: 3,
-    features: [
-      { type: "Sanctuary", q: -1, r: -1 },
-      { type: "Arcanum", q: 2, r: -1 },
-      { type: "AetheriumConduit", q: 0, r: 2 },
-      { type: "Teleporter", q: -2, r: 2 },
-      { type: "Monster Zone", q: 1, r: 0 },
-      { type: "Monster Zone", q: 0, r: -1 },
-      { type: "Boss Arena", q: 1, r: 1, name: "Magma Lord's Chamber" }
-    ]
+    description: "A maze that changes its layout with each visit.",
+    difficulty: 1,
+    features: [...starterZoneFeatures, { type: "Boss Arena", q: -1, r: 2, name: "Maze Heart" }]
   },
-
   "4": {
     name: "Arid Badlands (Human)",
-    gridSize: 5,
-    description: "An eternally frozen valley where ice spirits dance.",
-    difficulty: 4,
-    features: [
-      { type: "Sanctuary", q: 2, r: -2 },
-      { type: "Armory", q: -1, r: 0 },
-      { type: "Teleporter", q: 0, r: 3 },
-      { type: "Monster Zone", q: -2, r: 1 },
-      { type: "Monster Zone", q: 1, r: -1 },
-      { type: "Monster Zone", q: 0, r: -2 },
-      { type: "Resource Node", q: -2, r: 3, name: "Eternal Ice" }
-    ]
+    gridSize: 4,
+    description: "Sun-scorched lands where survival is key.",
+    difficulty: 1,
+    features: [...starterZoneFeatures, { type: "Resource Node", q: -1, r: 2, name: "Oasis Well" }]
   },
-
   "5": {
     name: "Glimmering Springs (Gnome)",
-    gridSize: 6,
-    description: "A misty realm where shadows take physical form.",
-    difficulty: 5,
-    features: [
-      { type: "Sanctuary", q: -3, r: 0 },
-      { type: "Arcanum", q: 2, r: 1 },
-      { type: "AetheriumConduit", q: 0, r: -3 },
-      { type: "Teleporter", q: 3, r: -2 },
-      { type: "Monster Zone", q: -1, r: 2 },
-      { type: "Monster Zone", q: 1, r: -2 },
-      { type: "Monster Zone", q: 0, r: 1 },
-      { type: "Boss Arena", q: -1, r: -1, name: "Shadow Nexus" }
-    ]
+    gridSize: 4,
+    description: "Magical springs that glimmer with arcane energy.",
+    difficulty: 1,
+    features: [...starterZoneFeatures, { type: "Resource Node", q: -1, r: 2, name: "Arcane Spring" }]
+  },
+  "6": {
+    name: "Blazefire Wastes (Tiefling)",
+    gridSize: 4,
+    description: "Burning wastelands where fire elementals roam.",
+    difficulty: 1,
+    features: [...starterZoneFeatures, { type: "Resource Node", q: -1, r: 2, name: "Flame Geyser" }]
+  },
+  "7": {
+    name: "Abyssal Fen (Swampfolk)",
+    gridSize: 4,
+    description: "Dark swamplands shrouded in perpetual mist.",
+    difficulty: 1,
+    features: [...starterZoneFeatures, { type: "Resource Node", q: -1, r: 2, name: "Bog Heart" }]
+  },
+  "8": {
+    name: "Moss-Covered Forest (Human/Fey)",
+    gridSize: 4,
+    description: "Ancient forest where fey magic lingers.",
+    difficulty: 1,
+    features: [...starterZoneFeatures, { type: "Resource Node", q: -1, r: 2, name: "Fey Circle" }]
+  },
+  "9": {
+    name: "Cinder Barrens (Orc)",
+    gridSize: 4,
+    description: "Volcanic barrens where orcish tribes make their home.",
+    difficulty: 1,
+    features: [...starterZoneFeatures, { type: "Resource Node", q: -1, r: 2, name: "Lava Pool" }]
+  },
+  "10": {
+    name: "Echo Mountain (Dwarf/Giant)",
+    gridSize: 4,
+    description: "Towering peaks where echoes never fade.",
+    difficulty: 1,
+    features: [...starterZoneFeatures, { type: "Resource Node", q: -1, r: 2, name: "Echo Chamber" }]
+  },
+  "11": {
+    name: "Labyrinth (Minotaur)",
+    gridSize: 4,
+    description: "An ancient labyrinth guarded by minotaurs.",
+    difficulty: 1,
+    features: [...starterZoneFeatures, { type: "Boss Arena", q: -1, r: 2, name: "Minotaur Court" }]
+  },
+  "12": {
+    name: "Steppe (Centaur)",
+    gridSize: 4,
+    description: "Endless grasslands where centaur herds roam.",
+    difficulty: 1,
+    features: [...starterZoneFeatures, { type: "Resource Node", q: -1, r: 2, name: "Sacred Grove" }]
+  },
+  "13": {
+    name: "Cloud Peak (Griffin/Angel)",
+    gridSize: 4,
+    description: "Sky-high peaks where celestial beings dwell.",
+    difficulty: 1,
+    features: [...starterZoneFeatures, { type: "Resource Node", q: -1, r: 2, name: "Celestial Altar" }]
+  },
+  "14": {
+    name: "Emberfall (Phoenix)",
+    gridSize: 4,
+    description: "Volcanic region where phoenixes nest.",
+    difficulty: 1,
+    features: [...starterZoneFeatures, { type: "Boss Arena", q: -1, r: 2, name: "Phoenix Roost" }]
+  },
+  "15": {
+    name: "Glimmering Glade (Unicorn)",
+    gridSize: 4,
+    description: "Pristine glade where unicorns graze.",
+    difficulty: 1,
+    features: [...starterZoneFeatures, { type: "Resource Node", q: -1, r: 2, name: "Unicorn Spring" }]
+  },
+  "16": {
+    name: "Swamps (Baba Yaga)",
+    gridSize: 4,
+    description: "Dark swamps where the witch Baba Yaga dwells.",
+    difficulty: 1,
+    features: [...starterZoneFeatures, { type: "Boss Arena", q: -1, r: 2, name: "Baba Yaga's Hut" }]
+  },
+  "17": {
+    name: "Gravefrost Peaks (Draugr)",
+    gridSize: 4,
+    description: "Frozen peaks haunted by the undead.",
+    difficulty: 1,
+    features: [...starterZoneFeatures, { type: "Resource Node", q: -1, r: 2, name: "Frozen Tomb" }]
+  },
+  "18": {
+    name: "Sunken City of Atla (Atlantean)",
+    gridSize: 4,
+    description: "Ancient underwater city ruins.",
+    difficulty: 1,
+    features: [...starterZoneFeatures, { type: "Resource Node", q: -1, r: 2, name: "Atlantean Spire" }]
+  },
+  "19": {
+    name: "Gloomwood (Vampire)",
+    gridSize: 4,
+    description: "Dark woods where vampires hunt.",
+    difficulty: 1,
+    features: [...starterZoneFeatures, { type: "Boss Arena", q: -1, r: 2, name: "Vampire Crypt" }]
+  },
+  "20": {
+    name: "Corrupted Jungle (Shaman)",
+    gridSize: 4,
+    description: "Jungle twisted by dark shamanic magic.",
+    difficulty: 1,
+    features: [...starterZoneFeatures, { type: "Resource Node", q: -1, r: 2, name: "Corruption Heart" }]
+  },
+  "21": {
+    name: "Primal Chasm (Barbarian)",
+    gridSize: 4,
+    description: "Deep chasm where primal barbarians dwell.",
+    difficulty: 1,
+    features: [...starterZoneFeatures, { type: "Boss Arena", q: -1, r: 2, name: "Primal Arena" }]
+  },
+  "22": {
+    name: "Sunken City of Eldoria (Drow/Merfolk)",
+    gridSize: 4,
+    description: "Underwater city shared by drow and merfolk.",
+    difficulty: 1,
+    features: [...starterZoneFeatures, { type: "Resource Node", q: -1, r: 2, name: "Depths Altar" }]
+  },
+  "23": {
+    name: "Blazefire Forge (Firenewt)",
+    gridSize: 4,
+    description: "Volcanic forge where firenewts craft weapons.",
+    difficulty: 1,
+    features: [...starterZoneFeatures, { type: "Resource Node", q: -1, r: 2, name: "Forge Heart" }]
+  },
+  "24": {
+    name: "Heavenly Spires (Angel/Aasimar)",
+    gridSize: 4,
+    description: "Divine spires where angels and aasimar reside.",
+    difficulty: 1,
+    features: [...starterZoneFeatures, { type: "Resource Node", q: -1, r: 2, name: "Divine Nexus" }]
   },
 
-  // Mid-tier Zones (25, 50)
+  // === HIGHER LEVEL ZONES (25+) ===
   "25": {
     name: "Echoing Chasms",
     gridSize: 7,
@@ -143,7 +244,6 @@ export const ZONE_BLUEPRINTS: Record<string, ZoneBlueprint> = {
     ]
   },
 
-  // High-tier Zone (75)
   "75": {
     name: "Nexus of Eternity",
     gridSize: 9,
@@ -166,7 +266,6 @@ export const ZONE_BLUEPRINTS: Record<string, ZoneBlueprint> = {
     ]
   },
 
-  // Endgame Zone (101)
   "101": {
     name: "The Void Throne",
     gridSize: 10,
