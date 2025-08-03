@@ -131,6 +131,7 @@ export default function InventoryTab({ gameState, updateGameState }: InventoryTa
                 <label className="text-xs text-gray-400 block mb-1">Category</label>
                 <select className="w-full px-2 py-1 text-xs bg-gray-800 border border-gray-600 rounded text-white">
                   <option value="All">All</option>
+                  <option value="Gem Pouch">Gem Pouch</option>
                   <option value="Spell">Spell</option>
                   <option value="Melee">Melee</option>
                   <option value="Ranged">Ranged</option>
