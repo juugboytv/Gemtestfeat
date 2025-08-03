@@ -4924,7 +4924,16 @@ const WorldMapManager = {
             initializeGDD(); // Load the GDD structure
             DevSuite.init(); // Initialize the dev tools listeners
             SettingsManager.init();
-            QuestManager.init();
+            
+            // Initialize QuestManager with proper DOM readiness check
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => {
+                    QuestManager.init();
+                });
+            } else {
+                QuestManager.init();
+            }
+            
            InfusionManager.init();
 
             this.initControls();
@@ -5422,6 +5431,14 @@ const InfusionManager = {
         init() {
             if (this.isInitialized) return;
             this.isInitialized = true;
+            
+            // Ensure DOM is ready before initializing
+            if (!ui.tabContentQuest) {
+                console.warn('Quest tab not ready, deferring initialization');
+                setTimeout(() => this.init(), 100);
+                return;
+            }
+            
             this.renderQuestTab();
             this.addEventListeners();
         },
@@ -5456,6 +5473,12 @@ const InfusionManager = {
             const activeQuestsContainer = document.getElementById('active-quests');
             const streakContainer = document.getElementById('quest-streak-container');
 
+            // Safety check for quest container
+            if (!activeQuestsContainer) {
+                console.warn('Quest container not found, skipping quest update');
+                return;
+            }
+
             if (!p.activeQuests || p.activeQuests.length === 0) {
                 activeQuestsContainer.innerHTML = '<p class="text-gray-500">No active quests. Level up to find new adventures!</p>';
             } else {
@@ -5471,6 +5494,12 @@ const InfusionManager = {
                         </div>
                     </div>
                 `).join('');
+            }
+
+            // Safety check for streak container
+            if (!streakContainer) {
+                console.warn('Quest streak container not found');
+                return;
             }
 
             const multiplier = 1 + (p.questStreak * 0.1);
