@@ -1,0 +1,235 @@
+Z01-Z24
+Various Starter Zones
+1
+Z25
+Echoing Chasms
+100
+Z26
+Starfall Deserts
+110
+Z27
+The Weeping Mire
+121
+Z28
+Frozen Spirelands
+135
+Z29
+Living Mountain
+149
+Z30
+Chrono-Distorted Fields
+166
+Z31
+Whisperwind Peaks
+184
+Z32
+Corrupted Jungles
+205
+Z33
+Acidic Fens
+227
+Z34
+Bone Deserts
+253
+Z35
+The Maw
+281
+Z36
+Poisonbloom Meadows
+312
+Z37
+Storm-Wrenched Coast
+347
+Z38
+The Rusting Wastes
+386
+Z39
+Webbed Caverns
+429
+Z40
+The Scarred Peaks
+477
+Z41
+Fungal Undergrowth
+530
+Z42
+Obsidian Flats
+589
+Z43
+Quicksand Dunes
+655
+Z44
+Floating Islands
+728
+Z45
+Glass Sea
+809
+Z46
+Upside-Down Forest
+899
+Z47
+Singing Sands
+1,000
+Z48
+Aurora Borealis Caverns
+1,000
+Z49
+Gloom-Shrouded Peaks
+1,000
+Z50
+Sunken Spire City
+1,000
+Z51
+Giant Mushroom Forests
+1,000
+Z52
+Living Stone Gardens
+1,643
+Z53
+The Whispering Wastes
+2,286
+Z54
+Mirage Deserts
+2,929
+Z55
+Gravity Wells
+3,571
+Z56
+Chromatic Reefs
+4,214
+Z57
+The Endless Bridge
+4,857
+Z58
+Sky-Whale Graveyard
+5,500
+Z59
+The Weaving Caves
+6,143
+Z60
+Echoing Valley of the Giants
+6,786
+Z61
+The Glimmering Shore
+7,429
+Z62
+The Whispering Canyon
+8,071
+Z63
+Floating River
+8,714
+Z64
+The Cloud Sea
+9,357
+Z65
+Obsidian Monolith Plains
+10,000
+Z66
+The Bloodfang Jungle
+13,636
+Z67
+Sunstone Deserts
+17,272
+Z68
+The Whispering Gardens
+20,908
+Z69
+Glass Peaks
+24,544
+Z70
+Phantom Forests
+28,180
+Z71
+The Shrouded Isles
+31,816
+Z72
+Gravity-Defying Rapids
+35,452
+Z73
+The Azure Depths
+39,088
+Z74
+Crystalline Spires
+42,724
+Z75
+The Void Scar
+46,360
+Z76
+Living Labyrinth
+50,000
+Z77
+The Silent Sands
+61,111
+Z78
+Acoustic Caves
+72,222
+Z79
+The Glittering Grottos
+83,333
+Z80
+Timeworn Badlands
+94,444
+Z81
+The Canopy Kingdom
+105,555
+Z82
+The Sunken Library
+116,666
+Z83
+Chromatic Geysers
+127,777
+Z84
+The Whispering City
+138,888
+Z85
+The Labyrinthine Mangroves
+150,000
+Z86
+The Frozen Heart of the World
+161,111
+Z87
+Gelatinous Jungles
+172,222
+Z88
+The Petrified Ocean
+183,333
+Z89
+The Symphony Springs
+194,444
+Z90
+The Whispering Cliffs
+205,555
+Z91
+The Bioluminescent Bog
+216,666
+Z92
+The Stone Giant's Graveyard
+227,777
+Z93
+The Maze of Roots
+238,888
+Z94
+The Endless Plains of Glass
+250,000
+Z95
+The Whispering Temple Ruins
+267,857
+Z96
+The Crystal Ocean
+285,714
+Z97
+The Sunken Palace of the Sea King
+303,571
+Z98
+The Land of Shifting Colors
+321,428
+Z99
+The Cloud Forest of the Sky Serpents
+339,285
+Z100
+The Singing Rivers
+357,142
+Z101
+The Echoing Gorge of Lost Souls
+400,000
+
