@@ -1,7 +1,7 @@
 /**
  * ZoneBulkUpdater.js - Updates all existing zones 25-34 to use correct feature mappings
  * Fixes the icon assignments to match the game system:
- * 🏧 Bank, 🌀 AetheriumConduit (teleporter), 🔮 Arcanum (spell shop), 
+ * 🏧🏦 Bank, 🌀 Tele (teleporter), 🔮 Arcanum (spell shop), 
  * ⚔️ Armory (weapon shop), 🆘 Sanctuary (revive), 💎 Gem Node (gem crucible)
  */
 
@@ -13,13 +13,13 @@ class ZoneBulkUpdater {
     // Create updated feature set with correct mappings
     createStandardFeatures() {
         return [
-            { type: "Sanctuary", q: 0, r: 0 },           // 🆘 Revive
+            { type: "Sanctuary", q: -2, r: 0 },           // 🆘 Revive
             { type: "Bank", q: -1, r: -1 },              // 🏧 Bank
             { type: "Arcanum", q: 1, r: -1 },            // 🔮 Spell shop
             { type: "Armory", q: -1, r: 1 },             // ⚔️ Armor/weapon shop
             { type: "AetheriumConduit", q: 1, r: 1 },    // 🌀 Teleporter
             { type: "Gem Node", q: 0, r: 2 },            // 💎 Gem crucible
-            { type: "Monster Zone", q: -2, r: 0 },
+            { type: "Monster Zone", q: -3, r: 0 },
             { type: "Monster Zone", q: 0, r: -2 },
             { type: "Monster Zone", q: 2, r: -2 },
             { type: "Monster Zone", q: -2, r: 2 },

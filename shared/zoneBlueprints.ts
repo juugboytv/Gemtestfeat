@@ -24,14 +24,14 @@ export interface ZoneBlueprint {
 // Standardized starter zone features: All 24 starter zones have these core features
 // 🆘 Sanctuary, 🏧 Bank, 🔮 Arcanum, ⚔️ Armory, 🌀 AetheriumConduit, 💎 Gem Node
 const starterZoneFeatures: ZoneFeature[] = [
-  { type: "Sanctuary", q: -2, r: 0 },      // 🆘 Center sanctuary for safety
-  { type: "Bank", q: 2, r: 0 },          //  🏧 Bank for item storage
+  { type: "ReviveStation", q: -2, r: 0 },      // 🆘 For dead players to revive
+  { type: "Bank", q: 2, r: 0 },          //  🏦 Bank for item storage
   { type: "Arcanum", q: 1, r: -1 },       // 🔮 Arcanum for magic services
   { type: "Armory", q: -1, r: 1 },        // ⚔️ Armory for equipment
-  { type: "AetheriumConduit", q: 1, r: 1 }, // 🌀 AetheriumConduit for energy
-  { type: "Gem Node", q: 0, r: 2 },       // 💎 Gem Node for gem collection
-  { type: "Teleporter", q: 2, r: 0 },     // Portal for zone travel
-  { type: "Monster Zone", q: -2, r: 0 },  // Monster areas for combat
+  { type: "AetheriumConduit", q: 1, r: 1 }, // 🏧 AetheriumConduit for energy
+  
+  { type: "Teleporter", q: 2, r: 0 },     // 🌀 Portal for zone travel
+  { type: "Monster Zone", q: -3, r: 0 },  // Monster areas for combat
   { type: "Monster Zone", q: 0, r: -2 }   // Additional monster area
 ];
 

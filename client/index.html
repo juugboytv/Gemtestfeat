@@ -3307,8 +3307,8 @@ const EquipmentManager = {
                 
             if (player.hp <= 0) { 
                 player.hp = 0; 
-                logToGame("You have been defeated! You are returned to the sanctuary.", 'system'); 
-                ProfileManager.healPlayer(); 
+                logToGame("You have been defeated! Visit Tye Revival Station", 'system'); 
+                RevivalManager.RevivePlayer(); 
                 WorldMapManager.playerPos = { q: 0, r: 0 }; 
                 WorldMapManager.draw(); 
                 WorldMapManager.updateInteractButton(); 
@@ -3593,23 +3593,23 @@ const WorldMapManager = {
             this.grid.get('1,-1').feature = { name: 'Weapons/Combat Shop', icon: '⚔️' };
             this.grid.get('-1,1').feature = { name: 'Magic/Accessories Shop', icon: '🔮' };
             this.grid.get('2,0').feature = { name: 'Bank', icon: '🏧' };
-            this.grid.get('-2,0').feature = { name: 'Sanctuary', icon: '🆘' };
+            this.grid.get('-2,0').feature = { name: 'Revive Station', icon: '🆘' };
             this.grid.get('0,2').feature = { name: 'Teleport Zone', icon: '🌀' };
         }
     },
     
     getFeatureData(type, name) {
         const featureMap = {
-            'Sanctuary': { name: 'Sanctuary', icon: '🆘' },
+            'Revive Station': { name: 'Revival Station', icon: ' 🆘 ' },
             'Armory': { name: 'Weapons/Combat Shop', icon: '⚔️' },
             'Arcanum': { name: 'Magic/Accessories Shop', icon: '🔮' },
             'Bank': { name: 'Bank', icon: '🏧' },
             'Teleporter': { name: 'Teleport Zone', icon: '🌀' },
             'Monster Zone': { name: 'Monster Zone', icon: '◻️' },
-            'Resource Node': { name: name || 'Resource Node', icon: '💎' }
+           
         };
         return featureMap[type] || { name: type, icon: '❓' };
-    },
+        },
     
     setZoneTheme(zoneId) {
         // Set different hex colors based on zone
@@ -3618,8 +3618,108 @@ const WorldMapManager = {
             2: 'rgba(34, 197, 94, 0.3)',  // Green for Elvenwood (Elf)
             3: 'rgba(239, 68, 68, 0.3)',  // Red for Shifting Maze (Halfling)
             4: 'rgba(245, 158, 11, 0.3)', // Orange for Arid Badlands (Human)
-            5: 'rgba(168, 85, 247, 0.3)'  // Purple for Glimmering Springs (Gnome)
-        };
+            5: 'rgba(168, 85, 247, 0.3)',  // Purple for Glimmering Springs (Gnome)
+    6: 'rgba(59, 130, 246, 0.3)',    
+            // Blue for Blazefire Wastes (Tiefling)
+                7: 'rgba(34, 197, 94, 0.3)',     // Green for Abyssal Fen (Swampfolk)
+                8: 'rgba(239, 68, 68, 0.3)',     // Red for Moss-Covered Forest (Human/Fey)
+                9: 'rgba(245, 158, 11, 0.3)',    // Orange for Cinder Barrens (Orc)
+                10: 'rgba(168, 85, 247, 0.3)',   // Purple for Echo Mountain (Dwarf/Giant)
+                11: 'rgba(59, 130, 246, 0.3)',   // Blue for Labyrinth (Minotaur)
+                12: 'rgba(34, 197, 94, 0.3)',    // Green for Steppe (Centaur)
+                13: 'rgba(239, 68, 68, 0.3)',    // Red for Cloud Peak (Griffin/Angel)
+                14: 'rgba(245, 158, 11, 0.3)',   // Orange for Emberfall (Phoenix)
+                15: 'rgba(168, 85, 247, 0.3)',   // Purple for Glimmering Glade (Unicorn)
+                16: 'rgba(59, 130, 246, 0.3)',   // Blue for Swamps (Baba Yaga)
+                17: 'rgba(34, 197, 94, 0.3)',    // Green for Gravefrost Peaks (Draugr)
+                18: 'rgba(239, 68, 68, 0.3)',    // Red for Sunken City of Atla (Atlantean)
+                19: 'rgba(245, 158, 11, 0.3)',   // Orange for Gloomwood (Vampire)
+                20: 'rgba(168, 85, 247, 0.3)',   // Purple for Corrupted Jungle (Shaman)
+                21: 'rgba(59, 130, 246, 0.3)',   // Blue for Primal Chasm (Barbarian)
+                22: 'rgba(34, 197, 94, 0.3)',    // Green for Sunken City of Eldoria (Drow/Merfolk)
+                23: 'rgba(239, 68, 68, 0.3)',    // Red for Blazefire Forge (Firenewt)
+                24: 'rgba(245, 158, 11, 0.3)',   // Orange for Heavenly Spires (Angel/Aasimar)
+                25: 'rgba(168, 85, 247, 0.3)',   // Purple for Echoing Chasms (Level 100)
+
+            26: 'rgba(59, 130, 246, 0.3)',   // Blue for Starfall Deserts (Level-100)
+            27: 'rgba(34, 197, 94, 0.3)',    // Green for The Weeping Mire (Level-100)
+            28: 'rgba(239, 68, 68, 0.3)',    // Red for Frozen Spirelands (Level-100)
+            29: 'rgba(245, 158, 11, 0.3)',   // Orange for Living Mountain (Level-100)
+            30: 'rgba(168, 85, 247, 0.3)',   // Purple for Chrono-Distorted Fields (Level-100)
+            31: 'rgba(59, 130, 246, 0.3)',   // Blue for Whisperwind Peaks (Level-100)
+            32: 'rgba(34, 197, 94, 0.3)',    // Green for Corrupted Jungles (Level-100)
+            33: 'rgba(239, 68, 68, 0.3)',    // Red for Acidic Fens (Level-100)
+            34: 'rgba(245, 158, 11, 0.3)',   // Orange for Bone Deserts (Level-100)
+            35: 'rgba(168, 85, 247, 0.3)',   // Purple for The Maw (Level-100)
+            36: 'rgba(59, 130, 246, 0.3)',   // Blue for Poisonbloom Meadows (Level-100)
+            37: 'rgba(34, 197, 94, 0.3)',    // Green for Storm-Wrenched Coast (Level-100)
+            38: 'rgba(239, 68, 68, 0.3)',    // Red for The Rusting Wastes (Level-100)
+            39: 'rgba(245, 158, 11, 0.3)',   // Orange for Webbed Caverns (Level-100)
+            40: 'rgba(168, 85, 247, 0.3)',   // Purple for The Scarred Peaks (Level-100)
+            41: 'rgba(59, 130, 246, 0.3)',   // Blue for Fungal Undergrowth (Level-100)
+            42: 'rgba(34, 197, 94, 0.3)',    // Green for Obsidian Flats (Level-100)
+            43: 'rgba(239, 68, 68, 0.3)',    // Red for Quicksand Dunes (Level-100)
+            44: 'rgba(245, 158, 11, 0.3)',   // Orange for Floating Islands (Level-100)
+            45: 'rgba(168, 85, 247, 0.3)',   // Purple for Glass Sea (Level-100)
+            46: 'rgba(59, 130, 246, 0.3)',   // Blue for Upside-Down Forest (Level-100)
+            47: 'rgba(34, 197, 94, 0.3)',    // Green for Singing Sands (Level-100)
+            48: 'rgba(239, 68, 68, 0.3)',    // Red for Aurora Borealis Caverns (Level-100)
+            49: 'rgba(245, 158, 11, 0.3)',   // Orange for Gloom-Shrouded Peaks (Level-100)
+            50: 'rgba(168, 85, 247, 0.3)',   // Purple for Sunken Spire City (Level-100)
+            51: 'rgba(59, 130, 246, 0.3)',   // Blue for Giant Mushroom Forests (Level-100)
+            52: 'rgba(34, 197, 94, 0.3)',    // Green for Living Stone Gardens (Level-100)
+            53: 'rgba(239, 68, 68, 0.3)',    // Red for The Whispering Wastes (Level-100)
+            54: 'rgba(245, 158, 11, 0.3)',   // Orange for Mirage Deserts (Level-100)
+            55: 'rgba(168, 85, 247, 0.3)',   // Purple for Gravity Wells (Level-100)
+            56: 'rgba(59, 130, 246, 0.3)',   // Blue for Chromatic Reefs (Level-100)
+            57: 'rgba(34, 197, 94, 0.3)',    // Green for The Endless Bridge (Level-100)
+            58: 'rgba(239, 68, 68, 0.3)',    // Red for Sky-Whale Graveyard (Level-100)
+            59: 'rgba(245, 158, 11, 0.3)',   // Orange for The Weaving Caves (Level-100)
+            60: 'rgba(168, 85, 247, 0.3)',   // Purple for Echoing Valley of the Giants (Level-100)
+            61: 'rgba(59, 130, 246, 0.3)',   // Blue for The Glimmering Shore (Level-100)
+            62: 'rgba(34, 197, 94, 0.3)',    // Green for The Whispering Canyon (Level-100)
+            63: 'rgba(239, 68, 68, 0.3)',    // Red for Floating River (Level-100)
+            64: 'rgba(245, 158, 11, 0.3)',   // Orange for The Cloud Sea (Level-100)
+            65: 'rgba(168, 85, 247, 0.3)',   // Purple for Obsidian Monolith Plains (Level-100)
+            66: 'rgba(59, 130, 246, 0.3)',   // Blue for The Bloodfang Jungle (Level-100)
+            67: 'rgba(34, 197, 94, 0.3)',    // Green for Sunstone Deserts (Level-100)
+            68: 'rgba(239, 68, 68, 0.3)',    // Red for The Whispering Gardens (Level-100)
+            69: 'rgba(245, 158, 11, 0.3)',   // Orange for Glass Peaks (Level-100)
+            70: 'rgba(168, 85, 247, 0.3)',   // Purple for Phantom Forests (Level-100)
+            71: 'rgba(59, 130, 246, 0.3)',   // Blue for The Shrouded Isles (Level-100)
+            72: 'rgba(34, 197, 94, 0.3)',    // Green for Gravity-Defying Rapids (Level-100)
+            73: 'rgba(239, 68, 68, 0.3)',    // Red for The Azure Depths (Level-100)
+            74: 'rgba(245, 158, 11, 0.3)',   // Orange for Crystalline Spires (Level-100)
+            75: 'rgba(168, 85, 247, 0.3)',   // Purple for The Void Scar (Level-100)
+            76: 'rgba(59, 130, 246, 0.3)',   // Blue for Living Labyrinth (Level-100)
+            77: 'rgba(34, 197, 94, 0.3)',    // Green for The Silent Sands (Level-100)
+            78: 'rgba(239, 68, 68, 0.3)',    // Red for Acoustic Caves (Level-100)
+            79: 'rgba(245, 158, 11, 0.3)',   // Orange for The Glittering Grottos (Level-100)
+            80: 'rgba(168, 85, 247, 0.3)',   // Purple for Timeworn Badlands (Level-100)
+            81: 'rgba(59, 130, 246, 0.3)',   // Blue for The Canopy Kingdom (Level-100)
+            82: 'rgba(34, 197, 94, 0.3)',    // Green for The Sunken Library (Level-100)
+            83: 'rgba(239, 68, 68, 0.3)',    // Red for Chromatic Geysers (Level-100)
+            84: 'rgba(245, 158, 11, 0.3)',   // Orange for The Whispering City (Level-100)
+            85: 'rgba(168, 85, 247, 0.3)',   // Purple for The Labyrinthine Mangroves (Level-100)
+            86: 'rgba(59, 130, 246, 0.3)',   // Blue for The Frozen Heart of the World (Level-100)
+            87: 'rgba(34, 197, 94, 0.3)',    // Green for Gelatinous Jungles (Level-100)
+            88: 'rgba(239, 68, 68, 0.3)',    // Red for The Petrified Ocean (Level-100)
+            89: 'rgba(245, 158, 11, 0.3)',   // Orange for The Symphony Springs (Level-100)
+            90: 'rgba(168, 85, 247, 0.3)',   // Purple for The Whispering Cliffs (Level-100)
+            91: 'rgba(59, 130, 246, 0.3)',   // Blue for The Bioluminescent Bog (Level-100)
+            92: 'rgba(34, 197, 94, 0.3)',    // Green for The Stone Giant's Graveyard (Level-100)
+            93: 'rgba(239, 68, 68, 0.3)',    // Red for The Maze of Roots (Level-100)
+            94: 'rgba(245, 158, 11, 0.3)',   // Orange for The Endless Plains of Glass (Level-100)
+            95: 'rgba(168, 85, 247, 0.3)',   // Purple for The Whispering Temple Ruins (Level-100)
+            96: 'rgba(59, 130, 246, 0.3)',   // Blue for The Crystal Ocean (Level-100)
+            97: 'rgba(34, 197, 94, 0.3)',    // Green for The Sunken Palace of the Sea King (Level-100)
+            98: 'rgba(239, 68, 68, 0.3)',    // Red for The Land of Shifting Colors (Level-100)
+            99: 'rgba(245, 158, 11, 0.3)',   // Orange for The Cloud Forest of the Sky Serpents (Level-100)
+            100: 'rgba(168, 85, 247, 0.3)',  // Purple for The Singing Rivers (Level-100)
+            101: 'rgba(59, 130, 246, 0.3)'   // Blue for The Echoing Gorge of Lost Souls (Level-100)
+
+                
+              };
         this.hexColor = themes[zoneId] || 'rgba(10, 10, 10, 0.5)';
     },
     
@@ -3661,8 +3761,8 @@ const WorldMapManager = {
                 ShopManager.openShop('magic');
             } else if (currentHex.feature.name === 'Bank') {
                 BankManager.openBank();
-            } else if (currentHex.feature.name === 'Sanctuary') {
-                ProfileManager.healPlayer();
+            } else if (currentHex.feature.name === 'Revive Station') {
+                RevivalManager.reviveplayer();
             } else if (currentHex.feature.name === 'Teleport Zone') {
                 TeleportManager.showModal();
             }

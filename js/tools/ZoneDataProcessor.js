@@ -108,16 +108,16 @@ class ZoneDataProcessor {
         return zones;
     }
 
-    // Generate standardized features for each zone (all 6 icons: 🌀🔮🏧⚔️💎🆘)
+    // Generate standardized features for each zone (all 6 icons: 🌀🔮🏧⚔️🆘)
     generateStandardFeatures(gridSize) {
         const features = [
-            { type: "Sanctuary", q: 0, r: 0 },               // 🆘 Center sanctuary 
-            { type: "AetheriumConduit", q: -1, r: -1 },      // 🌀 AetheriumConduit
+            { type: "Revive Station", q: 0, r: 2 },               // 🆘 Center sanctuary 
+            { type: "AetheriumConduit", q: -1, r: -1 },      // 🏧 AetheriumConduit
             { type: "Arcanum", q: 1, r: -1 },                // 🔮 Arcanum
-            { type: "Bank", q: -1, r: 1 },                   // 🏧 Bank
+            { type: "Bank", q: -1, r: 1 },                   // 🏦 Bank
             { type: "Armory", q: 1, r: 1 },                  // ⚔️ Armory
-            { type: "Gem Node", q: 0, r: 2 },                // 💎 Gem Node
-            { type: "Teleporter", q: 2, r: 0 }               // Teleporter for travel
+            
+            { type: "Teleporter", q: 2, r: 0 }               // 🌀 Teleporter for travel
         ];
 
         // Add monster zones based on grid size
@@ -327,7 +327,7 @@ class ZoneDataProcessor {
             processedZones: this.processedZones.length,
             zoneRange: 'Z25-Z101',
             levelRequirements: `${Math.min(...this.levelRequirements.values())} - ${Math.max(...this.levelRequirements.values())}`,
-            standardFeatures: ['🌀 AetheriumConduit', '🔮 Arcanum', '🏧 Bank', '⚔️ Armory', '💎 Gem Node', '🆘 Sanctuary'],
+            standardFeatures: ['🌀 Transport', '🔮 Arcanum', '🏧 Bank-AetheriumConduit', '⚔️ Armory', '💎 Gem Node', '🆘 Sanctuary'],
             monstersPerZone: '10 regular + 1 boss = 11 total',
             ready: this.processedZones.length === 77
         };
