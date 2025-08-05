@@ -38,8 +38,21 @@ Game state is managed through React hooks and context in `GeminusGame.tsx`, enha
 - **Drizzle ORM**: ORM for type-safe database queries with PostgreSQL.
 
 # Project Organization (Updated August 2025)
-The project has been reorganized with a clean, modern structure:
-- **Active game**: `client/src/components/GeminusGame.tsx` (React-based)
+The project now offers two approaches:
+
+## Single-File Approach (Default)
+- **Main game**: `client/index.html` (6,000-line working file)
+- **Benefits**: Everything in one place, no file dependencies, easy to edit
+- **Best for**: Quick development, simple deployment
+
+## Organized Structure (Alternative)
+- **Organized game**: `client/organized/` folder with modular structure
+- **CSS split**: `styles/main.css`, `styles/themes.css`, `styles/animations.css`, `styles/components.css`
+- **JavaScript split**: Prepared for `scripts/gameState.js`, `scripts/ui.js`, `scripts/combat.js`, etc.
+- **Benefits**: Easy navigation, better debugging, team development
+- **Best for**: Complex features, multiple developers
+
+## Other Files
 - **Legacy code**: `legacy/exact_original.html` (original Google Gemini Canvas)
 - **Modular utilities**: `js/` folder with organized game modules
 - **Assets**: `legacy/original_assets/` for all uploaded game assets

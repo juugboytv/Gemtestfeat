@@ -1,0 +1,195 @@
+/* ===== COMBAT ANIMATIONS ===== */
+
+/* Pulse Animations */
+@keyframes pulse-border {
+    0%, 100% {
+        border-color: var(--border-color-main);
+        box-shadow: 0 0 15px rgba(249, 115, 22, 0.2), 0 4px 30px rgba(0, 0, 0, 0.6);
+    }
+    50% {
+        border-color: var(--border-color-pulse);
+        box-shadow: 0 0 25px rgba(239, 68, 68, 0.4), 0 4px 30px rgba(0, 0, 0, 0.6);
+    }
+}
+
+@keyframes pulse-border-cyan {
+    0%, 100% {
+        border-color: rgba(34, 211, 238, 0.4);
+        box-shadow: 0 0 15px rgba(34, 211, 238, 0.2), 0 4px 30px rgba(0, 0, 0, 0.6);
+    }
+    50% {
+        border-color: rgba(103, 232, 249, 0.7);
+        box-shadow: 0 0 25px rgba(103, 232, 249, 0.3), 0 4px 30px rgba(0, 0, 0, 0.6);
+    }
+}
+
+@keyframes pulse-main-tab-glow {
+    0%, 100% {
+        border-bottom-color: var(--highlight-orange);
+        text-shadow: 0 0 8px var(--highlight-orange);
+    }
+    50% {
+        border-bottom-color: var(--glow-red);
+        text-shadow: 0 0 12px var(--glow-red);
+    }
+}
+
+/* Combat Damage Numbers */
+@keyframes damage-number {
+    0% {
+        opacity: 1;
+        transform: translateY(0px) scale(1);
+        color: #ff4444;
+    }
+    25% {
+        transform: translateY(-20px) scale(1.2);
+        color: #ff6666;
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-80px) scale(0.8);
+        color: #ff8888;
+    }
+}
+
+@keyframes crit-damage-number {
+    0% {
+        opacity: 1;
+        transform: translateY(0px) scale(1.5);
+        color: #ffdd00;
+        text-shadow: 0 0 10px #ffdd00;
+    }
+    25% {
+        transform: translateY(-30px) scale(1.8);
+        color: #ffee44;
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-100px) scale(1);
+        color: #ffff88;
+    }
+}
+
+/* Screen Shake Effects */
+@keyframes screen-shake {
+    0%, 100% { transform: translateX(0); }
+    10% { transform: translateX(-5px); }
+    20% { transform: translateX(5px); }
+    30% { transform: translateX(-3px); }
+    40% { transform: translateX(3px); }
+    50% { transform: translateX(-2px); }
+    60% { transform: translateX(2px); }
+    70% { transform: translateX(-1px); }
+    80% { transform: translateX(1px); }
+    90% { transform: translateX(0); }
+}
+
+@keyframes damage-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+}
+
+/* Health Bar Animations */
+@keyframes health-pulse {
+    0%, 100% {
+        opacity: 0.5;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+}
+
+/* Particle Effects */
+@keyframes particle-float {
+    0% {
+        opacity: 0;
+        transform: translateY(0px) scale(0.5);
+    }
+    20% {
+        opacity: 1;
+        transform: translateY(-20px) scale(1);
+    }
+    80% {
+        opacity: 1;
+        transform: translateY(-40px) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-60px) scale(0.5);
+    }
+}
+
+@keyframes spark-effect {
+    0% {
+        opacity: 1;
+        transform: scale(0.2) rotate(0deg);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1) rotate(180deg);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.1) rotate(360deg);
+    }
+}
+
+/* Tab Glow Effects */
+@keyframes flash {
+    0% {
+        color: #fff;
+        text-shadow: 0 0 10px #fff;
+    }
+    50% {
+        color: var(--highlight-orange);
+        text-shadow: 0 0 15px var(--highlight-orange);
+    }
+    100% {
+        color: #fff;
+        text-shadow: none;
+    }
+}
+
+/* Loading Animations */
+@keyframes loading-spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Combat State Classes */
+.screen-shake {
+    animation: screen-shake 0.5s ease-out;
+}
+
+.damage-shake {
+    animation: damage-shake 0.4s ease-out;
+}
+
+.flash-update {
+    animation: flash 0.5s ease-out;
+}
+
+.damage-number {
+    position: absolute;
+    font-size: 1.2rem;
+    font-weight: bold;
+    animation: damage-number 1.5s ease-out forwards;
+    pointer-events: none;
+    z-index: 100;
+}
+
+.crit-damage-number {
+    position: absolute;
+    font-size: 1.8rem;
+    font-weight: bold;
+    animation: crit-damage-number 2s ease-out forwards;
+    pointer-events: none;
+    z-index: 100;
+}

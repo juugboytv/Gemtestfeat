@@ -1,0 +1,64 @@
+/* ===== THEME SYSTEM VARIABLES ===== */
+:root {
+    /* Active theme colors - defaults to Molten Core */
+    --highlight-orange: #f97316;
+    --glow-red: #ef4444;
+    --text-primary: #f0f0f0;
+    --text-secondary: #a0a0a0;
+    --panel-bg: rgba(20, 20, 22, 0.75);
+    --input-bg: rgba(0, 0, 0, 0.4);
+    --border-color-main: rgba(249, 115, 22, 0.4);
+    --border-color-pulse: rgba(239, 68, 68, 0.7);
+
+    /* Combat & UI Colors (PRESERVED) */
+    --color-text-health: #00BFFF; /* 🔵 */
+    --color-text-exp: #0BDA51; /* 🟢 */
+    --color-text-next-level: #BF00FF; /* 🟣 */
+    --color-text-drop: #FF7518; /* 🟠 */
+    --color-text-level: #00BFFF; /* 🔵 */
+    --color-text-gold: #EFBF04; /* 🟡 */
+    --color-text-location: #FF1D15; /* 🔴 */
+    --color-status-ok: #7CB342;
+    --color-status-warn: #FDD835;
+    --color-status-danger: #D32F2F;
+    --hp-color: #E53935;
+}
+
+/* ===== BASE STYLES ===== */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    background: #000;
+    color: var(--text-primary);
+}
+
+.font-orbitron {
+    font-family: 'Orbitron', monospace;
+}
+
+/* ===== GLASS PANEL EFFECT ===== */
+.glass-panel {
+    background: var(--panel-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color-main);
+    box-shadow: 0 0 15px rgba(249, 115, 22, 0.2), 0 4px 30px rgba(0, 0, 0, 0.6);
+}
+
+/* ===== UTILITY CLASSES ===== */
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
