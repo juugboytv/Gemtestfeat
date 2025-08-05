@@ -1,0 +1,88 @@
+
+---
+
+✅ 1. MAIN GAME FILE IDENTIFIED
+
+The currently running game is served through React + Vite:
+
+📌 Main Entry Point:
+client/src/components/GeminusGame.tsx
+
+This is embedded in:
+
+client/src/App.tsx
+
+Served via:
+
+server/index.ts + server/vite.ts
+→ serves client/index.html
+→ loads the React app (GeminusGame.tsx)
+
+
+---
+
+📦 2. Recommended Folder Structure
+
+Here’s how you should organize everything for a clean, production-ready setup:
+
+📁 root/
+│
+├── index.html                # Optional static entry (likely unused now)
+├── exact_original.html       # Preserved original Gemini canvas game code
+├── postcss.config.js
+├── tailwind.config.ts
+├── vite.config.ts
+├── drizzle.config.ts
+├── package.json
+├── package-lock.json
+├── README.md
+├── replit.md
+│
+├── client/                   # React frontend
+│   ├── index.html            # Used by Vite (root div)
+│   ├── src/
+│   │   ├── App.tsx
+│   │   ├── components/
+│   │   │   └── GeminusGame.tsx  # Main game component
+│   │   ├── assets/              # Static images, fonts, etc.
+│   │   └── styles/              # Tailwind or additional CSS files
+│   └── gameAPI.js              # Client JS API support
+│
+├── server/                   # Express backend
+│   ├── index.ts              # Main server file
+│   └── vite.ts               # Vite server integration
+│
+├── js/                       # Legacy JS files (optional, or move into client/src/utils)
+├── shared/                   # Shared interfaces or types
+├── D_attached_assets/        # External or uploaded assets
+├── style.css                 # (If still in use, move to client/src/styles)
+├── script.js / temp_script.js # (Move to js/ or delete if unused)
+├── temp_zones_35_to_101.txt  # Development notes or data
+└── components.json           # (If config, move to root or shared/)
+
+
+---
+
+🔍 3. What You Can Clean Up
+
+If index.html, script.js, style.css aren’t referenced by your React/Vite build — move them to /legacy/ or delete them.
+
+Use /client/src/assets for all images, sounds, maps, etc.
+
+Move any remaining JS utility files into /client/src/utils.
+
+
+
+---
+
+🛠️ How to Tell Replit or Collaborators:
+
+Copy-paste this:
+
+> "Please organize the project using a modern structure:
+Move React components to /client/src/components, assets to /client/src/assets, and all original Gemini game HTML files to a /legacy folder.
+Confirm GeminusGame.tsx is the main entry point served by Vite through client/index.html.
+Move old script.js, style.css, etc. to /legacy if unused, or refactor into the new React structure if still relevant."
+
+
+
