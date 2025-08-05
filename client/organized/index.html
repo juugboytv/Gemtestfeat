@@ -20,7 +20,86 @@
 </head>
 <body class="bg-black">
     <!-- Game Body Content -->
-    <div id="game-content"></div>
+    <canvas id="smoke-canvas"></canvas>
+    
+    <div id="game-container" class="h-full">
+        <div id="game-hud-screen" class="relative z-10 h-full">
+            <div class="max-w-md mx-auto h-full flex flex-col p-2 gap-2"> 
+                
+                <header id="game-section" class="glass-panel p-3 rounded-lg flex justify-between items-center flex-shrink-0">
+                    <section id="player-status-panel" class="flex-1">
+                        <div id="player-status-container" class="flex flex-col items-start space-y-2 flex-grow">
+                            <div class="flex items-center gap-4">
+                                <div>
+                                    <span class="level-label font-orbitron">Level: </span>
+                                    <span id="player-level-value" class="level-value font-orbitron">1</span>
+                                    <span id="player-name-value" class="name-value ml-2 font-orbitron">Player</span>
+                                </div>
+                                <div id="transport-controls">
+                                    <button id="zone-teleport-trigger" class="teleport-trigger-btn" title="Teleport to Zone">🌀</button>
+                                </div>
+                            </div>
+                            <div class="health-bar-container w-full max-w-[150px]">
+                                <div class="progress-bar-track h-3"><div id="hp-bar" class="progress-bar-fill h-full" style="width: 100%; background-color: var(--hp-color);"></div></div>
+                                <span id="player-health-numeric">100 / 100</span>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <section id="navigation-panel" class="flex-1 flex justify-end">
+                        <div class="flex items-center gap-2">
+                            <div id="mini-map-container" class="relative w-24 h-24" title="World Map">
+                                 <div class="absolute -inset-1 rounded-full border border-dashed border-orange-500/30 animate-spin" style="animation-duration: 20s; animation-timing-function: linear;"></div>
+                                <div class="relative w-full h-full rounded-full overflow-hidden glass-panel border-2 border-[var(--border-color-main)]">
+                                   <canvas id="mini-map-canvas"></canvas>
+                                </div>
+                            </div>
+                            <div class="flex flex-col items-center gap-1">
+                                <div id="d-pad-controls">
+                                    <div class="game-key move-key" id="key-up" data-key="up"><svg viewBox="0 0 24 24"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path></svg></div>
+                                    <div class="game-key move-key" id="key-left" data-key="left"><svg viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"></path></svg></div>
+                                    <div class="game-key move-key" id="key-down" data-key="down"><svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"></path></svg></div>
+                                    <div class="game-key move-key" id="key-right" data-key="right"><svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"></path></svg></div>
+                                </div>
+                                <div class="game-key" id="key-interact" data-key="interact">Interact</div>
+                            </div>
+                        </div>
+                    </section>
+                </header>
+                
+                <section id="main-content-panel" class="flex-grow flex flex-col overflow-hidden">
+                    <main id="main-content" class="flex-grow flex flex-col overflow-hidden glass-panel rounded-lg relative">
+
+           <div id="main-tabs-container" class="flex-shrink-0 flex items-center overflow-x-auto whitespace-nowrap custom-scrollbar-x border-b border-[var(--border-color-main)]">
+                <button class="main-tab-button active" data-tab="equipment">Equipment</button>
+                <button class="main-tab-button" data-tab="infusion">Infusion</button>
+                <button class="main-tab-button" data-tab="inventory">Inventory</button>
+                <button class="main-tab-button" data-tab="stats">Stats</button>
+                <button class="main-tab-button" data-tab="combat">Combat</button>
+                <button class="main-tab-button" data-tab="quest">Quest</button>
+                <button class="main-tab-button" data-tab="settings">Settings</button>
+            </div>
+            <div id="main-tab-content" class="flex-grow p-2 md:p-4 overflow-y-auto custom-scrollbar relative">
+                <div id="tab-content-equipment" class="main-tab-panel active"></div>
+                <div id="tab-content-infusion" class="main-tab-panel"></div>
+                <div id="tab-content-inventory" class="main-tab-panel"></div>
+                <div id="tab-content-stats" class="main-tab-panel"></div>
+                <div id="tab-content-combat" class="main-tab-panel"></div>
+                <div id="tab-content-quest" class="main-tab-panel"></div>
+                <div id="tab-content-settings" class="main-tab-panel"></div>
+
+                        </div>
+                        <button id="focus-mode-btn" title="Toggle Focus Mode">
+                            <svg id="focus-icon-expand" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 0h-4m4 0l-5-5"></path></svg>
+                            <svg id="focus-icon-collapse" class="hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
+                        </button>
+                    </main>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals and overlays will be injected here by JavaScript -->
     
     <!-- Game Scripts -->
     <script src="scripts/gameState.js"></script>
